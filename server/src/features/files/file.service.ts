@@ -1,4 +1,5 @@
 import { prisma } from '../../../lib/prisma.js';
+import fs from 'fs/promises';
 
 export class FileService {
   async uploadFile(userId: string, fileName: string, filePath: string, fileSize: number) {
@@ -58,6 +59,32 @@ async getFileForUser(fileId: string, userId: string) {
   }
 
   return file;
+}
+
+async deleteFile(fileId: string, userId: string) {
+  const file = await prisma.file.findUnique({ where: { id: fileId } });
+
+  if (!file || file.ownerId !== userId) {
+    throw new Error("File not found or access denied");
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // 1. Remove from DB
+    await tx.file.delete({ where: { id: fileId } });
+
+    // 2. Update User Storage
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        storageUsed: { decrement: file.size }
+      }
+    });
+
+    // 3. Remove from physical disk
+    await fs.unlink(file.path);
+
+    return { message: "File deleted successfully" };
+  });
 }
 
 }

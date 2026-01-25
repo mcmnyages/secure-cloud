@@ -56,4 +56,22 @@ download = async (req: Request, res: Response) => {
   }
 };
 
+delete = async (req: Request, res: Response, next: Function) => {
+  try {
+    const userId = (req as any).userId;
+    const { fileId } = req.params;
+
+    if (typeof fileId !== 'string') {
+      return res.status(400).json({ message: "Invalid file id" });
+    }
+
+    const result = await fileService.deleteFile(fileId, userId);
+    
+    res.status(200).json(result);
+  } catch (error: any) {
+    // We pass the error to the next() function to use our Global Error Handler
+    next(error); 
+  }
+};
+
 }
