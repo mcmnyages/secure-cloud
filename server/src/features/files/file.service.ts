@@ -32,4 +32,32 @@ export class FileService {
       return savedFile;
     });
   }
+
+  async listUserFiles(userId: string) {
+  return await prisma.file.findMany({
+    where: { ownerId: userId },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      name: true,
+      size: true,
+      createdAt: true,
+      // We don't return the internal 'path' for security
+    }
+  });
+}
+
+async getFileForUser(fileId: string, userId: string) {
+  const file = await prisma.file.findUnique({
+    where: { id: fileId }
+  });
+
+  // Security: Check if file exists AND belongs to the requester
+  if (!file || file.ownerId !== userId) {
+    throw new Error("File not found or access denied");
+  }
+
+  return file;
+}
+
 }

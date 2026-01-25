@@ -7,6 +7,8 @@ const router = Router();
 const fileController = new FileController();
 
 // Protected Route: Only logged-in users can upload
+router.get('/', authenticate, fileController.list);
+router.get('/download/:fileId', authenticate, fileController.download);
 router.post('/upload', authenticate, upload.single('file'), fileController.upload);
 
 export default router;
