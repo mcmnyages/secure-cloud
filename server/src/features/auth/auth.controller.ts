@@ -1,34 +1,31 @@
-import bcrypt from 'bcrypt';
-import {prisma} from '../../../lib/prisma.js';
+import type { Request, Response, NextFunction } from 'express';
+import { AuthService } from './auth.service.js';
 
-export class AuthService {
-  async registerUser(email: string, passwordRaw: string, name?: string) {
-    // 1. Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+export class AuthController {
+  private authService: AuthService;
 
-    if (existingUser) {
-      throw new Error("User with this email already exists");
-    }
-
-    // 2. Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(passwordRaw, salt);
-
-    // 3. Create the user
-    return prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name: name ?? null,
-      },
-      // Security: We "select" only what we want to return. NEVER return the password hash!
-      select: {
-        id: true,
-        email: true,
-        name: true,
-      }
-    });
+  constructor() {
+    this.authService = new AuthService();
   }
+
+  register = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password, name } = req.body;
+      const user = await this.authService.registerUser(email, password, name);
+      res.status(201).json(user);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body;
+      const result = await this.authService.loginUser(email, password);
+
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
