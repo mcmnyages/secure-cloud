@@ -3,7 +3,7 @@ import { AuthController } from './auth.controller.js';
 import { validate } from '../../middleware/validate.js';
 import { RegisterSchema, LoginSchema } from './auth.schema.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { prisma } from '../../../lib/prisma.js';
+import { prisma } from '../../lib/prisma.js';
 
 const router = Router();
 const authController = new AuthController();
