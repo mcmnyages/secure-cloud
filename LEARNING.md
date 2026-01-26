@@ -25,3 +25,22 @@
 - Explore **AWS S3** for scalable cloud storage.
 - Implement **folder-based organization** and file renaming.
 - Add **end-to-end testing** with tools like Cypress or Playwright.
+
+
+
+
+
+
+Issues 
+📔 Engineering Log: Resolving the TypeScript TS6059 Build Error
+The Problem: The TypeScript compiler (tsc) failed with error TS6059, stating that a file (in this case, prisma.ts) was not under the defined rootDir.
+
+Possible Causes Investigated:
+
+Missing Type Definitions: Thought TS2688 was the root (missing Node types), which we fixed by forcing @types/node and using --include=dev.
+
+Environment Mismatch: Thought Render was using an old Node version (fixed via NODE_VERSION variable).
+
+Folder Structure Violation: The compiler's rootDir was set to src, but the project was importing files from a lib folder located outside of src.
+
+The Solution That Worked: Moving the lib folder inside the src directory. By restructuring the project to src/lib/prisma.ts, all source code became contained within the designated rootDir. This allowed the compiler to successfully map the entire project into the dist folder without "out-of-bounds" errors.
