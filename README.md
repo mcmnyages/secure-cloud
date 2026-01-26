@@ -1,58 +1,73 @@
 # ☁️ SecureCloud MVP
 
-A professional, secure personal cloud storage solution with a 100MB storage limit, built with a modern 2026 tech stack.
-This project aims to teach me various important technologies and how to integrate them. 
-Making sure I also learn the best security pratices and also alot of testing on the application on my knowledge of cybersecurity.
-Modularixation is also another important aspect of it making sure I can expand the apllication easily without breaking and chaning alot of things- that is adding new functionalities easily or intergrating with other third party applications.
+**A modern, secure personal cloud storage solution built for learning and scalability.**
 
-## 🚀 Tech Stack
+[![GitHub](https://img.shields.io/badge/GitHub-Repo-blue)](https://github.com/mcmnyages/secure-cloud)
+[![Tech Stack](https://img.shields.io/badge/Tech-2026%20Stack-green)](https://github.com/mcmnyages/secure-cloud#-tech-stack)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
 
-### Frontend
-- **React 19 + Vite** (Fast HMR and builds)
-- **Tailwind CSS v4** (High-performance, zero-config styling)
-- **Lucide React** (Consistent iconography)
-- **Axios** (API communication with interceptors)
+---
 
-### Backend
-- **Node.js & Express** (REST API)
-- **Prisma 7** (Type-safe ORM with Postgres Adapter)
-- **PostgreSQL** (Relational database)
-- **JWT & Bcrypt** (Secure authentication & hashing)
-- **Multer** (Multipart file handling)
+## 🌟 **Project Vision**
+SecureCloud MVP is a **learning-driven** project designed to explore modern web development, cybersecurity best practices, and modular architecture. It’s a **100MB personal cloud storage** solution with a focus on **security, scalability, and maintainability**.
 
-## 🏗️ Architecture
-The project follows a **Modular Three-Tier Architecture** to ensure separation of concerns:
-- **Routes**: Handles URL mapping and validation.
-- **Controllers**: Manages HTTP request/response logic.
-- **Services**: Contains core business logic and database interactions.
+---
 
+## 🚀 **Tech Stack**
 
+### **Frontend**
+- **React 19 + Vite**: Blazing-fast builds and Hot Module Replacement (HMR).
+- **Tailwind CSS v4**: Utility-first styling for rapid, responsive UI development.
+- **Lucide React**: Sleek, consistent iconography.
+- **Axios**: Robust API communication with interceptors for request/response handling.
 
-## 🛡️ Core Features
-- **Secure Auth**: JWT-based session management.
-- **Storage Quota**: Hard 100MB limit per user enforced via database transactions.
-- **File Management**: Full CRUD (Upload, List, Download, Delete).
-- **Global Error Handling**: Centralized middleware for consistent API error responses.
-- **Validation**: Strict schema validation using Zod.
+### **Backend**
+- **Node.js & Express**: RESTful API for seamless client-server communication.
+- **Prisma 7**: Type-safe ORM with PostgreSQL for efficient database management.
+- **PostgreSQL**: Reliable relational database for structured data storage.
+- **JWT & Bcrypt**: Secure authentication and password hashing.
+- **Multer**: Efficient multipart file handling for uploads.
 
-## 🛠️ Installation & Setup
+---
 
-### 1. Clone the repository
-```
-git clone <your-repo-url>
+## 🏗️ **Architecture**
+The project follows a **Modular Three-Tier Architecture** for clean separation of concerns:
+- **Routes**: URL mapping and validation.
+- **Controllers**: HTTP request/response logic.
+- **Services**: Core business logic and database interactions.
+
+---
+
+## 🛡️ **Core Features**
+✅ **Secure Authentication**: JWT-based session management.
+✅ **Storage Quota**: Enforced 100MB limit per user via database transactions.
+✅ **File Management**: Full CRUD operations (Upload, List, Download, Delete).
+✅ **Global Error Handling**: Centralized middleware for consistent API responses.
+✅ **Validation**: Strict schema validation using **Zod**.
+
+---
+
+## 🛠️ **Installation & Setup**
+
+### **1. Clone the Repository**
+```bash
+git clone https://github.com/mcmnyages/secure-cloud.git
 cd secure-cloud
 ```
 2. Backend Setup
 ```
 cd server
 npm install
+```
 Create a .env file:
-DATABASE_URL="postgresql://user:password@localhost:5432/cloud_db"
+```
+DATABASE_URL="postgresql://user\:password@localhost:5432/cloud_db"
 JWT_SECRET="your_super_secret_key"
 PORT=5000
-Initialize Database:
+```
+Initialize the database and start the server:
+```
 npx prisma db push
-Start Server:
 npm run dev
 ```
 3. Frontend Setup
@@ -61,11 +76,24 @@ cd ../client
 npm install
 npm run dev
 ```
+
 📈 Future Roadmap
-[ ] Folder-based organization
 
-[ ] File renaming and moving
+ Folder-based organization for intuitive file management.
+ File renaming and moving functionality.
+ Profile picture updates for user personalization.
+ Transition to AWS S3 for scalable cloud storage.
 
-[ ] Profile picture updates
+💡 Why This Project?
+This project is a learning journey to master:
 
-[ ] Transition to AWS S3 for cloud-scale storage
+Modern web development (React 19, Vite, Tailwind CSS).
+Backend architecture (Node.js, Express, Prisma).
+Cybersecurity best practices (JWT, Bcrypt, validation).
+Modular design for easy scalability and third-party integrations.
+
+🤝 Contribute
+Contributions are welcome! Open an issue or submit a PR to help improve SecureCloud MVP.
+
+🌐 Live Demo (soon)
+📂 GitHub Repository
