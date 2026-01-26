@@ -3,3 +3,5 @@ node_modules
 .env
 uploads/
 /generated/prisma
+.vscode/
+.DS_Store
