@@ -1,33 +1,38 @@
-import { useState } from 'react'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
+import Login from './pages/Login';
+// import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+
+// A simple wrapper to protect private routes
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+};
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div className="bg-blue-500 text-white p-4">
-        <a href="https://vite.dev" target="_blank">
+    <Router>
+      <div className="min-h-screen bg-gray-50 text-gray-900">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          {/* <Route path="/register" element={<Register />} /> */}
           
-        </a>
-        <a href="https://react.dev" target="_blank">
-          
-        </a>
+          <Route 
+            path="/dashboard" 
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            } 
+          />
+
+          {/* Default redirect */}
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;
