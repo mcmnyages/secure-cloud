@@ -16,7 +16,7 @@ const app = express();
 
 const allowedOrigins = [
   'http://localhost:5173', // Local development
-  'https://your-frontend-name.vercel.app' // Your future production URL
+  'https://secure-cloud-delta.vercel.app' // Your future production URL
 ];
 
 app.use(cors({
