@@ -50,8 +50,8 @@ postgresql://[user]:[pass]@[host]/neondb?sslmode=verify-full&connect_timeout=30
 1. Project Configuration
 Framework Preset: Vite
 Root Directory: client
-Environment Variables:
-VITE_API_URL: https://your-backend-name.onrender.com/api
+Environment Variables:```
+VITE_API_URL: https://your-backend-name.onrender.com/api```
 2. Client-Side Routing Fix
 To prevent 404 errors on page refreshes, a vercel.json was created in the client folder:
 ```
