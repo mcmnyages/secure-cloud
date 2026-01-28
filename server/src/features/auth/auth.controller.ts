@@ -15,7 +15,7 @@ export class AuthController {
        // 1. Create user
       const user = await this.authService.registerUser(email, password, name);
        // Trigger verification email
-      await sendVerificationEmail({ body: { userId: user.id, email } } as any, res);
+      await sendVerificationEmail({ body: { userId: user.id, email } } as any);
       // 4. Respond immediately
     res.status(201).send({
        message: 'Account created. Check your email to verify.',

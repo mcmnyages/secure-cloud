@@ -9,7 +9,7 @@ import bcrypt from 'bcrypt';
 /**
  * Send verification email to a user
  */
-export async function sendVerificationEmail(req: Request, res: Response) {
+export async function sendVerificationEmail(req: Request, ) {
   const { userId, email } = req.body;
 
   const token = await createEmailToken(userId, TokenPurpose.EMAIL_VERIFY);
@@ -18,8 +18,6 @@ export async function sendVerificationEmail(req: Request, res: Response) {
   const { subject, html } = getEmailTemplate(TokenPurpose.EMAIL_VERIFY, url);
 
   await sendEmail(email, subject, html);
-
-  res.send({ sent: true });
 }
 
 /**
