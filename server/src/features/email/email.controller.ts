@@ -4,6 +4,7 @@ import { getEmailTemplate } from './email.templates.js';
 import { createEmailToken, consumeEmailToken } from './email.tokens.js';
 import { TokenPurpose } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
+import bcrypt from 'bcrypt';
 
 /**
  * Send verification email to a user
@@ -37,4 +38,35 @@ export async function verifyEmail(req: Request, res: Response) {
   });
 
   res.send({ verified: true });
+}
+
+
+export async function requestPasswordReset(req: Request, res: Response) {
+  const { email } = req.body;
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(404).send('User not found');
+
+  const token = await createEmailToken(user.id, TokenPurpose.PASSWORD_RESET);
+  const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+  const { subject, html } = getEmailTemplate(TokenPurpose.PASSWORD_RESET, url);
+
+  await sendEmail(email, subject, html);
+  res.send({ sent: true });
+}
+
+
+export async function resetPassword(req: Request, res: Response) {
+  const { token, newPassword } = req.body;
+
+  const userId = await consumeEmailToken(token, TokenPurpose.PASSWORD_RESET);
+  if (!userId) return res.status(400).send('Invalid or expired token');
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashedPassword }, // Consider hashing in real implementation
+  });
+
+  res.send({ success: true });
 }
