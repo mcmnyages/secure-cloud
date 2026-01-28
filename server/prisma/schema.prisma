@@ -15,6 +15,8 @@ model User {
   storageUsed  BigInt @default(0)      // Track bytes used
   storageLimit BigInt @default(104857600) // 100MB in bytes
   files        File[]
+  verified Boolean @default(false)
+  tokens Token[]
 }
 
 model File {
@@ -25,4 +27,21 @@ model File {
   createdAt DateTime @default(now())
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id])
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  purpose   TokenPurpose
+  expiresAt DateTime
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token, purpose])
+}
+
+enum TokenPurpose {
+  EMAIL_VERIFY
+  PASSWORD_RESET
 }

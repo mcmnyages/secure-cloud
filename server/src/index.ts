@@ -6,9 +6,10 @@ import path from 'path';
 import fs from 'fs';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { errorHandler } from './middleware/error.middleware.js';
 import authRoutes from './features/auth/auth.routes.js';
 import fileRoutes from './features/files/file.routes.js';
-import { errorHandler } from './middleware/error.middleware.js';
+import { emailRoutes } from './features/email/index.js';
 
 dotenv.config();
 
@@ -50,7 +51,8 @@ app.use(morgan('dev')); // Logging
 // Routes
 app.get('/health', (req, res) => res.status(200).send('OK'));
 app.use('/api/auth', authRoutes);
-app.use('/api/files', fileRoutes); // Add this
+app.use('/api/files', fileRoutes); 
+app.use('/api/email', emailRoutes);
 
 
 app.use(errorHandler);
