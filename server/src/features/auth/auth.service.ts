@@ -23,6 +23,6 @@ export class AuthService {
     if (!isMatch) throw new Error("Invalid email or password");
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1d' });
-    return { user: { id: user.id, email: user.email, name: user.name }, token };
+    return { user: { id: user.id, email: user.email, name: user.name, isVerifed:user.verified }, token };
   }
 }
