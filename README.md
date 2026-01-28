@@ -35,6 +35,7 @@ The project follows a **Modular Three-Tier Architecture** for clean separation o
 ---
 
 ## 🛡️ **Core Features**
+--- 
 
 - ✅ **Secure Authentication**: JWT-based session management
 - ✅ **Storage Quota**: Enforced 100MB limit per user via database transactions
