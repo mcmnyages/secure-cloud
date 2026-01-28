@@ -1,4 +1,3 @@
-
 # 📚 Learning Journey: SecureCloud MVP
 
 ## 🚀 **Technologies Learned**
@@ -9,6 +8,7 @@
 - **Prisma 7**: Type-safe database interactions using PostgreSQL.
 - **JWT & Bcrypt**: Secure authentication implementation and password hashing.
 - **Multer**: Efficient handling of file uploads and multipart forms.
+- **Nodemailer**: Sending emails from the server, including verification and password reset emails.
 
 ## 🔍 **Key Challenges & Solutions**
 
@@ -20,6 +20,10 @@
 
 - **Challenge**: Modularizing the backend for scalability.
   **Solution**: Adopted a three-tier architecture (routes, controllers, services) to ensure separation of concerns and modular design.
+
+- **Challenge**: Implementing email verification and password reset workflows.
+  **Solution**: Integrated email verification on user registration and built a secure password reset system using email tokens. Gained hands-on experience with transactional email delivery, token management, and secure user flows.
+  Integrated **Nodemailer** for transactional email delivery (verification, password reset) using SMTP. Noted that Gmail users with 2FA must generate an App Password for authentication.
 
 ## 💡 **Best Practices Discovered**
 

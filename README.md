@@ -23,6 +23,7 @@ SecureCloud MVP is **my learning-driven project** to explore modern web developm
 - **PostgreSQL**: Reliable relational database for structured data storage.
 - **JWT & Bcrypt**: Secure authentication and password hashing.
 - **Multer**: Efficient multipart file handling for uploads.
+- **Nodemailer**: Used for sending transactional emails (verification, password reset) via SMTP. If using Gmail with 2FA enabled, an App Password (not your regular account password) is required for authentication.
 
 ---
 
@@ -42,6 +43,8 @@ The project follows a **Modular Three-Tier Architecture** for clean separation o
 - ✅ **File Management**: Full CRUD operations (Upload, List, Download, Delete)
 - ✅ **Global Error Handling**: Centralized middleware for consistent API responses
 - ✅ **Validation**: Strict schema validation using **Zod**
+- ✅ **Email Verification**: Users receive a verification email upon registration to activate their account, ensuring only valid email addresses are used.
+- ✅ **Password Reset**: Secure password reset flow via email, allowing users to regain access if they forget their credentials.
 
 ---
 
