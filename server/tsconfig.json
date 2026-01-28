@@ -53,6 +53,7 @@
   "exclude": [
     "node_modules", 
     "dist", 
-    "uploads" // 👈 Add this line to ignore the binary "fake" TS files
+    "uploads", // 👈 Add this line to ignore the binary "fake" TS files
+    "prisma.config.ts"
   ]
 }
