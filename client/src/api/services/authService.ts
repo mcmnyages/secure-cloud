@@ -3,6 +3,7 @@ import api from '../axios';
 import type { 
   LoginCredentials, 
   RegisterData, 
+  RegisterResponse,
   AuthResponse,
   RefreshTokenResponse 
 } from '../../types/authTypes';
@@ -13,11 +14,12 @@ export const authService = {
     return response.data;
   },
 
-  register: async (userData: RegisterData): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/register', userData);
+  register: async (userData: RegisterData): Promise<RegisterResponse> => {
+    const response = await api.post<RegisterResponse>('/auth/register', userData);
     return response.data;
   },
 
+   
   getCurrentUser: async (): Promise<any> => {
     const response = await api.get('/auth/me');
     return response.data;

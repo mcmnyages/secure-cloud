@@ -9,6 +9,10 @@ export interface RegisterData extends LoginCredentials {
   confirmPassword?: string;
 }
 
+export interface RegisterResponse {
+  user: User;
+}
+
 export interface AuthResponse {
   token: string;
   refreshToken?: string;
