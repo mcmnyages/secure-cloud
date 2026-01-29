@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MailCheck, ArrowLeft, LogIn } from "lucide-react";
-import { useResendVerification } from "../hooks/auth/useSendVerification";
+import { useResendVerification } from "../hooks/email/useSendVerification";
 
 const RESEND_DELAY = 60; // seconds
 

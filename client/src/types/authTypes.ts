@@ -32,6 +32,7 @@ export interface User {
   name: string;
   role?: string;
   avatar?: string;
+  isVerifed?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -43,3 +44,6 @@ export interface DecodedToken {
   iat: number;
 }
 
+export interface VerifyEmailResponse {
+  verified: boolean;
+}

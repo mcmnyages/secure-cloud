@@ -1,10 +1,13 @@
 import type { Request, Response } from 'express';
+import dotenv from 'dotenv';
 import { sendEmail } from './email.service.js';
 import { getEmailTemplate } from './email.templates.js';
 import { createEmailToken, consumeEmailToken } from './email.tokens.js';
 import { TokenPurpose } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
 import bcrypt from 'bcrypt';
+
+dotenv.config();
 
 /**
  * Send verification email to a user
