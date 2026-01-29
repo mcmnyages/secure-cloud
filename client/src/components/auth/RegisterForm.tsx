@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { RegisterData } from "../../types/authTypes";
+import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 interface RegisterFormProps {
   onSubmit: (data: RegisterData) => void;
@@ -15,6 +16,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,6 +29,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleSocialLogin = (provider: string) => {
+    // Replace with your actual social login logic
+    console.log(`Logging in with ${provider}...`);
   };
 
   return (
@@ -79,15 +90,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
-            <input
-              type="password"
-              name="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10"
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
             <p className="text-xs text-gray-500 mt-1">
               Minimum 8 characters
             </p>
@@ -106,6 +126,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
+
+        {/* Social Login */}
+        <div className="mt-6 flex items-center justify-center">
+          <span className="text-sm text-gray-500">or sign up with</span>
+        </div>
+        <div className="mt-4 flex justify-center space-x-4">
+          <button
+            onClick={() => handleSocialLogin('Google')}
+            className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+            aria-label="Sign up with Google"
+          >
+            <FaGoogle className="text-red-500" />
+          </button>
+          {/* Add more social login buttons as needed */}
+        </div>
 
         <p className="text-center text-sm text-gray-600 mt-6">
           Already have an account?{" "}
