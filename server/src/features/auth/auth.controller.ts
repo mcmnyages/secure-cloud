@@ -17,9 +17,7 @@ export class AuthController {
        // Trigger verification email
       await sendVerificationEmail({ body: { userId: user.id, email } } as any);
       // 4. Respond immediately
-    res.status(201).send({
-       message: 'Account created. Check your email to verify.',
-    });
+    res.status(201).json({user});
     } catch (err) {
       next(err);
     }
