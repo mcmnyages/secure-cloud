@@ -45,7 +45,7 @@ export async function verifyEmail(req: Request, res: Response) {
 export async function requestPasswordReset(req: Request, res: Response) {
   const { email } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return res.status(404).send('User not found');
+  if (!user) return res.status(404).send('An account with that email does not exist');
 
   const token = await createEmailToken(user.id, TokenPurpose.PASSWORD_RESET);
   const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
