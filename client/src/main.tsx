@@ -8,10 +8,10 @@ import { ToastProvider } from './providers/ToastProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-     <ToastProvider />
     <QueryProvider>
     <AuthProvider>
     <App />
+    <ToastProvider />
     </AuthProvider>
     </QueryProvider>
   </StrictMode>,
