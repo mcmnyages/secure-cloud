@@ -15,7 +15,7 @@ export default function ForgotPassword() {
       },
       onError: () => {
         setResponse({
-          message: 'Something went wrong. It is not you 😅',
+          message: 'Something went wrong. It is not you',
           sent: false,
         });
       },
