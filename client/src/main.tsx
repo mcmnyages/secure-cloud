@@ -4,14 +4,12 @@ import './index.css'
 import App from './App.tsx'
 import { QueryProvider } from './providers/QueryProvider.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
-import { ToastProvider } from './providers/ToastProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryProvider>
     <AuthProvider>
     <App />
-    <ToastProvider />
     </AuthProvider>
     </QueryProvider>
   </StrictMode>,

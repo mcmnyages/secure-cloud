@@ -7,6 +7,7 @@ import VerifyEmailCallback from './pages/VerifyEmailCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import { Toaster } from 'sonner';
 
 // A simple wrapper to protect private routes
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -16,6 +17,11 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
+    <>
+     <Toaster
+        position="bottom-right" // or top-left, bottom-right, bottom-left
+        richColors={true}     // enable colored styles
+      />
     <Router>
       <div className="min-h-screen bg-gray-50 text-gray-900">
         <Routes>
@@ -39,6 +45,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </>
   );
 }
 
