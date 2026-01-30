@@ -1,22 +1,29 @@
 // api/services/emailService.ts
 import api from "../axios";
-import type { VerifyEmailResponse } from "../../types/authTypes";
+import type { 
+  VerifyEmailResponse,
+  PasswordResetResponse
+ } from "../../types/emailTypes";
 
 export const emailService = {
   sendVerification: async (data: { userId: string; email: string }) => {
-    await api.post("/email/send-verification", { data });
+   const res=await api.post("/email/send-verification", { data });
+   return res.data
   },
   verifyEmail: async (token: string) =>{
-    api.get<VerifyEmailResponse>(`/email/verify?token=${token}`).then(res => res.data);
+    const res = api.get<VerifyEmailResponse>(`/email/verify?token=${token}`).then(res => res.data);
+    return res;
   },
 
   requestPasswordReset: async (email: string) => {
-    await api.post("/email/request-password-reset", { email });
+    const data =await api.post<PasswordResetResponse>("/email/request-password-reset", { email });
+    return data.data;
   },
 resetPassword: async (token: string, newPassword: string) => {
-  await api.post('/email/reset-password', {
+  const data =await api.post('/email/reset-password', {
     token,
     newPassword,
   });
+  return data.data;
 },
 };

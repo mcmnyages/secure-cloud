@@ -1,15 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
 import { emailService } from "../../api/services/emailService";
+import { getAxiosErrorMessage } from "../../utils/getAxiosErrorMessage";
 import { toast } from "sonner";
 
 export function useRequestPasswordReset() {
     return useMutation({
         mutationFn: (email: string) => emailService.requestPasswordReset(email),
-        onSuccess: () => {
-            toast.success("📩 If an account exists, a reset link has been sent.");
+        onSuccess: (response) => {
+            toast.success(response.message);
         },
         onError: () => {
-            toast.error("❌ Failed to send reset link. Please try again.");
+            toast.error(getAxiosErrorMessage(Error));
         },
     }); 
 }

@@ -45,14 +45,21 @@ export async function verifyEmail(req: Request, res: Response) {
 export async function requestPasswordReset(req: Request, res: Response) {
   const { email } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return res.status(404).send('An account with that email does not exist');
+  if (!user) {
+    return res.status(200).json({
+      message:'An account with that email does not exist',
+      sent:false
+    });
+  }
 
   const token = await createEmailToken(user.id, TokenPurpose.PASSWORD_RESET);
   const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
   const { subject, html } = getEmailTemplate(TokenPurpose.PASSWORD_RESET, url);
 
   await sendEmail(email, subject, html);
-  res.send({ sent: true });
+  res.json({ 
+    message:'Check your email for password reset instructions',
+    sent: true });
 }
 
 

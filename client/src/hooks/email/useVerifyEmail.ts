@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { emailService } from "../../api/services/emailService";
-import type { VerifyEmailResponse } from "../../types/authTypes";
+import type { VerifyEmailResponse } from "../../types/emailTypes";
 
 export const useVerifyEmail = (token: string) =>
   useQuery<VerifyEmailResponse>({

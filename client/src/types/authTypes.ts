@@ -44,6 +44,3 @@ export interface DecodedToken {
   iat: number;
 }
 
-export interface VerifyEmailResponse {
-  verified: boolean;
-}
