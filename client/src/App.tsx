@@ -3,11 +3,13 @@ import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyEmail from './pages/VerifyEmail';
+import AuthenticatedLayout from './layout/AuthenticatedLayout';
 import VerifyEmailCallback from './pages/VerifyEmailCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import { Toaster } from 'sonner';
+
 
 // A simple wrapper to protect private routes
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -25,12 +27,15 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-50 text-gray-900">
         <Routes>
+          {/* Default redirect */}
+          <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify" element={<VerifyEmailCallback />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/" element={<AuthenticatedLayout />}>
           <Route 
             path="/dashboard" 
             element={
@@ -39,9 +44,7 @@ function App() {
               </PrivateRoute>
             } 
           />
-
-          {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          </Route>
         </Routes>
       </div>
     </Router>
