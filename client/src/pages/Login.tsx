@@ -29,7 +29,6 @@ const Login: React.FC = () => {
   const { mutate, isPending } = useLogin({
     onSuccess: (data) => {
       login(data.token, data.user);
-      toast.success('Logged in successfully!');
       navigate('/dashboard');
     },
     onError: (err: any) => {
