@@ -2,7 +2,7 @@ import { prisma } from '../../lib/prisma.js';
 import fs from 'fs/promises';
 
 export class FileService {
-  async uploadFile(userId: string, fileName: string, filePath: string, fileSize: number) {
+  async uploadFile(userId: string, fileName: string, filePath: string, fileSize: number, mimetype: string) {
     // 1. Get user storage info
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error("User not found");
@@ -22,6 +22,7 @@ export class FileService {
           path: filePath,
           size: fileSize,
           ownerId: userId,
+          mimeType:mimetype,
         }
       });
 
@@ -43,6 +44,7 @@ export class FileService {
       name: true,
       size: true,
       createdAt: true,
+      mimeType: true,
       // We don't return the internal 'path' for security
     }
   });

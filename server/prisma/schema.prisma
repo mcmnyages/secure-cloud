@@ -22,8 +22,9 @@ model User {
 model File {
   id        String   @id @default(uuid())
   name      String
-  path      String   // Where the file lives on disk
-  size      Int      // Size in bytes
+  path      String   
+  size      Int      
+  mimeType  String   // e.g., "video/mp4", "application/pdf"
   createdAt DateTime @default(now())
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id])

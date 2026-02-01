@@ -15,7 +15,8 @@ export class FileController {
         userId,
         req.file.originalname,
         req.file.path,
-        req.file.size
+        req.file.size,
+        req.file.mimetype
       );
 
       res.status(201).json({ message: "File uploaded successfully", file });
