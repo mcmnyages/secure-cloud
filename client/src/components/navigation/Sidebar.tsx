@@ -29,7 +29,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
     md:translate-x-0
     ${collapsed ? 'md:w-20' : 'md:w-64'}
   `}
->
+> 
         {/* Logo */}
         <div className="h-16 flex items-center px-4 border-b">
           <span

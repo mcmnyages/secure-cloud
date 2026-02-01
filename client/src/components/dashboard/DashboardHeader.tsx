@@ -1,8 +1,7 @@
-import { LogOut } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 
 const DashboardHeader = () => {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
 
   return (
     <header className="flex justify-between items-center mb-8">
