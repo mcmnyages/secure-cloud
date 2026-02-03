@@ -21,7 +21,10 @@ const Files = () => {
 
       {/* Files table */}
       <FilesTable
-        files={files}
+        files={files.map(file => ({
+          ...file,
+          mimeType: file.mimeType ?? '', // Provide a default or map as needed
+        }))}
         onDelete={deleteFile}
         onDownload={downloadFile}
         onUpload={() => setIsModalOpen(true)}

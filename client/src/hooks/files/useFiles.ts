@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { fileService } from '../../api/services/fileService'
 
 export interface CloudFile {
+  mimeType: string
   id: string
   name: string
   size: number
