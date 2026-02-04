@@ -89,4 +89,39 @@ async deleteFile(fileId: string, userId: string) {
   });
 }
 
+// bulk delete files
+async bulkDeleteFiles(fileIds: string[], userId: string) {
+  const files = await prisma.file.findMany({
+    where: {
+      id: { in: fileIds },
+      ownerId: userId
+    }
+  });
+  if (files.length === 0) {
+    throw new Error("No files found or access denied");
+  }
+  return await prisma.$transaction(async (tx) => {
+    // 1. Remove from DB
+    await tx.file.deleteMany({
+      where: {
+        id: { in: fileIds },
+        ownerId: userId
+      }
+    });
+    // 2. Update User Storage
+    const totalSize = files.reduce((acc, file) => acc + file.size, 0);
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        storageUsed: { decrement: totalSize }
+      }
+    });
+    // 3. Remove from physical disk
+    for (const file of files) {
+      await fs.unlink(file.path);
+    }
+    return { message: "Files deleted successfully" };
+  });
+}
+
 }

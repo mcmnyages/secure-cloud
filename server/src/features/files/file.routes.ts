@@ -11,5 +11,6 @@ router.get('/', authenticate, fileController.list);
 router.get('/download/:fileId', authenticate, fileController.download);
 router.post('/upload', authenticate, upload.single('file'), fileController.upload);
 router.delete('/:fileId', authenticate, fileController.delete);
+router.post('/bulk-delete', authenticate, fileController.bulkDelete);
 
 export default router;

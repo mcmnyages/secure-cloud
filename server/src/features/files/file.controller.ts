@@ -74,5 +74,21 @@ delete = async (req: Request, res: Response, next: Function) => {
     next(error); 
   }
 };
+// delete multiple files
+bulkDelete = async (req: Request, res: Response, next: Function) => {
+  try {
+    const userId = (req as any).userId;
+    const { fileIds } = req.body; 
+    if (!Array.isArray(fileIds) || !fileIds.every(id => typeof id === 'string')) {
+      return res.status(400).json({ message: "Invalid file ids" });
+    }
+
+    const result = await fileService.bulkDeleteFiles(fileIds, userId);
+    
+    res.status(200).json(result);
+  } catch (error: any) {
+    next(error);
+  } 
+};
 
 }
