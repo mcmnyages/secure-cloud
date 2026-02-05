@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLogin } from '../hooks/auth/useLogin';
 import { toast } from 'sonner';
-import { FaGoogle, FaEye, FaEyeSlash, FaArrowCircleLeft } from 'react-icons/fa';
+import { FaGoogle, FaEye, FaEyeSlash, FaHome } from 'react-icons/fa';
 
 interface FormData {
   email: string;
@@ -68,8 +68,8 @@ const Login: React.FC = () => {
 
   return (
     <div>
-      <button onClick={() => navigate(-1)} className="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
-        <FaArrowCircleLeft size={24} />
+      <button onClick={() => navigate('/')} className="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
+        <FaHome size={24} />
       </button>
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
