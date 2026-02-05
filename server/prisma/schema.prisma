@@ -7,27 +7,50 @@ datasource db {
 }
 
 model User {
-  id           String @id @default(uuid())
-  email        String @unique
-  password     String
-  name         String?
-  // Add these two lines:
-  storageUsed  BigInt @default(0)      // Track bytes used
-  storageLimit BigInt @default(104857600) // 100MB in bytes
-  files        File[]
-  verified Boolean @default(false)
-  tokens Token[]
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  name          String?
+  verified      Boolean  @default(false)
+
+  storageUsed   BigInt   @default(0)
+  storageLimit BigInt   @default(104857600)
+
+  files         File[]
+  tokens        Token[]
 }
 
 model File {
   id        String   @id @default(uuid())
-  name      String
-  path      String   
-  size      Int      
-  mimeType  String   // e.g., "video/mp4", "application/pdf"
-  createdAt DateTime @default(now())
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  versions  FileVersion[]
+
+  @@index([ownerId])
+}
+
+model FileVersion {
+  id           String   @id @default(uuid())
+  fileId       String
+  file         File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  storageKey   String   // filesystem path or S3 key
+  size         Int
+  mimeType     String
+  checksum     String?
+
+  originalName String
+  displayName  String
+
+  createdAt    DateTime @default(now())
+  isCurrent    Boolean  @default(true)
+
+  @@index([fileId])
 }
 
 model Token {
