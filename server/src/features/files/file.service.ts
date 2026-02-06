@@ -101,6 +101,153 @@ async getFileForUser(fileId: string, userId: string) {
 }
 
 
+
+async findFileByName(userId: string, displayName: string) {
+  return prisma.file.findFirst({
+    where: {
+      ownerId: userId,
+      deletedAt: null,
+      versions: {
+        some: {
+          isCurrent: true,
+          displayName
+        }
+      }
+    }
+  });
+}
+
+
+
+async uploadOrReplaceFile(
+  userId: string,
+  file: Express.Multer.File,
+  replace: boolean
+) {
+  // 1. Look for existing logical file
+  const existingFile = await this.findFileByName(
+    userId,
+    file.originalname
+  );
+
+  // 2. If exists and user wants replace
+  if (existingFile && replace) {
+    return this.uploadNewVersion(
+      existingFile.id,
+      userId,
+      file.path,
+      file.originalname,
+      file.size,
+      file.mimetype
+    );
+  }
+
+  // 3. Otherwise create new file
+  return this.uploadFile(
+    userId,
+    file.originalname,
+    file.path,
+    file.size,
+    file.mimetype
+  );
+}
+
+
+
+
+async renameFile(fileId: string, userId: string, newName: string) {
+  const file = await prisma.file.findFirst({
+    where: {
+      id: fileId,
+      ownerId: userId,
+      deletedAt: null
+    },
+    include: {
+      versions: true
+    }
+  });
+
+  if (!file) {
+    throw new Error("File not found or access denied");
+  }
+
+  const currentVersion = file.versions.find(v => v.isCurrent);
+  if (!currentVersion) {
+    throw new Error("No active file version found");
+  }
+
+  return await prisma.fileVersion.update({
+    where: { id: currentVersion.id },
+    data: { displayName: newName }
+  });
+}
+
+
+
+
+async uploadNewVersion(
+  fileId: string,
+  userId: string,
+  storageKey: string,
+  originalName: string,
+  size: number,
+  mimeType: string
+) {
+  const file = await prisma.file.findFirst({
+    where: {
+      id: fileId,
+      ownerId: userId,
+      deletedAt: null
+    },
+    include: {
+      versions: true
+    }
+  });
+
+  if (!file) {
+    throw new Error("File not found or access denied");
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error("User not found");
+
+  const newTotal = Number(user.storageUsed) + size;
+  if (newTotal > Number(user.storageLimit)) {
+    throw new Error("Storage limit exceeded");
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // 1. Mark old version inactive
+    await tx.fileVersion.updateMany({
+      where: { fileId, isCurrent: true },
+      data: { isCurrent: false }
+    });
+
+    // 2. Create new version
+    const version = await tx.fileVersion.create({
+      data: {
+        fileId,
+        storageKey,
+        originalName,
+        displayName: originalName,
+        size,
+        mimeType,
+        isCurrent: true
+      }
+    });
+
+    // 3. Update storage usage
+    await tx.user.update({
+      where: { id: userId },
+      data: { storageUsed: { increment: size } }
+    });
+
+    return version;
+  });
+}
+
+
+
 async deleteFile(fileId: string, userId: string) {
   const file = await prisma.file.findFirst({
     where: { id: fileId, ownerId: userId },

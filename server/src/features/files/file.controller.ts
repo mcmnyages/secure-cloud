@@ -59,6 +59,62 @@ res.json(response);
   }
 };
 
+
+
+rename = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { fileId } = req.params;
+    const { name } = req.body;
+
+    if (!name || typeof name !== 'string') {
+      return res.status(400).json({ message: "Invalid name" });
+    }
+
+    if (typeof fileId !== 'string') {
+      return res.status(400).json({ message: "Invalid file id" });
+    }
+
+    await fileService.renameFile(fileId, userId, name);
+
+    res.json({ message: "File renamed successfully" });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+updateFile = async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const userId = (req as any).userId;
+    const { fileId } = req.params;
+    
+    if (typeof fileId !== 'string') {
+      return res.status(400).json({ message: "Invalid file id" });
+    }
+
+    await fileService.uploadNewVersion(
+      fileId,
+      userId,
+      req.file.path,
+      req.file.originalname,
+      req.file.size,
+      req.file.mimetype
+    );
+
+    res.json({ message: "File updated successfully" });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+
 download = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;

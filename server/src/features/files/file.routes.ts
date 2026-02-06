@@ -10,6 +10,8 @@ const fileController = new FileController();
 router.get('/', authenticate, fileController.list);
 router.get('/download/:fileId', authenticate, fileController.download);
 router.post('/upload', authenticate, upload.single('file'), fileController.upload);
+router.patch('/:fileId/rename', authenticate, fileController.rename);
+router.put('/:fileId', authenticate, upload.single('file'), fileController.updateFile);
 router.delete('/:fileId', authenticate, fileController.delete);
 router.post('/bulk-delete', authenticate, fileController.bulkDelete);
 
