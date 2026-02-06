@@ -6,31 +6,54 @@ const fileService = new FileService();
 
 export class FileController {
   upload = async (req: Request, res: Response) => {
-    try {
-      if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-
-      const userId = (req as any).userId; // Injected by our authenticate middleware
-      
-      const file = await fileService.uploadFile(
-        userId,
-        req.file.originalname,
-        req.file.path,
-        req.file.size,
-        req.file.mimetype
-      );
-
-      res.status(201).json({ message: "File uploaded successfully", file });
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
     }
-  };
 
+    const userId = (req as any).userId;
+
+    const result = await fileService.uploadFile(
+      userId,
+      req.file.originalname,
+      req.file.path,        // now = storageKey
+      req.file.size,
+      req.file.mimetype,
+      req.body.displayName // optional
+    );
+
+  res.status(201).json({
+  message: "File uploaded successfully",
+  file: {
+    id: result.fileId,
+    name: result.version.displayName || result.version.originalName,
+    size: result.version.size,
+    mimeType: result.version.mimeType,
+    createdAt: result.version.createdAt
+  }
+});
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
   list = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
     const files = await fileService.listUserFiles(userId);
-    res.json(files);
+    const response = files.map(file => {
+  // Assume the latest version is the current one (e.g., last in array)
+  const current = file.versions[file.versions.length - 1];
+  return {
+    id: file.id,
+    name: current?.displayName || current?.displayName || 'Unknown',
+    size: current?.size,
+    mimeType: current?.mimeType,
+    createdAt: file.createdAt
+  };
+});
+res.json(response);
+
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
