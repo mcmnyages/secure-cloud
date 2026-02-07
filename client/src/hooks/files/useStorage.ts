@@ -6,14 +6,20 @@ export const useStorage = () => {
     used: 0,
     limit: 104857600,
   })
+  const [isLoading, setIsLoading] = useState(false)
 
   const fetchStorage = async () => {
-    const res = await fileService.getStorage()
-    setStorage({
-      used: Number(res.data.storageUsed),
-      limit: Number(res.data.storageLimit),
-    })
+    setIsLoading(true)
+    try {
+      const res = await fileService.getStorage()
+      setStorage({
+        used: Number(res.data.storageUsed),
+        limit: Number(res.data.storageLimit),
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  return { storage, fetchStorage }
+  return { storage, fetchStorage, isLoading }
 }

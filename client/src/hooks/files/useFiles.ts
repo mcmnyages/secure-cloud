@@ -11,11 +11,17 @@ export interface CloudFile {
 
 export const useFiles = () => {
   const [files, setFiles] = useState<CloudFile[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const fetchFiles = async () => {
-    const res = await fileService.list()
-    setFiles(res.data)
+    setIsLoading(true)
+    try {
+      const res = await fileService.list()
+      setFiles(res.data)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  return { files, fetchFiles, setFiles }
+  return { files, fetchFiles, setFiles, isLoading }
 }

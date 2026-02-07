@@ -1,6 +1,10 @@
 import { useAuth } from '../../contexts/AuthContext'
 
-const DashboardHeader = () => {
+interface DashboardHeaderProps {
+  onUpload: () => void
+}
+
+const DashboardHeader = ({ onUpload }: DashboardHeaderProps) => {
   const { user } = useAuth()
 
   return (
@@ -11,8 +15,14 @@ const DashboardHeader = () => {
           Welcome back, {user?.name || user?.email}
         </p>
       </div>
+
+      <button
+        onClick={onUpload}
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+      >
+        Upload
+      </button>
     </header>
   )
 }
-
 export default DashboardHeader

@@ -5,9 +5,11 @@ import { useStorage } from './useStorage'
 import { useFileActions } from './useFileActions'
 
 export const useDashboard = () => {
-  const { files, fetchFiles } = useFiles()
-  const { storage, fetchStorage } = useStorage()
+  const { files, fetchFiles, isLoading: filesLoading } = useFiles()
+  const { storage, fetchStorage, isLoading: storageLoading } = useStorage()
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const isLoading = filesLoading || storageLoading
 
   const refresh = async () => {
     try {
@@ -26,6 +28,7 @@ export const useDashboard = () => {
   return {
     files,
     storage,
+    isLoading,
     isModalOpen,
     setIsModalOpen,
     refresh,
