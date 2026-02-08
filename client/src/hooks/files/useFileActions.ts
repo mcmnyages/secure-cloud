@@ -22,6 +22,7 @@ export const useFileActions = (refresh: () => void) => {
       link.href = url
       link.download = name
       link.click()
+      toast.success('Download started')
     } catch {
       toast.error('Download failed')
     }

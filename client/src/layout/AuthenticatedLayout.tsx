@@ -7,9 +7,7 @@ import AppHeader from '../components/navigation/AppHeader'
 const AuthLayout = () => {
   const { isAuthenticated } = useAuth()
 
-  // desktop collapsed state
   const [collapsed, setCollapsed] = useState(false)
-  // mobile drawer state
   const [mobileOpen, setMobileOpen] = useState(false)
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
@@ -24,6 +22,7 @@ const AuthLayout = () => {
 
       <div className="flex-1 flex flex-col">
         <AppHeader
+          collapsed={collapsed}
           onToggleDesktop={() => setCollapsed(c => !c)}
           onOpenMobile={() => setMobileOpen(true)}
         />
