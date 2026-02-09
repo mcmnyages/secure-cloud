@@ -8,6 +8,9 @@ interface Props {
   onCloseMobile: () => void
 }
 
+const APP_NAME = 'Secure Cloud'
+const APP_INITIALS = 'SC'
+
 const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
   return (
     <>
@@ -37,20 +40,39 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
       >
         {/* Header / Logo */}
         <div className="h-16 flex items-center px-4 border-b">
-          <span
-            className={`
-              font-bold text-lg whitespace-nowrap
-              transition-all duration-200
-              ${collapsed ? 'md:opacity-0 md:w-0 md:overflow-hidden' : 'opacity-100'}
-            `}
-          >
-            My Secure Cloud
-          </span>
+          <div className="flex items-center gap-2 overflow-hidden">
+            {/* Full name (expanded) */}
+            <span
+              className={`
+                font-bold text-lg whitespace-nowrap
+                transition-all duration-200
+                ${collapsed ? 'md:opacity-0 md:w-0 md:overflow-hidden' : 'opacity-100'}
+              `}
+            >
+              {APP_NAME}
+            </span>
+
+            {/* Initials (collapsed desktop) */}
+            <span
+              className={`
+                hidden md:flex
+                items-center justify-center
+                font-bold text-sm
+                w-9 h-9 rounded-lg
+                bg-blue-400 text-white
+                transition-all duration-200
+                ${collapsed ? 'md:opacity-100' : 'md:opacity-0 md:w-0 md:overflow-hidden'}
+              `}
+            >
+              {APP_INITIALS}
+            </span>
+          </div>
 
           {/* Mobile close */}
           <button
             onClick={onCloseMobile}
             className="ml-auto md:hidden p-2 rounded-lg hover:bg-gray-100"
+            aria-label="Close sidebar"
           >
             <X size={18} />
           </button>
@@ -97,14 +119,14 @@ const NavItem = ({
     to={to}
     className={({ isActive }) =>
       `
-      group flex items-center gap-3 px-3 py-2 rounded-lg
-      transition-colors
-      ${
-        isActive
-          ? 'bg-blue-50 text-blue-600'
-          : 'text-gray-600 hover:bg-gray-100'
-      }
-    `
+        group flex items-center gap-3 px-3 py-2 rounded-lg
+        transition-colors
+        ${
+          isActive
+            ? 'bg-blue-50 text-blue-600'
+            : 'text-gray-600 hover:bg-gray-100'
+        }
+      `
     }
   >
     <div className="shrink-0">{icon}</div>

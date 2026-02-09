@@ -1,6 +1,6 @@
 import {
   Menu,
-  ChevronLeft,
+  X,
   LogOut,
   User,
   Settings
@@ -93,14 +93,11 @@ const AppHeader = ({
     ${collapsed ? 'bg-blue-500 hover:bg-blue-600' : 'bg-red-500 hover:bg-red-600'}
   `}
 >
-  <ChevronLeft
-    size={20}
-    className={`
-      text-white
-      transition-transform duration-300
-      ${collapsed ? 'rotate-180' : ''}
-    `}
-  />
+  {collapsed ? (
+    <Menu size={20} className="text-white" />
+  ) : (
+    <X size={20} className="text-white" />
+  )}
 
   {/* Tooltip */}
   <span
@@ -119,6 +116,7 @@ const AppHeader = ({
     {collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
   </span>
 </button>
+
 
 
         <h1 className="font-semibold text-lg hidden sm:block text-gray-800">
