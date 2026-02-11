@@ -1,4 +1,4 @@
-import { Menu, X, LogOut, User, Settings, Cloud, ArrowRight } from 'lucide-react'
+import { Menu, X, LogOut, User, Settings, Cloud } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
