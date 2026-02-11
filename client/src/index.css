@@ -1,1 +1,19 @@
-  @import "tailwindcss";
+@import "tailwindcss";
+
+/* Default (light theme) */
+:root {
+  --bg: 255 255 255;
+  --text: 17 24 39;
+  --card: 255 255 255;
+  --border: 229 231 235;
+  --primary: 59 130 246;
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+  --bg: 24 24 27;        /* charcoal */
+  --text: 244 244 245;   /* near white */
+  --card: 39 39 42;      /* zinc-800 */
+  --border: 63 63 70;    /* subtle border */
+  --primary: 96 165 250; /* blue-400 */
+}
