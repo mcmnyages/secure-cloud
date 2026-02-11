@@ -13,7 +13,7 @@ const AuthLayout = () => {
   if (!isAuthenticated) return <Navigate to="/login" replace />
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}

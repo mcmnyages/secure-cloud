@@ -1,7 +1,7 @@
 import RegisterForm from "../components/auth/RegisterForm";
 import { useRegister } from "../hooks/auth/useRegister";
-import {  FaHome } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
+import AppHeader from "../components/navigation/AppHeader";
 
 const Register = () => {
   const { mutate, isPending } = useRegister();
@@ -9,9 +9,8 @@ const Register = () => {
 
   return (
     <div className="">
-      <button onClick={() => navigate('/')} className="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
-              <FaHome size={24} />
-            </button>
+      <AppHeader collapsed={false} onToggleDesktop={() => {}} onOpenMobile={() => {}} />
+
       <RegisterForm
         loading={isPending}
         onSubmit={(data) => mutate(data)}

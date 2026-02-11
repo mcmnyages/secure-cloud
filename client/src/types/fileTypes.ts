@@ -15,4 +15,6 @@ export interface CloudFile {
   id: string
   name: string
   size: number
+  mimeType: string
+  createdAt: string // ISO date string
 }
