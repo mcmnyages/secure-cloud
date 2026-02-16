@@ -71,7 +71,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
       <AppHeader collapsed={false} onToggleDesktop={() => {}} onOpenMobile={() => {}} />
 
-      <div className="flex items-center justify-center px-4 py-16">
+      <div className="flex items-center justify-center px-4 py-30">
         <div className="w-full max-w-md p-8 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl shadow-xl">
 
           {/* Header */}
