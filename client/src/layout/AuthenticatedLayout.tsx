@@ -14,20 +14,22 @@ const AuthLayout = () => {
 
   return (
     <div className="min-h-screen flex bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
+      {/* Sidebar */}
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
         onCloseMobile={() => setMobileOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col">
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         <AppHeader
           collapsed={collapsed}
           onToggleDesktop={() => setCollapsed(c => !c)}
           onOpenMobile={() => setMobileOpen(true)}
         />
 
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>
       </div>

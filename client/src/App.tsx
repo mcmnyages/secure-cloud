@@ -22,51 +22,55 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <>
-     <Toaster
-        position="bottom-right" // or top-left, bottom-right, bottom-left
-        richColors={true}     // enable colored styles
+      <Toaster
+        position="bottom-right"
+        richColors={true}
       />
-    <Router>
-      <div className="min-h-screen bg-gray-50 text-gray-900">
-        <Routes>
-          {/* Default redirect */}
-          <Route path="/Landing" element={<Landing />} />
-          <Route path="/" element={<Navigate to="/Landing" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/verify" element={<VerifyEmailCallback />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/" element={<AuthenticatedLayout />}>
-          <Route 
-            path="/dashboard" 
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/files" 
-            element={
-              <PrivateRoute>
-                <Files />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/settings" 
-            element={
-              <PrivateRoute>
-                <Settings />
-              </PrivateRoute>
-            } 
-          />
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+
+      <Router>
+        {/* Apply theme colors via CSS variables */}
+        <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Navigate to="/landing" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/verify" element={<VerifyEmailCallback />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
+            {/* Authenticated routes */}
+            <Route path="/" element={<AuthenticatedLayout />}>
+              <Route 
+                path="/dashboard" 
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/files" 
+                element={
+                  <PrivateRoute>
+                    <Files />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/settings" 
+                element={
+                  <PrivateRoute>
+                    <Settings />
+                  </PrivateRoute>
+                } 
+              />
+            </Route>
+          </Routes>
+        </div>
+      </Router>
     </>
   );
 }

@@ -24,26 +24,22 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
 
       <aside
         className={`
-          fixed md:static z-50
-          inset-y-0 left-0
+          md:sticky top-0 z-50
+          md:h-screen
           bg-[rgb(var(--card))]
           border-r border-[rgb(var(--border))]
-          transition-[width,transform] duration-300 ease-in-out
-          
-          /* Mobile */
           w-64
+          ${collapsed ? 'md:w-20' : 'md:w-64'}
+          flex flex-col
+          transition-[width,transform] duration-300 ease-in-out
+          fixed md:relative
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0
-          
-          /* Desktop */
-          ${collapsed ? 'md:w-20' : 'md:w-64'}
         `}
       >
-        {/* Header */}
-        <div className="h-16 flex items-center px-4 border-b border-[rgb(var(--border))]">
+        {/* Header inside sidebar */}
+        <div className="h-16 flex items-center px-4 border-b border-[rgb(var(--border))] flex-shrink-0">
           <div className="flex items-center gap-2 overflow-hidden">
-            
-            {/* Full name */}
             <span
               className={`
                 font-bold text-lg whitespace-nowrap
@@ -54,16 +50,10 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
             >
               {APP_NAME}
             </span>
-
-            {/* Initials */}
             <span
               className={`
-                hidden md:flex
-                items-center justify-center
-                font-bold text-sm
-                w-9 h-9 rounded-lg
-                bg-[rgb(var(--primary))]
-                text-white
+                hidden md:flex items-center justify-center font-bold text-sm
+                w-9 h-9 rounded-lg bg-[rgb(var(--primary))] text-white
                 transition-all duration-200
                 ${collapsed ? 'md:opacity-100' : 'md:opacity-0 md:w-0 md:overflow-hidden'}
               `}
@@ -72,7 +62,6 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
             </span>
           </div>
 
-          {/* Mobile close */}
           <button
             onClick={onCloseMobile}
             className="ml-auto md:hidden p-2 rounded-lg hover:bg-[rgb(var(--bg))] transition"
@@ -82,26 +71,11 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="px-3 py-4 space-y-1">
-          <NavItem
-            to="/dashboard"
-            icon={<LayoutGrid size={20} />}
-            label="Dashboard"
-            collapsed={collapsed}
-          />
-          <NavItem
-            to="/files"
-            icon={<Folder size={20} />}
-            label="Files"
-            collapsed={collapsed}
-          />
-          <NavItem
-            to="/settings"
-            icon={<Settings size={20} />}
-            label="Settings"
-            collapsed={collapsed}
-          />
+        {/* Nav items scrollable if needed */}
+        <nav className="flex-1 overflow-auto px-3 py-4 space-y-1">
+          <NavItem to="/dashboard" icon={<LayoutGrid size={20} />} label="Dashboard" collapsed={collapsed} />
+          <NavItem to="/files" icon={<Folder size={20} />} label="Files" collapsed={collapsed} />
+          <NavItem to="/settings" icon={<Settings size={20} />} label="Settings" collapsed={collapsed} />
         </nav>
       </aside>
     </>
@@ -123,22 +97,17 @@ const NavItem = ({
     to={to}
     className={({ isActive }) =>
       `
-        group flex items-center gap-3 px-3 py-2 rounded-lg
-        transition-all
-        ${
-          isActive
-            ? 'bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]'
-            : 'text-[rgb(var(--text)/0.7)] hover:bg-[rgb(var(--bg))]'
-        }
+        group flex items-center gap-3 px-3 py-2 rounded-lg transition-all
+        ${isActive
+          ? 'bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]'
+          : 'text-[rgb(var(--text)/0.7)] hover:bg-[rgb(var(--bg))]'}
       `
     }
   >
     <div className="shrink-0">{icon}</div>
-
     <span
       className={`
-        whitespace-nowrap
-        transition-all duration-200
+        whitespace-nowrap transition-all duration-200
         ${collapsed ? 'md:opacity-0 md:w-0 md:overflow-hidden' : 'opacity-100'}
       `}
     >

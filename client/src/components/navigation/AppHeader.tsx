@@ -66,43 +66,70 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
   /* ---------------- Header Style ---------------- */
   const headerStyles = isAuthenticated
-    ? "h-16 bg-[rgb(var(--card))] border-b border-[rgb(var(--border))] shadow-sm sticky top-0 z-40"
-    : `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "h-16 bg-[rgb(var(--card))/0.8] backdrop-blur-lg border-b border-[rgb(var(--border))/0.5] shadow-md"
-          : "h-16 bg-transparent"
-      }`
+    ? `
+      fixed top-0 right-0 h-16 z-40
+      bg-[rgb(var(--card))]
+      border-b border-[rgb(var(--border))]
+      shadow-sm
+      transition-all duration-300
+      ${collapsed ? 'md:left-20' : 'md:left-64'}
+    `
+    : `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
+      ? "h-16 bg-[rgb(var(--card))/0.8] backdrop-blur-lg border-b border-[rgb(var(--border))/0.5] shadow-md"
+      : "h-16 bg-transparent"
+    }`
 
   return (
     <header className={headerStyles}>
-      <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+      <div
+        className={`h-full px-4 md:px-6 flex items-center justify-between ${isAuthenticated ? '' : 'max-w-7xl mx-auto'
+          }`}
+      >
 
         {/* ================= LEFT ================= */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center">
 
-          {isAuthenticated ? (
-            <>
+          {isAuthenticated && (
+            <div className="flex items-center">
+
+              {/* Mobile Toggle */}
               <button
                 onClick={onOpenMobile}
-                className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg
-                  hover:bg-[rgb(var(--bg))] transition"
+                className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg 
+                  hover:bg-[rgb(var(--bg))]
+                  transition-colors duration-200"
               >
-                <Menu size={18} className="text-[rgb(var(--text)/0.85)]" />
+                <Menu size={18} />
               </button>
 
+              {/* Desktop Toggle */}
               <button
                 onClick={onToggleDesktop}
-                className="hidden md:flex w-9 h-9 items-center justify-center rounded-lg
-                  border border-[rgb(var(--border))]
-                  bg-[rgb(var(--bg))]
-                  hover:bg-[rgb(var(--primary)/0.1)]
-                  transition"
+                className="
+                    hidden md:flex 
+                    w-10 h-10
+                    items-center justify-center
+                    rounded-lg
+                     border border-[rgb(var(--border))]
+                     bg-[rgb(var(--card))]
+                    hover:bg-[rgb(var(--primary)/0.08)] 
+                    hover:border-[rgb(var(--primary)/0.4)]
+                    active:scale-95
+                    transition-all duration-200
+                    shadow-sm
+  "
               >
-                {collapsed ? <Menu size={18} /> : <X size={18} />}
+                {collapsed ? (
+                  <Menu size={18} className="text-[rgb(var(--text))]" />
+                ) : (
+                  <X size={18} className="text-[rgb(var(--text))]" />
+                )}
               </button>
-            </>
-          ) : (
-            <Link to="/" className="flex items-center gap-2 group">
+            </div>
+          )}
+
+          {!isAuthenticated && (
+            <Link to="/" className="flex items-center gap-2 pl-4 group">
               <div className="bg-[rgb(var(--primary))] p-2 rounded-xl
                 shadow-lg shadow-[rgb(var(--primary))/0.15]
                 group-hover:scale-105 transition"
@@ -114,6 +141,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
               </span>
             </Link>
           )}
+
         </div>
 
         {/* ================= RIGHT ================= */}
@@ -122,12 +150,14 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
           <ThemeToggle />
 
           {isAuthenticated ? (
-            /* ================= AUTH USER ================= */
             <div ref={menuRef} className="relative">
               <button
                 onClick={() => setOpen(!open)}
-                className="w-9 h-9 rounded-full flex items-center justify-center
-                  bg-[rgb(var(--primary))] text-white font-bold text-sm"
+                className="w-10 h-10 rounded-full flex items-center justify-center
+                  bg-[rgb(var(--primary))]
+                  text-white font-bold text-sm
+                  hover:opacity-90
+                  transition"
               >
                 {initials}
               </button>
@@ -149,10 +179,13 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
                     <MenuItem icon={<Settings size={16} />} onClick={() => navigate('/settings')}>
                       Settings
                     </MenuItem>
+
                     <MenuItem icon={<User size={16} />} onClick={() => navigate('/profile')}>
                       Profile
                     </MenuItem>
+
                     <div className="h-px bg-[rgb(var(--border))] my-1 mx-2" />
+
                     <MenuItem icon={<LogOut size={16} />} danger onClick={handleLogout}>
                       Logout
                     </MenuItem>
@@ -161,9 +194,8 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
               )}
             </div>
           ) : (
-            /* ================= PUBLIC ================= */
             <>
-              {/* Desktop buttons */}
+              {/* Desktop Buttons */}
               <div className="hidden md:flex items-center gap-2">
                 <Link
                   to="/login"
@@ -185,11 +217,11 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
                 </Link>
               </div>
 
-              {/* Mobile Hamburger */}
+              {/* Mobile Menu */}
               <div className="md:hidden relative" ref={mobileMenuRef}>
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="w-9 h-9 flex items-center justify-center rounded-lg
+                  className="w-10 h-10 flex items-center justify-center rounded-lg
                     border border-[rgb(var(--border))]
                     bg-[rgb(var(--bg))]"
                 >
@@ -225,6 +257,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
               </div>
             </>
           )}
+
         </div>
       </div>
     </header>
