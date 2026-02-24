@@ -18,10 +18,22 @@ const MenuItem = ({
       w-full flex items-center gap-2
       px-4 py-2 text-sm rounded-md mx-1
       transition
-      ${danger
-        ? 'text-red-600 hover:bg-red-50'
-        : 'text-gray-700 hover:bg-gray-100'}
-      focus-visible:outline-none focus-visible:ring-2 ring-blue-500
+
+      ${
+        danger
+          ? `
+            text-[rgb(var(--danger))]
+            hover:bg-[rgb(var(--danger)/0.1)]
+          `
+          : `
+            text-[rgb(var(--text))]
+            hover:bg-[rgb(var(--card))]
+          `
+      }
+
+      focus-visible:outline-none
+      focus-visible:ring-2
+      ring-[rgb(var(--primary))]
     `}
   >
     {icon}

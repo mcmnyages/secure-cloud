@@ -7,13 +7,17 @@
   --card: 255 255 255;
   --border: 229 231 235;
   --primary: 59 130 246;
+
+  --danger: 220 38 38; /* red-600 */
 }
 
 /* Dark theme */
 [data-theme='dark'] {
-  --bg: 24 24 27;        /* charcoal */
-  --text: 244 244 245;   /* near white */
-  --card: 39 39 42;      /* zinc-800 */
-  --border: 63 63 70;    /* subtle border */
-  --primary: 96 165 250; /* blue-400 */
+  --bg: 24 24 27;
+  --text: 244 244 245;
+  --card: 39 39 42;
+  --border: 63 63 70;
+  --primary: 96 165 250;
+
+  --danger: 248 113 113; /* red-400 (better for dark mode) */
 }

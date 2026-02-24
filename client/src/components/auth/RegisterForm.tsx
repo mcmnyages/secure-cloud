@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import type { RegisterData } from "../../types/authTypes"
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa"
+import { Link } from "react-router-dom"
 
 interface RegisterFormProps {
   onSubmit: (data: RegisterData) => void
@@ -117,7 +118,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-[rgb(var(--text)/0.5)]"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {showPassword ? <FaEyeSlash color="currentColor"/> : <FaEye color="currentColor" />}
               </button>
             </div>
 
@@ -158,12 +159,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
         <p className="text-center text-sm text-[rgb(var(--text)/0.6)] mt-6">
           Already have an account?{" "}
-          <a
-            href="/login"
-            className="text-[rgb(var(--primary))] hover:underline"
-          >
-            Sign in
-          </a>
+          <Link to="/login" className="text-[rgb(var(--primary))] hover:underline">
+            Log in
+          </Link>
         </p>
       </div>
     </div>
