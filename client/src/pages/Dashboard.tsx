@@ -26,7 +26,7 @@ const Dashboard = () => {
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 text-[rgb(var(--text))]">
 
       {/* Header */}
-      <DashboardHeader onUpload={() => setIsModalOpen(true)} />
+      <DashboardHeader  />
 
       {/* Summary Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -63,13 +63,6 @@ const Dashboard = () => {
             <h2 className="font-semibold text-lg">
               Your files
             </h2>
-
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-[rgb(var(--primary))] text-white px-4 py-2 rounded-lg hover:bg-[rgb(var(--primary)/0.85)] transition-all active:scale-95"
-            >
-              Upload file
-            </button>
           </div>
 
           {isLoading && (
