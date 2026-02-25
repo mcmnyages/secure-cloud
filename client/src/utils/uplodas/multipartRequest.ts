@@ -9,7 +9,7 @@ type MultipartOptions = {
   config?: AxiosRequestConfig
 }
 
-export const multipartRequest = (p0: string, p1: string, file: File, {
+export const multipartRequest = (_p0: string, _p1: string, _file: File, {
   method, url, files = [], data = {}, config = {},
 }: MultipartOptions) => {
   const formData = new FormData()
