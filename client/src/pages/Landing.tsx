@@ -1,7 +1,7 @@
 import { Shield, Upload, HardDrive, ArrowRight, CheckCircle2 } from 'lucide-react'
 import type { JSX } from 'react'
 import { Link } from 'react-router-dom'
-import AppHeader from '../components/navigation/AppHeader'
+import AppHeader from '../components/ui/navigation/AppHeader'
 
 const Landing = () => {
   return (
@@ -9,10 +9,10 @@ const Landing = () => {
       {/* The AppHeader now handles all Navigation 
           (Logo, Login, Register, and User Profile)
       */}
-      <AppHeader 
-        collapsed={false} 
-        onToggleDesktop={() => {}} 
-        onOpenMobile={() => {}} 
+      <AppHeader
+        collapsed={false}
+        onToggleDesktop={() => { }}
+        onOpenMobile={() => { }}
       />
 
       <main>
@@ -26,14 +26,14 @@ const Landing = () => {
               </span>
               TRUSTED BY 10K+ USERS
             </div>
-            
+
             <h2 className="text-5xl md:text-6xl font-extrabold text-[rgb(var(--text))] leading-[1.1] tracking-tight">
               Secure cloud storage, <br />
               <span className="text-[rgb(var(--primary))]">made simple.</span>
             </h2>
 
             <p className="mt-8 text-lg text-[rgb(var(--text)/0.7)] max-w-lg leading-relaxed">
-              Upload, manage, and access your files from anywhere. 
+              Upload, manage, and access your files from anywhere.
               Built with military-grade security and a focus on lightning-fast speed.
             </p>
 
@@ -76,7 +76,7 @@ const Landing = () => {
                 </div>
                 <div className="h-4 w-32 bg-[rgb(var(--bg)/0.7)] rounded-full" />
               </div>
-              
+
               <div className="space-y-4">
                 {[80, 45, 60].map((width, i) => (
                   <div key={i} className="flex items-center gap-4">
@@ -102,7 +102,7 @@ const Landing = () => {
               <h3 className="text-3xl font-bold text-[rgb(var(--text))]">Everything you need to manage data</h3>
               <p className="text-[rgb(var(--text)/0.6)] mt-4">Powerful features to help you keep your digital life organized and secure.</p>
             </div>
-            
+
             <div className="grid md:grid-cols-3 gap-8">
               <Feature
                 icon={<Upload size={24} />}

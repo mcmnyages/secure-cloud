@@ -3,7 +3,7 @@ import { useRequestPasswordReset } from '../hooks/email/useRequestPasswordReset'
 import type { PasswordResetResponse } from '../types/emailTypes'
 import { Link } from 'react-router-dom'
 import { FiArrowLeft, FiMail, FiUserPlus } from 'react-icons/fi'
-import AppHeader from '../components/navigation/AppHeader'
+import AppHeader from '../components/ui/navigation/AppHeader'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -24,7 +24,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
-      <AppHeader collapsed={false} onToggleDesktop={() => {}} onOpenMobile={() => {}} />
+      <AppHeader collapsed={false} onToggleDesktop={() => { }} onOpenMobile={() => { }} />
 
       <div className="flex items-center justify-center px-4 py-60">
         <div className="w-full max-w-md bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl shadow-xl p-8">
@@ -56,11 +56,10 @@ export default function ForgotPassword() {
           {/* Feedback Message */}
           {response && (
             <div
-              className={`mt-6 flex items-start gap-3 rounded-lg p-4 text-sm border ${
-                response.sent
+              className={`mt-6 flex items-start gap-3 rounded-lg p-4 text-sm border ${response.sent
                   ? 'bg-[rgb(var(--primary)/0.08)] text-[rgb(var(--primary))] border-[rgb(var(--primary)/0.2)]'
                   : 'bg-[rgb(var(--destructive)/0.08)] text-[rgb(var(--destructive))] border-[rgb(var(--destructive)/0.2)]'
-              }`}
+                }`}
               role="alert"
               aria-live="polite"
             >

@@ -1,6 +1,6 @@
-import UploadModal from '../components/UploadModal'
+import UploadModal from '@/components/ui/modals/UploadModal'
 import { useDashboard } from '../hooks/files/useDashboard'
-import { FilesTable } from '../components/dashboard'
+import { FilesTable } from '../components/ui/dashboard'
 import { LoadingSpinner } from '../components/ui/spinners/LoadingSpinner'
 
 const Files = () => {
@@ -24,7 +24,7 @@ const Files = () => {
       {isLoading && (
         <div className="flex justify-center py-10">
           <LoadingSpinner size="large" />
-        </div>  
+        </div>
       )}
 
       {/* Files table */}

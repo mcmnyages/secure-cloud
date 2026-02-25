@@ -1,6 +1,6 @@
-import RegisterForm from "../components/auth/RegisterForm";
+import RegisterForm from "../components/ui/auth/RegisterForm";
 import { useRegister } from "../hooks/auth/useRegister";
-import AppHeader from "../components/navigation/AppHeader";
+import AppHeader from "../components/ui/navigation/AppHeader";
 
 const Register = () => {
   const { mutate, isPending } = useRegister();
@@ -8,7 +8,7 @@ const Register = () => {
 
   return (
     <div className="">
-      <AppHeader collapsed={false} onToggleDesktop={() => {}} onOpenMobile={() => {}} />
+      <AppHeader collapsed={false} onToggleDesktop={() => { }} onOpenMobile={() => { }} />
 
       <RegisterForm
         loading={isPending}

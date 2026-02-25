@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { MailCheck, ArrowLeft, LogIn } from "lucide-react"
 import { useResendVerification } from "../hooks/email/useSendVerification"
-import AppHeader from "../components/navigation/AppHeader"
+import AppHeader from "../components/ui/navigation/AppHeader"
 
 const RESEND_DELAY = 60 // seconds
 
@@ -53,7 +53,7 @@ const VerifyEmail = () => {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
-      <AppHeader collapsed={false} onToggleDesktop={() => {}} onOpenMobile={() => {}} />
+      <AppHeader collapsed={false} onToggleDesktop={() => { }} onOpenMobile={() => { }} />
 
       <div className="flex items-center justify-center p-4 py-20">
         <div className="relative max-w-md w-full bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl shadow-xl p-8 text-center">
@@ -94,10 +94,9 @@ const VerifyEmail = () => {
             onClick={handleResend}
             disabled={!canResend || isPending}
             className={`w-full py-3 rounded-lg font-medium text-white transition
-              ${
-                canResend
-                  ? "bg-[rgb(var(--primary))] hover:opacity-90"
-                  : "bg-[rgb(var(--border))] cursor-not-allowed text-[rgb(var(--text)/0.6)]"
+              ${canResend
+                ? "bg-[rgb(var(--primary))] hover:opacity-90"
+                : "bg-[rgb(var(--border))] cursor-not-allowed text-[rgb(var(--text)/0.6)]"
               }
             `}
           >

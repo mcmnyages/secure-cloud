@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { getFileConfig, formatFileSize, formatDate } from '../../utils/helpers/files/fileUtils';
+import { getFileConfig, formatFileSize, formatDate } from '../../../utils/helpers/files/fileUtils';
 import { Check, Download, Trash2, Upload, X, Calendar } from 'lucide-react';
-import type { CloudFile } from '../../types/fileTypes';
+import type { CloudFile } from '../../../types/fileTypes';
 
 interface FilesTableProps {
   files: CloudFile[];
@@ -83,11 +83,10 @@ const FilesTable = ({ files, onDelete, onDownload, onUpload, onBulkDelete }: Fil
                 {/* 2. MASTER CHECKBOX UI */}
                 <div
                   onClick={toggleSelectAll}
-                  className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-300 ${
-                    selectedIds.length === files.length && files.length > 0
+                  className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-300 ${selectedIds.length === files.length && files.length > 0
                       ? 'bg-[rgb(var(--primary))] border-[rgb(var(--primary))]'
                       : 'border-[rgb(var(--border))] hover:border-[rgb(var(--primary))]'
-                  }`}
+                    }`}
                 >
                   {selectedIds.length === files.length && files.length > 0 && <Check size={12} className="text-white stroke-[4px]" />}
                 </div>
@@ -117,11 +116,10 @@ const FilesTable = ({ files, onDelete, onDownload, onUpload, onBulkDelete }: Fil
                   <td className={`px-6 py-4 first:rounded-l-2xl transition-all ${isSelected ? 'border-l-4 border-[rgb(var(--primary))]' : 'border-l-4 border-transparent'}`}>
                     <div
                       onClick={() => toggleSelect(file.id)}
-                      className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${
-                        isSelected 
-                        ? 'bg-[rgb(var(--primary))] border-[rgb(var(--primary))] scale-110' 
-                        : 'border-[rgb(var(--border))] opacity-40 group-hover:opacity-100'
-                      }`}
+                      className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${isSelected
+                          ? 'bg-[rgb(var(--primary))] border-[rgb(var(--primary))] scale-110'
+                          : 'border-[rgb(var(--border))] opacity-40 group-hover:opacity-100'
+                        }`}
                     >
                       {isSelected && <Check size={12} className="text-white stroke-[4px]" />}
                     </div>

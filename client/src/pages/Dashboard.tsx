@@ -1,10 +1,10 @@
-import UploadModal from '../components/UploadModal'
+import UploadModal from '@/components/ui/modals/UploadModal'
 import { useDashboard } from '../hooks/files/useDashboard'
 import {
   DashboardHeader,
   StorageCard,
   FilesTable,
-} from '../components/dashboard'
+} from '../components/ui/dashboard'
 
 const Dashboard = () => {
   const {

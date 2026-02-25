@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useLogin } from '../hooks/auth/useLogin'
 import { toast } from 'sonner'
 import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'
-import AppHeader from '../components/navigation/AppHeader'
+import AppHeader from '../components/ui/navigation/AppHeader'
 
 interface FormData {
   email: string
@@ -69,7 +69,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
-      <AppHeader collapsed={false} onToggleDesktop={() => {}} onOpenMobile={() => {}} />
+      <AppHeader collapsed={false} onToggleDesktop={() => { }} onOpenMobile={() => { }} />
 
       <div className="flex items-center justify-center px-4 py-30">
         <div className="w-full max-w-md p-8 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl shadow-xl">
@@ -102,11 +102,10 @@ const Login: React.FC = () => {
                 placeholder="you@example.com"
                 className={`w-full p-3 rounded-lg border bg-[rgb(var(--bg))] text-[rgb(var(--text))] 
                 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary))] 
-                ${
-                  errors.email
+                ${errors.email
                     ? 'border-red-500'
                     : 'border-[rgb(var(--border))]'
-                }`}
+                  }`}
               />
 
               {errors.email && (
@@ -132,11 +131,10 @@ const Login: React.FC = () => {
                   placeholder="••••••••"
                   className={`w-full p-3 pr-10 rounded-lg border bg-[rgb(var(--bg))] text-[rgb(var(--text))]
                   focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary))]
-                  ${
-                    errors.password
+                  ${errors.password
                       ? 'border-red-500'
                       : 'border-[rgb(var(--border))]'
-                  }`}
+                    }`}
                 />
 
                 <button
@@ -169,10 +167,9 @@ const Login: React.FC = () => {
               type="submit"
               disabled={isPending}
               className={`w-full py-3 rounded-lg font-semibold text-white transition-all
-                ${
-                  isPending
-                    ? 'bg-[rgb(var(--primary)/0.6)] cursor-not-allowed'
-                    : 'bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.85)] active:scale-95'
+                ${isPending
+                  ? 'bg-[rgb(var(--primary)/0.6)] cursor-not-allowed'
+                  : 'bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.85)] active:scale-95'
                 }`}
             >
               {isPending ? 'Signing in...' : 'Sign In'}

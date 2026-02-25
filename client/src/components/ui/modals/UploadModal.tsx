@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Upload, Loader2 } from 'lucide-react'
-import { useFileMutations } from '../hooks/files/useFileMutations'
+import { useFileMutations } from '@/hooks/files/useFileMutations'
 
 interface Props {
   isOpen: boolean

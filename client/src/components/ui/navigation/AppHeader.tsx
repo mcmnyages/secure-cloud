@@ -1,10 +1,10 @@
 import { Menu, X, LogOut, User, Settings, Cloud } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '../../../contexts/AuthContext'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import getInitials from '../../utils/helpers/getInitials'
+import getInitials from '../../../utils/helpers/getInitials'
 import MenuItem from './MenuItem'
-import ThemeToggle from '../ui/buttons/ThemeToggleButton'
+import ThemeToggle from '../buttons/ThemeToggleButton'
 
 interface Props {
   collapsed: boolean
@@ -59,17 +59,17 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   const sidebarWidth = collapsed ? 'md:left-20' : 'md:left-64'
 
   return (
-    <header 
+    <header
       className={`
         fixed top-0 right-0 h-16 z-40 transition-all duration-300 ease-in-out
-        ${isAuthenticated 
-          ? `left-0 ${sidebarWidth} bg-[rgb(var(--card))] border-b border-[rgb(var(--border))] shadow-sm` 
+        ${isAuthenticated
+          ? `left-0 ${sidebarWidth} bg-[rgb(var(--card))] border-b border-[rgb(var(--border))] shadow-sm`
           : `left-0 w-full ${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
         }
       `}
     >
       <div className={`h-full flex items-center justify-between px-4 sm:px-6 lg:px-8 ${!isAuthenticated && 'max-w-7xl mx-auto'}`}>
-        
+
         {/* LEFT SECTION: Contextual Toggles */}
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
@@ -143,17 +143,17 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
               {/* Public Mobile Nav Dropdown */}
               <div className="sm:hidden" ref={mobileMenuRef}>
-                <button 
+                <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="p-2 rounded-md border border-[rgb(var(--border))]"
                 >
                   {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
                 {mobileMenuOpen && (
-                   <div className="absolute right-4 mt-2 w-48 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg shadow-lg p-2 flex flex-col gap-1">
-                      <Link to="/login" className="p-2 text-sm" onClick={closeMenus}>Log In</Link>
-                      <Link to="/register" className="p-2 text-sm bg-[rgb(var(--primary))] text-white rounded-md text-center" onClick={closeMenus}>Sign Up</Link>
-                   </div>
+                  <div className="absolute right-4 mt-2 w-48 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg shadow-lg p-2 flex flex-col gap-1">
+                    <Link to="/login" className="p-2 text-sm" onClick={closeMenus}>Log In</Link>
+                    <Link to="/register" className="p-2 text-sm bg-[rgb(var(--primary))] text-white rounded-md text-center" onClick={closeMenus}>Sign Up</Link>
+                  </div>
                 )}
               </div>
             </nav>

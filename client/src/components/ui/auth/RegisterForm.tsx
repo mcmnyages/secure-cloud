@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import type { RegisterData } from "../../types/authTypes"
+import type { RegisterData } from "../../../types/authTypes"
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa"
 import { Link } from "react-router-dom"
 
@@ -118,7 +118,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-[rgb(var(--text)/0.5)]"
               >
-                {showPassword ? <FaEyeSlash color="currentColor"/> : <FaEye color="currentColor" />}
+                {showPassword ? <FaEyeSlash color="currentColor" /> : <FaEye color="currentColor" />}
               </button>
             </div>
 
@@ -132,10 +132,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             type="submit"
             disabled={loading}
             className={`w-full py-3 rounded-lg font-semibold text-white transition-all
-              ${
-                loading
-                  ? "bg-[rgb(var(--primary)/0.6)] cursor-not-allowed"
-                  : "bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.85)] active:scale-95"
+              ${loading
+                ? "bg-[rgb(var(--primary)/0.6)] cursor-not-allowed"
+                : "bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.85)] active:scale-95"
               }`}
           >
             {loading ? "Creating account..." : "Create Account"}

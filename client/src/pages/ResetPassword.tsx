@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useResetPassword } from '../hooks/email/useResetPassword'
 import { getQueryParam } from '../utils/getQueryParam'
 import { Link } from 'react-router-dom'
-import AppHeader from '../components/navigation/AppHeader'
+import AppHeader from '../components/ui/navigation/AppHeader'
 
 export default function ResetPassword() {
   const token = getQueryParam('token')
@@ -39,7 +39,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
-      <AppHeader collapsed={false} onToggleDesktop={() => {}} onOpenMobile={() => {}} />
+      <AppHeader collapsed={false} onToggleDesktop={() => { }} onOpenMobile={() => { }} />
 
       <div className="flex items-center justify-center px-4 py-20">
         <div className="w-full max-w-md bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl shadow-xl p-8">
@@ -55,11 +55,10 @@ export default function ResetPassword() {
           {/* Feedback Message */}
           {responseMessage && (
             <div
-              className={`mt-6 rounded-lg p-4 text-center font-medium border ${
-                responseMessage.success
+              className={`mt-6 rounded-lg p-4 text-center font-medium border ${responseMessage.success
                   ? 'bg-[rgb(var(--primary)/0.08)] text-[rgb(var(--primary))] border-[rgb(var(--primary)/0.2)]'
                   : 'bg-[rgb(var(--destructive)/0.08)] text-[rgb(var(--destructive))] border-[rgb(var(--destructive)/0.2)]'
-              }`}
+                }`}
             >
               {responseMessage.message}
             </div>

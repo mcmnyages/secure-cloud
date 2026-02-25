@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import Sidebar from '../components/navigation/Sidebar'
-import AppHeader from '../components/navigation/AppHeader'
+import Sidebar from '../components/ui/navigation/Sidebar'
+import AppHeader from '../components/ui/navigation/AppHeader'
 
 const AuthLayout = () => {
   const { isAuthenticated } = useAuth()
@@ -23,10 +23,10 @@ const AuthLayout = () => {
 
       {/* Main content */}
       <AppHeader
-          collapsed={collapsed}
-          onToggleDesktop={() => setCollapsed(c => !c)}
-          onOpenMobile={() => setMobileOpen(true)}
-        />
+        collapsed={collapsed}
+        onToggleDesktop={() => setCollapsed(c => !c)}
+        onOpenMobile={() => setMobileOpen(true)}
+      />
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
