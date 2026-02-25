@@ -14,8 +14,8 @@ export const fileService = {
 
   getStorage: () => api.get('/auth/me'),
 
-  renameFile: (id: string, newName: string) =>
-    api.put(`/files/${id}/rename`, { newName }),
+  renameFile: (id: string, name: string) =>
+    api.patch(`/files/${id}/rename`, { name }),
 
   uploadNewVersion: (id: string, file: File) => {
     return multipartRequest('PUT', `/files/${id}`, file, {

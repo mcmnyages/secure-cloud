@@ -1,138 +1,150 @@
-import UploadModal from '@/components/ui/modals/UploadModal'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import { useDashboard } from '@/hooks/files/useDashboard'
-import {
-  DashboardHeader,
-  StorageCard,
-  FilesTable,
-} from '../components/ui/dashboard'
+import UploadModal from '@/components/ui/modals/UploadModal'
+import { DashboardHeader, StorageCard } from '@/components/ui/dashboard'
+import DashboardToolbar from '@/components/ui/dashboard/DashboardToolbar'
+import QuickStat from '@/components/ui/dashboard/QuickStat'
+import FileListItem from '@/components/ui/dashboard/FileListItem'
+import FileGridItem from '@/components/ui/dashboard/FileGridItem'
+import { File, Search } from 'lucide-react'
+import { formatFileSize } from '@/utils/helpers/files/fileUtils'
+import DashboardSidebar from '@/components/ui/dashboard/DashboardSidebar'
+import FloatingUploadButton from '@/components/ui/buttons/FloatingUploadButton'
+import MobileUpgradeBanner from '@/components/ui/dashboard/MobileUpgradeBanner'
+import { OverlayLoader } from '@/components/ui/spinners'
 
 const Dashboard = () => {
-  const {
-    files,
-    storage,
-    isModalOpen,
-    setIsModalOpen,
-    deleteFile,
-    downloadFile,
-    isLoading,
+  const { 
+    files, 
+    storage, 
+    isModalOpen, 
+    setIsModalOpen, 
+    deleteFile, 
+    downloadFile, 
+    isLoading 
   } = useDashboard()
 
-  const isEmpty = !isLoading && files.length === 0
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
+  const [search, setSearch] = useState('')
+  const [showFilter, setShowFilter] = useState(false)
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('newest')
 
-  const storagePercentage =
-    storage?.limit && storage.limit > 0
-      ? (storage.used / storage.limit) * 100
-      : 0
+  const filterRef = useRef<HTMLDivElement>(null!)
+
+  // Handle clicking outside of filters to close them
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setShowFilter(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filteredFiles = useMemo(() => {
+    return files
+      .filter(file => 
+        file.name.toLowerCase().includes(search.toLowerCase()) &&
+        (typeFilter === 'all' || file.mimeType.includes(typeFilter))
+      )
+      .sort((a, b) => {
+        if (sortBy === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        if (sortBy === 'size') return b.size - a.size
+        return a.name.localeCompare(b.name)
+      })
+  }, [files, search, typeFilter, sortBy])
 
   return (
-    <div className="max-w-7xl px-2 py-8 space-y-8 text-[rgb(var(--text))]">
+    <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--text))] transition-colors duration-300 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+        <DashboardHeader />
 
-      {/* Header */}
-      <DashboardHeader />
-
-      {/* Summary Section */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        {storage && <StorageCard {...storage} />}
-
-        <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow p-6">
-          <h3 className="text-sm text-[rgb(var(--text)/0.6)] mb-1">
-            Total files
-          </h3>
-          <p className="text-2xl font-bold">
-            {files.length}
-          </p>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {storage && <StorageCard {...storage} />}
+          <QuickStat label="Total Files" value={files.length} icon={<File size={20} />} />
+          <QuickStat label="Search Matches" value={filteredFiles.length} icon={<Search size={20} />} />
         </div>
 
-        <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow p-6">
-          <h3 className="text-sm text-[rgb(var(--text)/0.6)] mb-1">
-            Last upload
-          </h3>
-          <p className="text-sm text-[rgb(var(--text)/0.8)]">
-            {files[0]?.createdAt
-              ? new Date(files[0].createdAt).toLocaleDateString()
-              : '—'}
-          </p>
-        </div>
-
-      </section>
-
-      {/* Main Content */}
-      <section className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-        {/* Files Section */}
-        <div className="lg:col-span-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow">
-
-          <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border))]">
-            <h2 className="font-semibold text-lg">
-              Your files
-            </h2>
-          </div>
-
-          {/* Loading */}
-          {isLoading && (
-            <div className="p-6 text-[rgb(var(--text)/0.6)]">
-              Loading files…
-            </div>
-          )}
-
-          {/* Empty State */}
-          {isEmpty && (
-            <div className="p-12 text-center text-[rgb(var(--text)/0.6)]">
-              <p className="mb-4">No files yet</p>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="text-[rgb(var(--primary))] font-medium hover:underline"
-              >
-                Upload your first file
-              </button>
-            </div>
-          )}
-
-          {/* Files Table */}
-          {!isLoading && !isEmpty && (
-            <FilesTable
-              files={files}
-              onDelete={(id) => deleteFile.mutate(id)}
-              onDownload={downloadFile}
-              onUpload={() => setIsModalOpen(true)}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main Content Area */}
+          <div className="flex-1 space-y-6">
+            <DashboardToolbar
+              search={search}
+              setSearch={setSearch}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              showFilter={showFilter}
+              setShowFilter={setShowFilter}
+              filterRef={filterRef}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              typeFilter={typeFilter}
+              setTypeFilter={setTypeFilter} 
+              // FIX: Connect the modal trigger here
+              openUploadModal={() => setIsModalOpen(true)} 
             />
-          )}
 
-        </div>
-
-        {/* Sidebar */}
-        <aside className="space-y-6">
-
-          <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow p-6">
-            <h3 className="font-medium mb-2">
-              Quick actions
-            </h3>
-
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="w-full bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] py-2 rounded-lg hover:bg-[rgb(var(--primary)/0.2)] transition"
-            >
-              Upload new file
-            </button>
+            {isLoading ? (
+              <OverlayLoader label='Loading Dashboard Elements...' />
+            ) : filteredFiles.length === 0 ? (
+              <div className="text-center py-20 bg-[rgb(var(--card))] rounded-3xl border border-dashed border-[rgb(var(--border))]">
+                <Search size={40} className="mx-auto mb-4 opacity-20" />
+                <p className="text-[rgb(var(--text)/0.6)] font-medium">No files match your current filters.</p>
+              </div>
+            ) : (
+              <div className="transition-all duration-300">
+                {viewMode === 'list' ? (
+                  <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl overflow-hidden shadow-sm">
+                    <div className="divide-y divide-[rgb(var(--border))]">
+                      {filteredFiles.map(file => (
+                        <FileListItem
+                          key={file.id}
+                          file={file}
+                          formatSize={formatFileSize}
+                          onDownload={downloadFile}
+                          onDelete={deleteFile}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {filteredFiles.map(file => (
+                      <FileGridItem
+                        key={file.id}
+                        file={file}
+                        onDownload={downloadFile}
+                        onDelete={deleteFile}
+                        formatSize={formatFileSize}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {storagePercentage > 80 && (
-            <div className="bg-[rgb(var(--primary)/0.08)] border border-[rgb(var(--primary)/0.3)] rounded-xl p-4 text-sm text-[rgb(var(--primary))]">
-              You’re running out of storage. Consider deleting unused files.
-            </div>
-          )}
+          {/* Sidebar */}
+          <aside className="lg:w-80">
+            <DashboardSidebar />
+          </aside>
+        </div>
+      </div>
 
-        </aside>
+      {/* NOTE: Since DashboardToolbar now has a built-in FAB logic 
+         from our previous step, you might not need FloatingUploadButton anymore.
+         If you want to keep the standalone one, ensure it also uses setIsModalOpen(true).
+      */}
 
-      </section>
+      {/* <MobileUpgradeBanner /> */}
 
-      {/* Upload Modal */}
-      <UploadModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+      <UploadModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
       />
-
     </div>
   )
 }

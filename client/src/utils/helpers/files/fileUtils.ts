@@ -171,7 +171,7 @@ const mimeMatchers: MimeMatcher[] = [
   },
 ];
 
-export const getFileConfig = (mimeType?: string): FileTypeConfig => {
+export const getFileConfig = (mimeType?: string, _p0?: number): FileTypeConfig => {
   if (!mimeType) return defaultConfig;
 
   const normalized = mimeType.toLowerCase().split(';')[0]; // remove charset
