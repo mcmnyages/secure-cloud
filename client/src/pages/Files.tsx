@@ -1,5 +1,5 @@
 import UploadModal from '../components/UploadModal'
-import { useDashboard } from '../hooks/files/useDashboard'
+import { useDashboard } from '../hooks/files/useFileMutations'
 import { FilesTable } from '../components/dashboard'
 
 const Files = () => {
