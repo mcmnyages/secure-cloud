@@ -1,5 +1,5 @@
 import UploadModal from '../components/UploadModal'
-import { useDashboard } from '../hooks/files/useFileMutations'
+import { useDashboard } from '../hooks/files/useDashboard'
 import { FilesTable } from '../components/dashboard'
 
 const Files = () => {
@@ -7,34 +7,52 @@ const Files = () => {
     files,
     isModalOpen,
     setIsModalOpen,
-    refresh,
     deleteFile,
     downloadFile,
+    isLoading,
   } = useDashboard()
 
   return (
     <div className="space-y-6">
+
       {/* Page header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Files</h1>
+
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[rgb(var(--primary))] text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
+        >
+          Upload
+        </button>
       </div>
 
-      {/* Files table */}
-      <FilesTable
-        files={files.map(file => ({
-          ...file,
-          mimeType: file.mimeType ?? '', // Provide a default or map as needed
-        }))}
-        onDelete={deleteFile}
-        onDownload={downloadFile}
-        onUpload={() => setIsModalOpen(true)}
-      />
+      {/* Loading */}
+      {isLoading && (
+        <div className="text-[rgb(var(--text)/0.6)]">
+          Loading files…
+        </div>
+      )}
 
+      {/* Files table */}
+      {!isLoading && (
+        <FilesTable
+          files={files.map(file => ({
+            ...file,
+            mimeType: file.mimeType ?? '',
+          }))}
+          onDelete={(id) => deleteFile.mutate(id)}
+          onDownload={downloadFile}
+          onUpload={() => setIsModalOpen(true)}
+        />
+      )}
+
+      {/* Upload Modal */}
       <UploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onUploadSuccess={refresh}
       />
+
     </div>
   )
 }

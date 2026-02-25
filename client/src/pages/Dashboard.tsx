@@ -1,5 +1,5 @@
 import UploadModal from '../components/UploadModal'
-import { useDashboard } from '../hooks/files/useFileMutations'
+import { useDashboard } from '../hooks/files/useDashboard'
 import {
   DashboardHeader,
   StorageCard,
@@ -12,15 +12,17 @@ const Dashboard = () => {
     storage,
     isModalOpen,
     setIsModalOpen,
-    refresh,
     deleteFile,
     downloadFile,
     isLoading,
   } = useDashboard()
 
   const isEmpty = !isLoading && files.length === 0
+
   const storagePercentage =
-    storage.limit > 0 ? (storage.used / storage.limit) * 100 : 0
+    storage?.limit && storage.limit > 0
+      ? (storage.used / storage.limit) * 100
+      : 0
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 text-[rgb(var(--text))]">
@@ -30,7 +32,8 @@ const Dashboard = () => {
 
       {/* Summary Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StorageCard {...storage} />
+
+        {storage && <StorageCard {...storage} />}
 
         <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow p-6">
           <h3 className="text-sm text-[rgb(var(--text)/0.6)] mb-1">
@@ -51,12 +54,13 @@ const Dashboard = () => {
               : '—'}
           </p>
         </div>
+
       </section>
 
       {/* Main Content */}
       <section className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-        {/* Files */}
+        {/* Files Section */}
         <div className="lg:col-span-3 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow">
 
           <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border))]">
@@ -65,12 +69,14 @@ const Dashboard = () => {
             </h2>
           </div>
 
+          {/* Loading */}
           {isLoading && (
             <div className="p-6 text-[rgb(var(--text)/0.6)]">
               Loading files…
             </div>
           )}
 
+          {/* Empty State */}
           {isEmpty && (
             <div className="p-12 text-center text-[rgb(var(--text)/0.6)]">
               <p className="mb-4">No files yet</p>
@@ -83,17 +89,19 @@ const Dashboard = () => {
             </div>
           )}
 
+          {/* Files Table */}
           {!isLoading && !isEmpty && (
             <FilesTable
               files={files}
-              onDelete={deleteFile}
+              onDelete={(id) => deleteFile.mutate(id)}
               onDownload={downloadFile}
               onUpload={() => setIsModalOpen(true)}
             />
           )}
+
         </div>
 
-        {/* Right Sidebar */}
+        {/* Sidebar */}
         <aside className="space-y-6">
 
           <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow p-6">
@@ -116,13 +124,15 @@ const Dashboard = () => {
           )}
 
         </aside>
+
       </section>
 
+      {/* Upload Modal */}
       <UploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onUploadSuccess={refresh}
       />
+
     </div>
   )
 }
