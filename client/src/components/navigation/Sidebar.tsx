@@ -22,23 +22,19 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
         />
       )}
 
+      {/* Sidebar */}
       <aside
         className={`
-          md:sticky top-0 z-50
-          md:h-screen
-          bg-[rgb(var(--card))]
-          border-r border-[rgb(var(--border))]
-          w-64
+          fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out
+          bg-[rgb(var(--card))] border-r border-[rgb(var(--border))]
+          w-64 md:sticky md:top-0 md:h-screen md:relative
+          flex flex-col z-50
           ${collapsed ? 'md:w-20' : 'md:w-64'}
-          flex flex-col
-          transition-[width,transform] duration-300 ease-in-out
-          fixed md:relative
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
         `}
       >
-        {/* Header inside sidebar */}
-        <div className="h-16 flex items-center px-4 border-b border-[rgb(var(--border))] flex-shrink-0">
+        {/* Header */}
+        <div className="h-16 flex items-center px-4 border-b border-[rgb(var(--border))] flex-shrink-0 relative">
           <div className="flex items-center gap-2 overflow-hidden">
             <span
               className={`
@@ -62,17 +58,18 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
             </span>
           </div>
 
+          {/* Close button on mobile */}
           <button
             onClick={onCloseMobile}
-            className="ml-auto md:hidden p-2 rounded-lg hover:bg-[rgb(var(--bg))] transition"
+            className="absolute top-4 right-4 md:hidden p-2 rounded-lg hover:bg-[rgb(var(--bg))] transition"
             aria-label="Close sidebar"
           >
             <X size={18} className="text-[rgb(var(--text))]" />
           </button>
         </div>
 
-        {/* Nav items scrollable if needed */}
-        <nav className="flex-1 overflow-auto px-3 py-4 space-y-1">
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           <NavItem to="/dashboard" icon={<LayoutGrid size={20} />} label="Dashboard" collapsed={collapsed} />
           <NavItem to="/files" icon={<Folder size={20} />} label="Files" collapsed={collapsed} />
           <NavItem to="/settings" icon={<Settings size={20} />} label="Settings" collapsed={collapsed} />

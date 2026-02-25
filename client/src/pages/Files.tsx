@@ -15,19 +15,10 @@ const Files = () => {
   } = useDashboard()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-18">
 
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Files</h1>
-
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-[rgb(var(--primary))] text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
-        >
-          Upload
-        </button>
-      </div>
+      {/*  You can replace this with a more complex header if needed */}
 
       {/* Loading */}
       {isLoading && (

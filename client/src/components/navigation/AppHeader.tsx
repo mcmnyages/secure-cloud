@@ -26,238 +26,138 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   const isAuthenticated = !!user
   const initials = getInitials(user?.name, user?.email)
 
-  /* ---------------- Scroll Effect (public only) ---------------- */
+  /* ---------------- Scroll & Click Logic ---------------- */
   useEffect(() => {
     if (isAuthenticated) return
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-
+    const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isAuthenticated])
 
-  /* ---------------- Close Dropdowns ---------------- */
-  const closeMenu = useCallback(() => setOpen(false), [])
-  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), [])
+  const closeMenus = useCallback(() => {
+    setOpen(false)
+    setMobileMenuOpen(false)
+  }, [])
 
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        closeMenu()
-      }
-
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
-        closeMobileMenu()
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false)
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) setMobileMenuOpen(false)
     }
-
     document.addEventListener('mousedown', handleOutside)
     return () => document.removeEventListener('mousedown', handleOutside)
-  }, [closeMenu, closeMobileMenu])
+  }, [])
 
-  /* ---------------- Logout ---------------- */
   const handleLogout = async () => {
     await logout()
-    closeMenu()
+    closeMenus()
     navigate('/')
   }
 
-  /* ---------------- Header Style ---------------- */
-  const headerStyles = isAuthenticated
-    ? `
-      fixed top-0 right-0 h-16 z-40
-      bg-[rgb(var(--card))]
-      border-b border-[rgb(var(--border))]
-      shadow-sm
-      transition-all duration-300
-      ${collapsed ? 'md:left-20' : 'md:left-64'}
-    `
-    : `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-      ? "h-16 bg-[rgb(var(--card))/0.8] backdrop-blur-lg border-b border-[rgb(var(--border))/0.5] shadow-md"
-      : "h-16 bg-transparent"
-    }`
+  /* ---------------- Responsive Constants ---------------- */
+  // These should match your Sidebar widths exactly
+  const sidebarWidth = collapsed ? 'md:left-20' : 'md:left-64'
 
   return (
-    <header className={headerStyles}>
-      <div
-        className={`h-full px-4 md:px-6 flex items-center justify-between ${isAuthenticated ? '' : 'max-w-7xl mx-auto'
-          }`}
-      >
-
-        {/* ================= LEFT ================= */}
-        <div className="flex items-center">
-
-          {isAuthenticated && (
-            <div className="flex items-center">
-
-              {/* Mobile Toggle */}
+    <header 
+      className={`
+        fixed top-0 right-0 h-16 z-40 transition-all duration-300 ease-in-out
+        ${isAuthenticated 
+          ? `left-0 ${sidebarWidth} bg-[rgb(var(--card))] border-b border-[rgb(var(--border))] shadow-sm` 
+          : `left-0 w-full ${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
+        }
+      `}
+    >
+      <div className={`h-full flex items-center justify-between px-4 sm:px-6 lg:px-8 ${!isAuthenticated && 'max-w-7xl mx-auto'}`}>
+        
+        {/* LEFT SECTION: Contextual Toggles */}
+        <div className="flex items-center gap-4">
+          {isAuthenticated ? (
+            <>
+              {/* Mobile: Hamburger to open Drawer */}
               <button
                 onClick={onOpenMobile}
-                className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg 
-                  hover:bg-[rgb(var(--bg))]
-                  transition-colors duration-200"
+                className="md:hidden p-2 -ml-2 rounded-md text-[rgb(var(--text))] hover:bg-[rgb(var(--bg))] transition-colors"
               >
-                <Menu size={18} />
+                <Menu size={24} />
               </button>
 
-              {/* Desktop Toggle */}
+              {/* Desktop: Collapse/Expand Sidebar */}
               <button
                 onClick={onToggleDesktop}
-                className="
-                    hidden md:flex 
-                    w-10 h-10
-                    items-center justify-center
-                    rounded-lg
-                     border border-[rgb(var(--border))]
-                     bg-[rgb(var(--card))]
-                    hover:bg-[rgb(var(--primary)/0.08)] 
-                    hover:border-[rgb(var(--primary)/0.4)]
-                    active:scale-95
-                    transition-all duration-200
-                    shadow-sm
-  "
+                className="hidden md:flex items-center justify-center w-8 h-8 rounded-md border border-[rgb(var(--border))] hover:bg-[rgb(var(--primary)/0.1)] hover:text-[rgb(var(--primary))] transition-all"
               >
-                {collapsed ? (
-                  <Menu size={18} className="text-[rgb(var(--text))]" />
-                ) : (
-                  <X size={18} className="text-[rgb(var(--text))]" />
-                )}
+                {collapsed ? <Menu size={18} /> : <X size={18} />}
               </button>
-            </div>
-          )}
-
-          {!isAuthenticated && (
-            <Link to="/" className="flex items-center gap-2 pl-4 group">
-              <div className="bg-[rgb(var(--primary))] p-2 rounded-xl
-                shadow-lg shadow-[rgb(var(--primary))/0.15]
-                group-hover:scale-105 transition"
-              >
-                <Cloud className="text-white" size={20} />
-              </div>
-              <span className="font-bold text-xl text-[rgb(var(--text))]">
+            </>
+          ) : (
+            <Link to="/" className="flex items-center gap-2 group">
+              <Cloud className="text-[rgb(var(--primary))] group-hover:scale-110 transition-transform" size={28} />
+              <span className="font-bold text-xl tracking-tight hidden xs:block">
                 Secure<span className="text-[rgb(var(--primary))]">Cloud</span>
               </span>
             </Link>
           )}
-
         </div>
 
-        {/* ================= RIGHT ================= */}
-        <div className="flex items-center gap-3">
-
+        {/* RIGHT SECTION: Actions & Profile */}
+        <div className="flex items-center gap-2 sm:gap-4">
           <ThemeToggle />
 
           {isAuthenticated ? (
             <div ref={menuRef} className="relative">
               <button
                 onClick={() => setOpen(!open)}
-                className="w-10 h-10 rounded-full flex items-center justify-center
-                  bg-[rgb(var(--primary))]
-                  text-white font-bold text-sm
-                  hover:opacity-90
-                  transition"
+                className="flex items-center gap-2 p-1 rounded-full hover:bg-[rgb(var(--bg))] transition-colors"
               >
-                {initials}
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[rgb(var(--primary))] text-white flex items-center justify-center text-xs font-bold shadow-inner">
+                  {initials}
+                </div>
+                {/* Desktop only: Show Name */}
+                <span className="hidden lg:block text-sm font-medium pr-2">{user?.name?.split(' ')[0]}</span>
               </button>
 
+              {/* Dropdown Menu */}
               {open && (
-                <div className="absolute right-0 mt-3 w-56
-                  bg-[rgb(var(--card))]
-                  border border-[rgb(var(--border))]
-                  rounded-xl shadow-2xl overflow-hidden"
-                >
-                  <div className="p-4 border-b border-[rgb(var(--border))] bg-[rgb(var(--bg))/0.5]">
-                    <p className="text-sm font-bold">{user?.name}</p>
-                    <p className="text-xs text-[rgb(var(--text)/0.6)] truncate">
-                      {user?.email}
-                    </p>
+                <div className="absolute right-0 mt-2 w-56 origin-top-right bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-4 py-3 border-b border-[rgb(var(--border))]">
+                    <p className="text-sm font-semibold truncate">{user?.name}</p>
+                    <p className="text-xs text-[rgb(var(--text)/0.5)] truncate">{user?.email}</p>
                   </div>
-
                   <div className="p-1">
-                    <MenuItem icon={<Settings size={16} />} onClick={() => navigate('/settings')}>
-                      Settings
-                    </MenuItem>
-
-                    <MenuItem icon={<User size={16} />} onClick={() => navigate('/profile')}>
-                      Profile
-                    </MenuItem>
-
+                    <MenuItem icon={<User size={16} />} onClick={() => { navigate('/profile'); setOpen(false); }}>Profile</MenuItem>
+                    <MenuItem icon={<Settings size={16} />} onClick={() => { navigate('/settings'); setOpen(false); }}>Settings</MenuItem>
                     <div className="h-px bg-[rgb(var(--border))] my-1 mx-2" />
-
-                    <MenuItem icon={<LogOut size={16} />} danger onClick={handleLogout}>
-                      Logout
-                    </MenuItem>
+                    <MenuItem icon={<LogOut size={16} />} danger onClick={handleLogout}>Logout</MenuItem>
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <>
-              {/* Desktop Buttons */}
-              <div className="hidden md:flex items-center gap-2">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm font-bold
-                    text-[rgb(var(--text)/0.8)]
-                    hover:text-[rgb(var(--primary))]"
-                >
-                  Log in
-                </Link>
-
-                <Link
-                  to="/register"
-                  className="px-5 py-2 rounded-full text-sm font-bold
-                    bg-[rgb(var(--primary))]
-                    text-white
-                    hover:opacity-90 transition"
-                >
-                  Get Started
-                </Link>
+            <nav className="flex items-center gap-2">
+              {/* Public Desktop Nav */}
+              <div className="hidden sm:flex items-center gap-2">
+                <Link to="/login" className="px-4 py-2 text-sm font-medium hover:text-[rgb(var(--primary))] transition-colors">Log In</Link>
+                <Link to="/register" className="px-4 py-2 text-sm font-bold bg-[rgb(var(--primary))] text-white rounded-lg hover:opacity-90 transition-all">Get Started</Link>
               </div>
 
-              {/* Mobile Menu */}
-              <div className="md:hidden relative" ref={mobileMenuRef}>
-                <button
+              {/* Public Mobile Nav Dropdown */}
+              <div className="sm:hidden" ref={mobileMenuRef}>
+                <button 
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg
-                    border border-[rgb(var(--border))]
-                    bg-[rgb(var(--bg))]"
+                  className="p-2 rounded-md border border-[rgb(var(--border))]"
                 >
-                  {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+                  {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
-
                 {mobileMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-44
-                    bg-[rgb(var(--card))]
-                    border border-[rgb(var(--border))]
-                    rounded-xl shadow-xl p-2"
-                  >
-                    <Link
-                      to="/login"
-                      onClick={closeMobileMenu}
-                      className="block w-full px-4 py-2 rounded-lg text-sm
-                        hover:bg-[rgb(var(--bg))]"
-                    >
-                      Log in
-                    </Link>
-
-                    <Link
-                      to="/register"
-                      onClick={closeMobileMenu}
-                      className="block w-full px-4 py-2 rounded-lg text-sm
-                        bg-[rgb(var(--primary))]
-                        text-white mt-1 text-center"
-                    >
-                      Get Started
-                    </Link>
-                  </div>
+                   <div className="absolute right-4 mt-2 w-48 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg shadow-lg p-2 flex flex-col gap-1">
+                      <Link to="/login" className="p-2 text-sm" onClick={closeMenus}>Log In</Link>
+                      <Link to="/register" className="p-2 text-sm bg-[rgb(var(--primary))] text-white rounded-md text-center" onClick={closeMenus}>Sign Up</Link>
+                   </div>
                 )}
               </div>
-            </>
+            </nav>
           )}
-
         </div>
       </div>
     </header>
