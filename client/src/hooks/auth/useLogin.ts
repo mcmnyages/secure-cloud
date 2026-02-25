@@ -2,6 +2,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../../api/services/authService';
 import type { LoginCredentials, AuthResponse } from '../../types/authTypes';
+import { getErrorMessage } from '@/utils/errors/getErrorMessage';
+import { toast } from 'sonner';
 
 interface UseLoginOptions {
   onSuccess?: (data: AuthResponse) => void;
@@ -12,6 +14,9 @@ export const useLogin = ({ onSuccess, onError }: UseLoginOptions = {}) => {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
     onSuccess,
-    onError,
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+      onError?.(error);
+    },
   });
 };

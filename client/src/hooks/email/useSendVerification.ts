@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { emailService } from "../../api/services/emailService";
+import { emailService } from "@/api/services/emailService";
+import { getErrorMessage } from "@/utils/errors/getErrorMessage";
 import { toast } from "sonner";
 
 export const useResendVerification = () => {
@@ -11,8 +12,8 @@ export const useResendVerification = () => {
       toast.success("Verification email resent");
     },
 
-    onError: () => {
-      toast.error("Please wait before trying again");
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
     },
   });
 };

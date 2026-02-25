@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { authService } from "../../api/services/authService";
 import { useNavigate } from "react-router-dom";
+import { getErrorMessage } from "@/utils/errors/getErrorMessage";
 import { toast } from "sonner";
 
 export const useRegister = () => {
@@ -17,9 +18,9 @@ export const useRegister = () => {
       });
     },
 
-    onError: (err: any) => {
+    onError: (error: any) => {
       toast.error(
-        err.response?.data?.message ?? "Registration failed"
+        getErrorMessage(error)
       );
     },
   });

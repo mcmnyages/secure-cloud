@@ -3,7 +3,7 @@ import api from "../axios";
 import type { 
   VerifyEmailResponse,
   PasswordResetResponse
- } from "../../types/emailTypes";
+ } from "@/types/emailTypes";
 
 export const emailService = {
   sendVerification: async (data: { userId: string; email: string }) => {

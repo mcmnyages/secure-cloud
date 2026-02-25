@@ -1,25 +1,26 @@
-import { useState } from 'react'
-import { fileService } from '../../api/services/fileService'
+// hooks/useStorageQuery.ts
 
-export const useStorage = () => {
-  const [storage, setStorage] = useState({
-    used: 0,
-    limit: 104857600,
-  })
-  const [isLoading, setIsLoading] = useState(false)
+import { useQuery } from '@tanstack/react-query'
+import { fileService } from '@/api/services/fileService'
 
-  const fetchStorage = async () => {
-    setIsLoading(true)
-    try {
+interface StorageInfo {
+  used: number
+  limit: number
+}
+
+export const useStorageQuery = () => {
+  return useQuery<StorageInfo>({
+    queryKey: ['storage'],
+
+    queryFn: async () => {
       const res = await fileService.getStorage()
-      setStorage({
+
+      return {
         used: Number(res.data.storageUsed),
         limit: Number(res.data.storageLimit),
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+      }
+    },
 
-  return { storage, fetchStorage, isLoading }
+    staleTime: 1000 * 60 * 2, // 2 minutes (optional but recommended)
+  })
 }

@@ -1,5 +1,5 @@
 import api from '../axios'
-import { multipartRequest } from '../../utils/uplodas/multipartRequest'
+import { multipartRequest } from '@/utils/uplodas/multipartRequest'
 
 export const fileService = {
   Upload: (file: File) => {

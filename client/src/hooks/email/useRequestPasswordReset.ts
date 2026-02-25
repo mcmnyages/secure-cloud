@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { emailService } from "../../api/services/emailService";
-import { getAxiosErrorMessage } from "../../utils/getAxiosErrorMessage";
+import { getErrorMessage } from "@/utils/errors/getErrorMessage";
 import { toast } from "sonner";
 
 export function useRequestPasswordReset() {
@@ -9,8 +9,8 @@ export function useRequestPasswordReset() {
         onSuccess: (response) => {
             toast.success(response.message);
         },
-        onError: () => {
-            toast.error(getAxiosErrorMessage(Error));
+        onError: (error) => {
+            toast.error(getErrorMessage(error));
         },
     }); 
 }

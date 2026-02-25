@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { emailService } from "../../api/services/emailService";
-import { getAxiosErrorMessage } from "../../utils/getAxiosErrorMessage";
+import { getErrorMessage } from "@/utils/errors/getErrorMessage";
 
 
 export const useResendVerification = () =>
@@ -13,8 +13,8 @@ export const useResendVerification = () =>
       toast.success(response.message);
     },
 
-    onError: () => {
-      toast.error(getAxiosErrorMessage(Error));
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
     },
   });
 

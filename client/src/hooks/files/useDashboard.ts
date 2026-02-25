@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useFilesQuery } from './useFilesQuery'
 import { useFileMutations } from './useFileMutations'
-import { useStorage } from './useStorage'
+import { useStorageQuery } from './useStorage'
 
 export const useDashboard = () => {
   const { data: files = [], isLoading: filesLoading } = useFilesQuery()
-  const { storage, isLoading: storageLoading } = useStorage()
+  const { data: storage, isLoading: storageLoading } = useStorageQuery()
   const { uploadFile, deleteFile, downloadFile, bulkDeleteFiles } = useFileMutations()
 
   const [isModalOpen, setIsModalOpen] = useState(false)

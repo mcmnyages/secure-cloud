@@ -1,4 +1,4 @@
-import api from '../../api/axios'
+import api from '@/api/axios'
 import type { Method, AxiosRequestConfig } from 'axios'
 
 type MultipartOptions = {

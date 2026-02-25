@@ -6,7 +6,7 @@ import type {
   RegisterResponse,
   AuthResponse,
   RefreshTokenResponse 
-} from '../../types/authTypes';
+} from '@/types/authTypes';
 
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {

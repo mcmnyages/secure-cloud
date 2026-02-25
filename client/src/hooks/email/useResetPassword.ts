@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { emailService } from '../../api/services/emailService';
+import { emailService } from '@/api/services/emailService';
+import { getErrorMessage } from '@/utils/errors/getErrorMessage';
 import { toast } from 'sonner';
 
 export function useResetPassword() {
@@ -11,8 +12,8 @@ export function useResetPassword() {
       toast.success('✅ Password reset successful. You can now log in.');
     },
 
-    onError: () => {
-      toast.error('❌ Failed to reset password. Please try again.');
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
     },
   });
 }
