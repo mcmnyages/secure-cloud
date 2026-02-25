@@ -6,7 +6,7 @@ import { useStorage } from './useStorage'
 export const useDashboard = () => {
   const { data: files = [], isLoading: filesLoading } = useFilesQuery()
   const { storage, isLoading: storageLoading } = useStorage()
-  const { uploadFile, deleteFile, downloadFile } = useFileMutations()
+  const { uploadFile, deleteFile, downloadFile, bulkDeleteFiles } = useFileMutations()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -20,6 +20,7 @@ export const useDashboard = () => {
     setIsModalOpen,
     uploadFile,
     deleteFile,
+    bulkDeleteFiles,
     downloadFile,
   }
 }

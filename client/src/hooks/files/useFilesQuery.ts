@@ -1,13 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { fileService } from '../../api/services/fileService'
-
-export interface CloudFile {
-  id: string
-  name: string
-  size: number
-  mimeType: string
-  createdAt: string
-}
+import { fileService } from '@/api/services/fileService'
+import type { CloudFile } from '@/types/fileTypes'
 
 export const useFilesQuery = () => {
   return useQuery<CloudFile[]>({

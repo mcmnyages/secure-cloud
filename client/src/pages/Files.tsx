@@ -1,6 +1,7 @@
 import UploadModal from '../components/UploadModal'
 import { useDashboard } from '../hooks/files/useDashboard'
 import { FilesTable } from '../components/dashboard'
+import { LoadingSpinner } from '../components/ui/spinners/LoadingSpinner'
 
 const Files = () => {
   const {
@@ -10,6 +11,7 @@ const Files = () => {
     deleteFile,
     downloadFile,
     isLoading,
+    bulkDeleteFiles
   } = useDashboard()
 
   return (
@@ -29,9 +31,9 @@ const Files = () => {
 
       {/* Loading */}
       {isLoading && (
-        <div className="text-[rgb(var(--text)/0.6)]">
-          Loading files…
-        </div>
+        <div className="flex justify-center py-10">
+          <LoadingSpinner size="large" />
+        </div>  
       )}
 
       {/* Files table */}
@@ -44,6 +46,7 @@ const Files = () => {
           onDelete={(id) => deleteFile.mutate(id)}
           onDownload={downloadFile}
           onUpload={() => setIsModalOpen(true)}
+          onBulkDelete={(ids) => bulkDeleteFiles.mutate(ids)}
         />
       )}
 

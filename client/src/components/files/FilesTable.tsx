@@ -1,15 +1,6 @@
-import {
-  FileText,
-  Trash2,
-  Download,
-  Upload,
-  Image as ImageIcon,
-  Video,
-  Music,
-  FileCode,
-  File,
-  Archive
-} from 'lucide-react';
+import { useState } from 'react';
+import { getFileConfig, formatFileSize, formatDate } from '../../utils/helpers/files/fileUtils';
+import { Check, Download, Trash2, Upload, X, Calendar } from 'lucide-react';
 import type { CloudFile } from '../../types/fileTypes';
 
 interface FilesTableProps {
@@ -17,126 +8,174 @@ interface FilesTableProps {
   onDelete: (id: string) => void;
   onDownload: (id: string, name: string) => void;
   onUpload: () => void;
+  onBulkDelete?: (ids: string[]) => void;
 }
 
-// Map MIME types to icons, colors, and badge variables
-const getFileIcon = (mimeType: string) => {
-  if (!mimeType) return { Icon: File, color: 'text-[rgb(var(--text-muted))]', label: 'File', badge: '--badge-file' };
-  if (mimeType.startsWith('image/')) return { Icon: ImageIcon, color: 'text-[rgb(var(--primary))]', label: 'Image', badge: '--badge-image' };
-  if (mimeType.startsWith('video/')) return { Icon: Video, color: 'text-[rgb(var(--purple))]', label: 'Video', badge: '--badge-video' };
-  if (mimeType.startsWith('audio/')) return { Icon: Music, color: 'text-[rgb(var(--pink))]', label: 'Audio', badge: '--badge-audio' };
-  if (mimeType.includes('pdf')) return { Icon: FileText, color: 'text-[rgb(var(--danger))]', label: 'PDF', badge: '--badge-pdf' };
-  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('tar')) return { Icon: Archive, color: 'text-[rgb(var(--orange))]', label: 'Archive', badge: '--badge-archive' };
-  if (mimeType.includes('javascript') || mimeType.includes('typescript') || mimeType.includes('json') || mimeType.includes('html')) return { Icon: FileCode, color: 'text-[rgb(var(--yellow))]', label: 'Code', badge: '--badge-code' };
-  return { Icon: File, color: 'text-[rgb(var(--text-muted))]', label: 'File', badge: '--badge-file' };
-};
+const FilesTable = ({ files, onDelete, onDownload, onUpload, onBulkDelete }: FilesTableProps) => {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-// Format bytes to KB/MB/GB
-const formatFileSize = (bytes: number) => {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-};
+  // Selection Logic
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
 
-const FilesTable = ({ files, onDelete, onDownload, onUpload }: FilesTableProps) => {
+  const toggleSelectAll = () => {
+    if (selectedIds.length === files.length && files.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(files.map((file) => file.id));
+    }
+  };
+
   return (
-    <div className="md:col-span-2 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl shadow-lg overflow-hidden">
-      {/* Header */}
-      <div className="p-6 border-b border-[rgb(var(--border))] flex justify-between items-center">
-        <h2 className="font-bold text-lg text-[rgb(var(--text))]">Recent Files</h2>
-        <button
-          onClick={onUpload}
-          className="flex items-center gap-2 bg-[rgb(var(--primary))] text-white px-5 py-2 rounded-lg hover:bg-[rgb(var(--primary-dark))] transition-shadow shadow-md"
-        >
+    <div className="relative md:col-span-2 bg-[rgb(var(--card)/0.8)] backdrop-blur-xl border border-[rgb(var(--border))] rounded-[2rem] shadow-2xl overflow-hidden transition-all duration-500">
+
+      {/* 1. FLOATING BULK ACTION BAR (Z-INDEX 100) */}
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-6 bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 animate-in fade-in slide-in-from-bottom-8">
+          <div className="flex items-center gap-3 pr-6 border-r border-white/20">
+            <div className="bg-[rgb(var(--primary))] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+              {selectedIds.length}
+            </div>
+            <span className="text-sm font-medium">Files selected</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                onBulkDelete?.(selectedIds);
+                setSelectedIds([]); // Clear selection after delete
+              }}
+              className="flex items-center gap-2 hover:text-red-400 transition-colors text-sm font-semibold"
+            >
+              <Trash2 size={18} /> Delete
+            </button>
+            <button className="flex items-center gap-2 hover:text-[rgb(var(--primary))] transition-colors text-sm font-semibold">
+              <Download size={18} /> Download (.zip)
+            </button>
+            <button onClick={() => setSelectedIds([])} className="p-1 hover:bg-white/10 rounded-full transition-colors">
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* HEADER SECTION */}
+      <div className="p-8 border-b border-[rgb(var(--border)/0.5)] flex justify-between items-center bg-gradient-to-r from-transparent to-[rgb(var(--primary)/0.02)]">
+        <div>
+          <h2 className="font-bold text-2xl text-[rgb(var(--text))] tracking-tight">Recent Files</h2>
+          <p className="text-sm text-[rgb(var(--text-muted))]">Manage your recently uploaded assets</p>
+        </div>
+        <button onClick={onUpload} className="group flex items-center gap-2 bg-[rgb(var(--primary))] text-white px-6 py-3 rounded-xl hover:shadow-lg active:scale-95 transition-all">
           <Upload size={18} />
-          Upload
+          <span className="font-semibold">Upload</span>
         </button>
       </div>
 
-      {/* Empty state */}
-      {files.length === 0 ? (
-        <div className="p-16 text-center text-[rgb(var(--text-muted))] flex flex-col items-center gap-4">
-          <File size={60} className="opacity-20 animate-pulse" />
-          <p className="text-lg">No files uploaded yet.</p>
-          <button
-            onClick={onUpload}
-            className="mt-2 bg-[rgb(var(--primary))] text-white px-4 py-2 rounded-lg hover:bg-[rgb(var(--primary-dark))] transition"
-          >
-            Upload Your First File
-          </button>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-separate border-spacing-0">
-            <thead className="bg-[rgb(var(--border)/0.1)] text-[rgb(var(--text-muted))] text-xs uppercase tracking-wider">
-              <tr>
-                <th className="px-6 py-4 font-semibold">Name</th>
-                <th className="px-6 py-4 font-semibold">Type</th>
-                <th className="px-6 py-4 font-semibold">Size</th>
-                <th className="px-6 py-4 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
+      {/* TABLE SECTION */}
+      <div className="overflow-x-auto px-4 pb-4">
+        <table className="w-full text-left border-separate border-spacing-y-2">
+          <thead className="text-[rgb(var(--text-muted))] text-[11px] uppercase tracking-[0.2em]">
+            <tr>
+              <th className="px-6 py-4">
+                {/* 2. MASTER CHECKBOX UI */}
+                <div
+                  onClick={toggleSelectAll}
+                  className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-300 ${
+                    selectedIds.length === files.length && files.length > 0
+                      ? 'bg-[rgb(var(--primary))] border-[rgb(var(--primary))]'
+                      : 'border-[rgb(var(--border))] hover:border-[rgb(var(--primary))]'
+                  }`}
+                >
+                  {selectedIds.length === files.length && files.length > 0 && <Check size={12} className="text-white stroke-[4px]" />}
+                </div>
+              </th>
+              <th className="px-2 py-4 font-bold">File Name</th>
+              <th className="px-6 py-4 font-bold hidden sm:table-cell">Category</th>
+              {/* 3. NEW COLUMN: DATE UPLOADED */}
+              <th className="px-6 py-4 font-bold hidden lg:table-cell">
+                <div className="flex items-center gap-2">
+                  <Calendar size={14} />
+                  <span>Uploaded</span>
+                </div>
+              </th>
+              <th className="px-6 py-4 font-bold">Size</th>
+              <th className="px-6 py-4 text-right font-bold">Actions</th>
+            </tr>
+          </thead>
 
-            <tbody className="divide-y divide-[rgb(var(--border)/0.1)]">
-              {files.map((file) => {
-                const { Icon, color, label, badge } = getFileIcon(file.mimeType);
-                return (
-                  <tr key={file.id} className="hover:bg-[rgb(var(--primary)/0.05)] transition-colors group">
-                    {/* File Name */}
-                    <td className="px-6 py-4 flex items-center gap-3">
-                      <Icon size={20} className={`${color} shrink-0`} />
-                      <span
-                        className="font-medium text-[rgb(var(--text))] truncate max-w-[200px] md:max-w-xs"
-                        title={file.name}
-                      >
-                        {file.name}
-                      </span>
-                    </td>
+          <tbody>
+            {files.map((file) => {
+              const { Icon, bg, color, label } = getFileConfig(file.mimeType);
+              const isSelected = selectedIds.includes(file.id);
 
-                    {/* File Type Badge */}
-                    <td className="px-6 py-4">
-                      <span
-                        className="text-[10px] uppercase font-bold px-2 py-1 rounded-md"
-                        style={{
-                          backgroundColor: `rgba(var(${badge}-rgb), 0.15)`,
-                          color: `rgb(var(${badge}-rgb))`,
-                        }}
-                      >
-                        {label}
-                      </span>
-                    </td>
+              return (
+                <tr key={file.id} className={`group transition-all duration-300 ${isSelected ? 'bg-[rgb(var(--primary)/0.06)]' : 'hover:bg-[rgb(var(--primary)/0.02)]'}`}>
+                  {/* 4. ROW CHECKBOX UI */}
+                  <td className={`px-6 py-4 first:rounded-l-2xl transition-all ${isSelected ? 'border-l-4 border-[rgb(var(--primary))]' : 'border-l-4 border-transparent'}`}>
+                    <div
+                      onClick={() => toggleSelect(file.id)}
+                      className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${
+                        isSelected 
+                        ? 'bg-[rgb(var(--primary))] border-[rgb(var(--primary))] scale-110' 
+                        : 'border-[rgb(var(--border))] opacity-40 group-hover:opacity-100'
+                      }`}
+                    >
+                      {isSelected && <Check size={12} className="text-white stroke-[4px]" />}
+                    </div>
+                  </td>
 
-                    {/* File Size */}
-                    <td className="px-6 py-4 text-sm text-[rgb(var(--text-muted))]">
-                      {formatFileSize(file.size)}
-                    </td>
+                  {/* FILE NAME & ICON */}
+                  <td className="px-2 py-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`${bg} ${color} p-3 rounded-2xl group-hover:rotate-6 transition-transform`}>
+                        <Icon size={20} />
+                      </div>
+                      <div className="flex flex-col min-w-0 text-sm">
+                        <span className={`font-semibold truncate max-w-[150px] md:max-w-xs ${isSelected ? 'text-[rgb(var(--primary))]' : 'text-[rgb(var(--text))]'}`}>
+                          {file.name}
+                        </span>
+                        <span className="text-[10px] text-[rgb(var(--text-muted))] sm:hidden">{label}</span>
+                      </div>
+                    </div>
+                  </td>
 
-                    {/* Actions */}
-                    <td className="px-6 py-4 text-right flex justify-end items-center space-x-2">
-                      <button
-                        onClick={() => onDownload(file.id, file.name)}
-                        className="p-2 text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.15)] rounded-lg transition-transform hover:scale-110"
-                        title="Download"
-                      >
+                  {/* TYPE BADGE */}
+                  <td className="px-6 py-4 hidden sm:table-cell">
+                    <span className={`text-[10px] uppercase px-3 py-1 rounded-full border border-current font-bold opacity-80 ${color}`}>
+                      {label}
+                    </span>
+                  </td>
+
+                  {/* 5. DATA INJECTION: DATE COLUMN CELL */}
+                  <td className="px-6 py-4 text-sm font-medium text-[rgb(var(--text-muted))] hidden lg:table-cell">
+                    {formatDate(file.createdAt)}
+                  </td>
+
+                  {/* SIZE CELL */}
+                  <td className="px-6 py-4 text-sm font-medium text-[rgb(var(--text-muted))]">
+                    {formatFileSize(file.size)}
+                  </td>
+
+                  {/* ACTIONS CELL */}
+                  <td className="px-6 py-4 text-right last:rounded-r-2xl">
+                    <div className={`flex justify-end gap-1 transition-all ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                      <button onClick={() => onDownload(file.id, file.name)} className="p-2.5 hover:bg-white dark:hover:bg-gray-800 rounded-xl transition-all border border-transparent hover:border-[rgb(var(--border))]">
                         <Download size={18} />
                       </button>
-                      <button
-                        onClick={() => onDelete(file.id)}
-                        className="p-2 text-[rgb(var(--danger))] hover:bg-[rgb(var(--danger)/0.15)] rounded-lg transition-transform hover:scale-110"
-                        title="Delete"
-                      >
+                      <button onClick={() => onDelete(file.id)} className="p-2.5 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-500 rounded-xl transition-all">
                         <Trash2 size={18} />
                       </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
