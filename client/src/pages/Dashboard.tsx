@@ -1,5 +1,5 @@
 import UploadModal from '@/components/ui/modals/UploadModal'
-import { useDashboard } from '../hooks/files/useDashboard'
+import { useDashboard } from '@/hooks/files/useDashboard'
 import {
   DashboardHeader,
   StorageCard,
@@ -25,7 +25,7 @@ const Dashboard = () => {
       : 0
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 text-[rgb(var(--text))]">
+    <div className="max-w-7xl px-2 py-8 space-y-8 text-[rgb(var(--text))]">
 
       {/* Header */}
       <DashboardHeader />

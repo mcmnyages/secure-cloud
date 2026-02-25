@@ -1,7 +1,8 @@
 import UploadModal from '@/components/ui/modals/UploadModal'
-import { useDashboard } from '../hooks/files/useDashboard'
-import { FilesTable } from '../components/ui/dashboard'
-import { LoadingSpinner } from '../components/ui/spinners/LoadingSpinner'
+import { useDashboard } from '@/hooks/files/useDashboard'
+import { FilesTable } from '@/components/ui/dashboard'
+import { OverlayLoader } from '@/components/ui/spinners'
+
 
 const Files = () => {
   const {
@@ -23,7 +24,7 @@ const Files = () => {
       {/* Loading */}
       {isLoading && (
         <div className="flex justify-center py-10">
-          <LoadingSpinner size="large" />
+          <OverlayLoader label="Loading your files..." />
         </div>
       )}
 
