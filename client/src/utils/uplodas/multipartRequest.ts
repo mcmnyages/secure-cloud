@@ -9,8 +9,12 @@ type MultipartOptions = {
   config?: AxiosRequestConfig
 }
 
-export const multipartRequest = (_p0: string, _p1: string, _file: File, {
-  method, url, files = [], data = {}, config = {},
+export const multipartRequest = ({
+  method,
+  url,
+  files = [],
+  data = {},
+  config = {},
 }: MultipartOptions) => {
   const formData = new FormData()
 
@@ -19,7 +23,7 @@ export const multipartRequest = (_p0: string, _p1: string, _file: File, {
   })
 
   Object.entries(data).forEach(([key, value]) => {
-    formData.append(key, value)
+    formData.append(key, value as any)
   })
 
   return api.request({

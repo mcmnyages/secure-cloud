@@ -7,11 +7,11 @@ export const useFileMutations = () => {
   const queryClient = useQueryClient()
 
   const uploadFile = useMutation({
-    mutationFn: (file: File) => fileService.Upload(file),
+    mutationFn: (files: File[]) => fileService.Upload(files),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] })
-      toast.success('File uploaded')
+      toast.success('Files uploaded')
     },
 
     onError: (error: any) => {

@@ -1,13 +1,15 @@
-// client/src/types/file.ts
-export interface File {
+// client/src/types/fileTypes.ts
+// fileTypes.ts
+export interface ServerFile {
   id: string;
   name: string;
   size: number;
-  path: string; // Internal use only, not sent to client
+  path: string;
   mimeType: string;
-  createdAt: string; // ISO date string from backend
+  createdAt: string;
   ownerId: string;
 }
+
 
 export type FileCategory = 'all' | 'image' | 'video' | 'audio' | 'document' | 'other';
 

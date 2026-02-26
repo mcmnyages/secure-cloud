@@ -2,13 +2,19 @@ import api from '../axios'
 import { multipartRequest } from '@/utils/uplodas/multipartRequest'
 
 export const fileService = {
-  Upload: (file: File) => {
-    return multipartRequest('POST', '/files/upload', file, {
-      method: 'POST',
-      url: '/files/upload',
-      files: [{ fieldName: 'file', file }],
-    })
-  },
+  Upload: (files: File[], replace?: boolean) => {
+  return multipartRequest({
+    method: 'POST',
+    url: '/files/upload',
+    files: files.map(file => ({
+      fieldName: 'files',
+      file,
+    })),
+    data: {
+      replace: replace ? 'true' : 'false',
+    },
+  })
+},
 
   list: () => api.get('/files'),
 
@@ -18,10 +24,11 @@ export const fileService = {
     api.patch(`/files/${id}/rename`, { name }),
 
   uploadNewVersion: (id: string, file: File) => {
-    return multipartRequest('PUT', `/files/${id}`, file, {
+    return multipartRequest({
       method: 'PUT',
       url: `/files/${id}`,
       files: [{ fieldName: 'file', file }],
+      
     })
   },
 
