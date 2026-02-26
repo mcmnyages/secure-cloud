@@ -26,8 +26,9 @@ router.patch('/:fileId/rename', authenticate, fileController.rename);
 router.put('/:fileId', authenticate, upload.single(UPLOAD_CONFIG.SINGLE_FIELD), fileController.updateFile);
 
 // ####### DELETE ##########
-router.delete('/:fileId', authenticate, fileController.delete);
 router.delete('/bulk-delete', authenticate, fileController.bulkDelete);
+router.delete('/:fileId', authenticate, fileController.delete);
+
 
 
 export default router;

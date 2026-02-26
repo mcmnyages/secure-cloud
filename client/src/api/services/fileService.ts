@@ -34,7 +34,7 @@ export const fileService = {
 
   delete: (id: string) => api.delete(`/files/${id}`),
 
-  bulkDelete: (ids: string[]) => api.post('/files/bulk-delete', { fileIds:ids }),
+  bulkDelete: (ids: string[]) => api.delete('/files/bulk-delete', { data: { fileIds:ids } }),
 
   download: (id: string) =>
     api.get(`/files/download/${id}`, { responseType: 'blob' }),
