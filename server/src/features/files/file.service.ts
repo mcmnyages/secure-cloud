@@ -1,49 +1,145 @@
 import { prisma } from '../../lib/prisma.js';
 import fs from 'fs/promises';
+import { StorageLimitExceededError, DuplicateFileError } from '../../exceptions/file/file.exceptions.js';
 
 export class FileService {
-  async uploadFile(
+  async uploadBatch(
   userId: string,
-  originalName: string,
-  storageKey: string,
-  fileSize: number,
-  mimeType: string,
-  displayName?: string
+  files: Express.Multer.File[],
+  replace: boolean
 ) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  // 1️⃣ Validate user
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
+  });
+
   if (!user) throw new Error("User not found");
 
-  const newTotal = Number(user.storageUsed) + fileSize;
-  if (newTotal > Number(user.storageLimit)) {
-    throw new Error("Storage limit exceeded (100MB max)");
+  // 2️⃣ Check duplicate names inside batch
+  const names = files.map(f => f.originalname);
+  const uniqueNames = new Set(names);
+
+  
+
+  if (uniqueNames.size !== names.length) {
+    throw new DuplicateFileError("Duplicate file names in upload batch");
   }
 
-  return await prisma.$transaction(async (tx) => {
-    // 1. Create logical File
-    const file = await tx.file.create({
-      data: { ownerId: userId }
-    });
+  // 3️⃣ Calculate total batch size
+  const totalUploadSize = files.reduce((sum, f) => sum + f.size, 0);
 
-    // 2. Create FileVersion (actual blob)
-    const version = await tx.fileVersion.create({
-      data: {
-        fileId: file.id,
-        storageKey,
-        size: fileSize,
-        mimeType,
-        originalName,
-        displayName: displayName || originalName,
-        isCurrent: true
+  const newTotal = Number(user.storageUsed) + totalUploadSize;
+  
+
+  if (newTotal > Number(user.storageLimit)) {
+    throw new StorageLimitExceededError();
+  }
+
+  // 4️⃣ Get existing files in one query
+  const existingFiles = await prisma.file.findMany({
+    where: {
+      ownerId: userId,
+      deletedAt: null,
+      versions: {
+        some: {
+          isCurrent: true,
+          displayName: { in: names }
+        }
       }
-    });
+    },
+    include: {
+      versions: true
+    }
+  });
 
-    // 3. Update storage usage
+  const existingMap = new Map(
+    existingFiles.map(file => {
+      const current = file.versions.find(v => v.isCurrent);
+      return [current?.displayName, file];
+    })
+  );
+
+  // 5️⃣ Transaction (ALL OR NOTHING)
+  return await prisma.$transaction(async (tx) => {
+
+    const results = [];
+
+    for (const file of files) {
+
+      const existing = existingMap.get(file.originalname);
+
+      // 🔁 Replace existing
+      if (existing && replace) {
+
+        await tx.fileVersion.updateMany({
+          where: { fileId: existing.id, isCurrent: true },
+          data: { isCurrent: false }
+        });
+
+        const version = await tx.fileVersion.create({
+          data: {
+            fileId: existing.id,
+            storageKey: file.path,
+            originalName: file.originalname,
+            displayName: file.originalname,
+            size: file.size,
+            mimeType: file.mimetype,
+            isCurrent: true
+          }
+        });
+
+        results.push({
+          fileId: existing.id,
+          version
+        });
+
+      } 
+      // ❌ Duplicate but replace = false
+      else if (existing && !replace) {
+        throw new Error(`File "${file.originalname}" already exists`);
+      } 
+      // 🆕 New file
+      else {
+
+        const newFile = await tx.file.create({
+          data: { ownerId: userId }
+        });
+
+        const version = await tx.fileVersion.create({
+          data: {
+            fileId: newFile.id,
+            storageKey: file.path,
+            originalName: file.originalname,
+            displayName: file.originalname,
+            size: file.size,
+            mimeType: file.mimetype,
+            isCurrent: true
+          }
+        });
+
+        results.push({
+          fileId: newFile.id,
+          version
+        });
+      }
+    }
+
+    // 6️⃣ Update storage ONCE
     await tx.user.update({
       where: { id: userId },
-      data: { storageUsed: { increment: fileSize } }
+      data: { storageUsed: { increment: totalUploadSize } }
     });
 
-    return { fileId: file.id, version };
+    return {
+      count: results.length,
+      files: results.map(r => ({
+        id: r.fileId,
+        name: r.version.displayName,
+        size: r.version.size,
+        mimeType: r.version.mimeType,
+        createdAt: r.version.createdAt
+      }))
+    };
   });
 }
 
@@ -115,41 +211,6 @@ async findFileByName(userId: string, displayName: string) {
       }
     }
   });
-}
-
-
-
-async uploadOrReplaceFile(
-  userId: string,
-  file: Express.Multer.File,
-  replace: boolean
-) {
-  // 1. Look for existing logical file
-  const existingFile = await this.findFileByName(
-    userId,
-    file.originalname
-  );
-
-  // 2. If exists and user wants replace
-  if (existingFile && replace) {
-    return this.uploadNewVersion(
-      existingFile.id,
-      userId,
-      file.path,
-      file.originalname,
-      file.size,
-      file.mimetype
-    );
-  }
-
-  // 3. Otherwise create new file
-  return this.uploadFile(
-    userId,
-    file.originalname,
-    file.path,
-    file.size,
-    file.mimetype
-  );
 }
 
 

@@ -1,68 +1,54 @@
 import type { Request, Response } from 'express';
 import { FileService } from './file.service.js';
 import path from 'path';
+import { asyncHandler } from '../../utils/asyncHandler.js';
 
 const fileService = new FileService();
 
 export class FileController {
-  upload = async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+
+  upload = asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).userId;
+
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
     }
 
-    const userId = (req as any).userId;
+    const files = req.files as Express.Multer.File[];
+    const replace = req.body.replace === 'true';
 
-    const result = await fileService.uploadFile(
+    const result = await fileService.uploadBatch(
       userId,
-      req.file.originalname,
-      req.file.path,        // now = storageKey
-      req.file.size,
-      req.file.mimetype,
-      req.body.displayName // optional
+      files,
+      replace
     );
 
-  res.status(201).json({
-  message: "File uploaded successfully",
-  file: {
-    id: result.fileId,
-    name: result.version.displayName || result.version.originalName,
-    size: result.version.size,
-    mimeType: result.version.mimeType,
-    createdAt: result.version.createdAt
-  }
-});
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};
+    res.status(201).json({
+      message: "Files uploaded successfully",
+      ...result
+    });
+  });
 
-  list = async (req: Request, res: Response) => {
-  try {
+  list = asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).userId;
     const files = await fileService.listUserFiles(userId);
+
     const response = files.map(file => {
-  // Assume the latest version is the current one (e.g., last in array)
-  const current = file.versions[file.versions.length - 1];
-  return {
-    id: file.id,
-    name: current?.displayName || current?.displayName || 'Unknown',
-    size: current?.size,
-    mimeType: current?.mimeType,
-    createdAt: file.createdAt
-  };
-});
-res.json(response);
+      const current = file.versions[file.versions.length - 1];
 
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
-};
+      return {
+        id: file.id,
+        name: current?.displayName || 'Unknown',
+        size: current?.size,
+        mimeType: current?.mimeType,
+        createdAt: file.createdAt
+      };
+    });
 
+    res.json(response);
+  });
 
-
-rename = async (req: Request, res: Response) => {
-  try {
+  rename = asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).userId;
     const { fileId } = req.params;
     const { name } = req.body;
@@ -78,22 +64,16 @@ rename = async (req: Request, res: Response) => {
     await fileService.renameFile(fileId, userId, name);
 
     res.json({ message: "File renamed successfully" });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};
+  });
 
-
-
-updateFile = async (req: Request, res: Response) => {
-  try {
+  updateFile = asyncHandler(async (req: Request, res: Response) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
     const userId = (req as any).userId;
     const { fileId } = req.params;
-    
+
     if (typeof fileId !== 'string') {
       return res.status(400).json({ message: "Invalid file id" });
     }
@@ -108,15 +88,9 @@ updateFile = async (req: Request, res: Response) => {
     );
 
     res.json({ message: "File updated successfully" });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};
+  });
 
-
-
-download = async (req: Request, res: Response) => {
-  try {
+  download = asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).userId;
     const { fileId } = req.params;
 
@@ -126,18 +100,12 @@ download = async (req: Request, res: Response) => {
 
     const file = await fileService.getFileForUser(fileId, userId);
 
-    // Resolve the absolute path to the file
     const absolutePath = path.resolve(file.path);
-    
-    // Express helper to send the file to the browser
-    res.download(absolutePath, file.name); 
-  } catch (error: any) {
-    res.status(404).json({ message: error.message });
-  }
-};
 
-delete = async (req: Request, res: Response, next: Function) => {
-  try {
+    res.download(absolutePath, file.name);
+  });
+
+  delete = asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).userId;
     const { fileId } = req.params;
 
@@ -146,28 +114,21 @@ delete = async (req: Request, res: Response, next: Function) => {
     }
 
     const result = await fileService.deleteFile(fileId, userId);
-    
+
     res.status(200).json(result);
-  } catch (error: any) {
-    // We pass the error to the next() function to use our Global Error Handler
-    next(error); 
-  }
-};
-// delete multiple files
-bulkDelete = async (req: Request, res: Response, next: Function) => {
-  try {
+  });
+
+  bulkDelete = asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).userId;
-    const { fileIds } = req.body; 
+    const { fileIds } = req.body;
+
     if (!Array.isArray(fileIds) || !fileIds.every(id => typeof id === 'string')) {
       return res.status(400).json({ message: "Invalid file ids" });
     }
 
     const result = await fileService.bulkDeleteFiles(fileIds, userId);
-    
+
     res.status(200).json(result);
-  } catch (error: any) {
-    next(error);
-  } 
-};
+  });
 
 }

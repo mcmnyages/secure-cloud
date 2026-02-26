@@ -10,11 +10,14 @@ import { errorHandler } from './middleware/error.middleware.js';
 import authRoutes from './features/auth/auth.routes.js';
 import fileRoutes from './features/files/file.routes.js';
 import { emailRoutes } from './features/email/index.js';
+import { multerErrorHandler } from './middleware/errors/multerError.middleware.js';
 
 dotenv.config();
 
 const app = express();
 
+app.use(helmet());
+app.use(morgan('dev'));
 const allowedOrigins = [
   'http://localhost:5173', // Local development
   'https://secure-cloud-delta.vercel.app' // Your future production URL
@@ -31,6 +34,7 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(express.json());
 
 // Ensure uploads folder exists on the server disk
 const uploadDir = path.join(process.cwd(), 'uploads');
@@ -42,7 +46,6 @@ if (!fs.existsSync(uploadDir)) {
 
 // Middleware
 app.use('/uploads', express.static(uploadDir));
-app.use(cors());
 app.use(express.json()); // CRITICAL: This allows Express to read the body of your request
 app.use(helmet()); // Basic security
 app.use(morgan('dev')); // Logging
@@ -54,8 +57,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/files', fileRoutes); 
 app.use('/api/email', emailRoutes);
 
-
+// I am told this must be the last middleware in the chain, to catch any errors from above routes or middlewares
+app.use(multerErrorHandler); // Handle Multer errors before the general error handler
 app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server live on http://localhost:${PORT}`);
