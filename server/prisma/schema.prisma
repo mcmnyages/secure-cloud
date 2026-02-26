@@ -35,22 +35,24 @@ model File {
 }
 
 model FileVersion {
-  id           String   @id @default(uuid())
-  fileId       String
-  file         File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  id            String   @id @default(uuid())
+  fileId        String
+  file          File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
-  storageKey   String   // filesystem path or S3 key
-  size         Int
-  mimeType     String
-  checksum     String?
+  versionNumber Int
+  storageKey    String
+  size          Int
+  mimeType      String
+  checksum      String?
 
-  originalName String
-  displayName  String
+  originalName  String
+  displayName   String
 
-  createdAt    DateTime @default(now())
-  isCurrent    Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  isCurrent     Boolean  @default(true)
 
   @@index([fileId])
+  @@unique([fileId, versionNumber])
 }
 
 model Token {

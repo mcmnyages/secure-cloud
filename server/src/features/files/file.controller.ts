@@ -30,23 +30,72 @@ export class FileController {
   });
 
   list = asyncHandler(async (req: Request, res: Response) => {
-    const userId = (req as any).userId;
-    const files = await fileService.listUserFiles(userId);
+  const userId = (req as any).userId;
 
-    const response = files.map(file => {
-      const current = file.versions[file.versions.length - 1];
+  const files = await fileService.listUserFiles(userId);
 
-      return {
-        id: file.id,
-        name: current?.displayName || 'Unknown',
-        size: current?.size,
-        mimeType: current?.mimeType,
-        createdAt: file.createdAt
-      };
-    });
+  const response = files.map(file => {
+    const current = file.versions[0]; // only 1 because filtered by isCurrent
 
-    res.json(response);
+    return {
+      id: file.id,
+      versionId: current?.id,
+      versionNumber: current?.versionNumber,
+      name: current?.displayName,
+      size: current?.size,
+      mimeType: current?.mimeType,
+      createdAt: file.createdAt
+    };
   });
+
+  res.json(response);
+});
+
+
+ versions = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).userId;
+  const { fileId } = req.params;
+
+  if (!fileId) {
+    return res.status(400).json({ message: "Invalid file id" });
+  }
+
+  if (typeof fileId !== 'string') {
+    return res.status(400).json({ message: "Invalid file id" });
+  }
+
+  const versions = await fileService.getFileVersions(fileId, userId);
+
+  const response = versions.map(v => ({
+    id: v.id,
+    versionNumber: v.versionNumber,
+    name: v.displayName,
+    size: v.size,
+    mimeType: v.mimeType,
+    createdAt: v.createdAt,
+    isCurrent: v.isCurrent
+  }));
+
+  res.json(response);
+});
+
+
+restoreVersion = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).userId;
+  const { fileId, versionId } = req.params;
+
+  if (typeof fileId !== 'string' || typeof versionId !== 'string') {
+    return res.status(400).json({ message: "Invalid file or version id" });
+  }
+
+  const result = await fileService.restoreVersion(
+    fileId,
+    versionId,
+    userId
+  );
+
+  res.status(200).json(result);
+});
 
   rename = asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).userId;
@@ -104,6 +153,25 @@ export class FileController {
 
     res.download(absolutePath, file.name);
   });
+
+
+  downloadVersion = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).userId;
+  const { fileId, versionId } = req.params;
+
+  if (typeof fileId !== 'string' || typeof versionId !== 'string') {
+    return res.status(400).json({ message: "Invalid file or version id" });
+  }
+
+  // Fetch the specific version for the user
+  const version = await fileService.getFileVersionForUser(fileId, versionId, userId);
+
+  // Resolve absolute path
+  const absolutePath = path.resolve(version.storageKey);
+
+  // Send the file to client
+  res.download(absolutePath, version.displayName);
+});
 
   delete = asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).userId;
