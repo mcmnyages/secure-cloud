@@ -10,7 +10,7 @@ interface DashboardToolbarProps {
   setViewMode: (val: 'grid' | 'list') => void
   showFilter: boolean
   setShowFilter: (val: boolean) => void
-  filterRef: React.RefObject<HTMLDivElement>
+  filterRef: React.RefObject<HTMLDivElement | null>
   sortBy: string
   setSortBy: (val: string) => void
   typeFilter: string

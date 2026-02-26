@@ -1,22 +1,32 @@
 // client/src/types/fileTypes.ts
-// fileTypes.ts
-export interface ServerFile {
-  id: string;
-  name: string;
-  size: number;
-  path: string;
-  mimeType: string;
-  createdAt: string;
-  ownerId: string;
-}
 
-
-export type FileCategory = 'all' | 'image' | 'video' | 'audio' | 'document' | 'other';
-
-export interface CloudFile {
+// Backend flat file from API
+export interface FlatFile {
   id: string
+  versionId: string
+  versionNumber: number
   name: string
   size: number
   mimeType: string
-  createdAt: string // ISO date string
+  createdAt: string
 }
+
+// Frontend-friendly version info
+export interface FileVersion {
+  id: string
+  versionNumber: number
+  name: string
+  size: number
+  mimeType: string
+  createdAt: string
+}
+
+// CloudFile used in UI
+export interface CloudFile {
+  id: string
+  createdAt: string
+  currentVersion: FileVersion
+}
+
+// File category enum
+export type FileCategory = 'all' | 'image' | 'video' | 'audio' | 'document' | 'other'
