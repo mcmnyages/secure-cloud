@@ -45,7 +45,7 @@ const Dashboard = () => {
   }, [files, search, typeFilter, sortBy])
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--text))] transition-colors duration-300 relative">
+    <div className="min-h-screen mt-4 bg-[rgb(var(--background))] text-[rgb(var(--text))] transition-colors duration-300 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         <DashboardToolbar
           search={search}
