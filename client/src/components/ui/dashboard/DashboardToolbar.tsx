@@ -1,6 +1,7 @@
 import { Search, X, Sliders, List, LayoutGrid, Plus, Filter, ChevronDown } from 'lucide-react'
 import ViewButton from './ViewButton'
 import FilterSection from './FilterSection'
+import Dropdown from './dropdowns/FilterOptionsDropdown'
 
 interface DashboardToolbarProps {
   search: string
@@ -14,7 +15,7 @@ interface DashboardToolbarProps {
   setSortBy: (val: string) => void
   typeFilter: string
   setTypeFilter: (val: string) => void
-  openUploadModal: () => void 
+  openUploadModal: () => void
 }
 
 const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
@@ -24,33 +25,32 @@ const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
   openUploadModal
 }) => {
 
+  const sortOptions = [
+    { value: "newest", label: "Newest Uploads" },
+    { value: "name", label: "Alphabetical (A-Z)" },
+    { value: "size", label: "File Size (Large)" },
+  ]
+
   // Shared Filter UI to avoid repetition
   const FilterContent = () => (
     <>
       <FilterSection label="Sort Order">
-        <div className="relative">
-          <select 
-            value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value)}
-            className="w-full p-3 md:p-2.5 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))] text-sm outline-none appearance-none font-medium cursor-pointer"
-          >
-            <option value="newest">Newest Uploads</option>
-            <option value="name">Alphabetical (A-Z)</option>
-            <option value="size">File Size (Large)</option>
-          </select>
-          <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50" />
-        </div>
+        <Dropdown
+          value={sortBy}
+          onChange={setSortBy}
+          options={sortOptions}
+        />
       </FilterSection>
 
       <FilterSection label="File Category">
         <div className="grid grid-cols-2 gap-2">
           {['all', 'image', 'video', 'pdf'].map(cat => (
-            <button 
+            <button
               key={cat}
               onClick={() => setTypeFilter(cat)}
               className={`px-3 py-3 md:py-2 rounded-xl text-xs font-bold capitalize transition-all border
-                ${typeFilter === cat 
-                  ? 'bg-[rgb(var(--primary))] text-white border-[rgb(var(--primary))] shadow-md' 
+                ${typeFilter === cat
+                  ? 'bg-[rgb(var(--primary))] text-white border-[rgb(var(--primary))] shadow-md'
                   : 'bg-[rgb(var(--background))] border-[rgb(var(--border))] hover:bg-[rgb(var(--muted)/0.3)]'}`}
             >
               {cat}
@@ -64,7 +64,7 @@ const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
   return (
     <div className="relative z-30">
       <div className="flex items-center gap-2 md:gap-6 bg-[rgb(var(--card))] border border-[rgb(var(--border))] p-2 md:p-4 rounded-2xl shadow-sm">
-        
+
         {/* 1. Search */}
         <div className="relative flex-1 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text)/0.3)] group-focus-within:text-[rgb(var(--primary))]" size={20} />
@@ -92,7 +92,7 @@ const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
           <div className="h-8 w-px bg-[rgb(var(--border))]" />
 
           <div className="relative" ref={filterRef}>
-            <button 
+            <button
               onClick={() => setShowFilter(!showFilter)}
               className={`flex items-center gap-2 px-5 py-3 rounded-xl border font-semibold text-sm transition-all
                 ${showFilter ? 'bg-[rgb(var(--primary))] text-white shadow-lg' : 'bg-[rgb(var(--background))] border-[rgb(var(--border))]'}`}
@@ -111,7 +111,7 @@ const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
         </div>
 
         {/* 3. Upload Button */}
-        <button 
+        <button
           onClick={openUploadModal}
           className="hidden md:flex items-center gap-2 px-6 py-3 bg-[rgb(var(--primary))] text-white rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg font-bold"
         >
@@ -120,7 +120,7 @@ const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
         </button>
 
         {/* Mobile Filter Trigger */}
-        <button 
+        <button
           onClick={() => setShowFilter(true)}
           className="lg:hidden p-3 bg-[rgb(var(--background))] border border-[rgb(var(--border))] rounded-xl text-[rgb(var(--text)/0.7)]"
         >
@@ -129,7 +129,7 @@ const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
       </div>
 
       {/* FAB for Mobile */}
-      <button 
+      <button
         onClick={openUploadModal}
         className="fixed bottom-8 right-8 z-40 md:hidden w-16 h-16 bg-[rgb(var(--primary))] text-white rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform"
       >
@@ -142,24 +142,24 @@ const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowFilter(false)} />
           <div className="relative w-full bg-[rgb(var(--card))] rounded-t-[32px] p-6 pb-10 animate-in slide-in-from-bottom duration-300">
             <div className="w-12 h-1.5 bg-[rgb(var(--muted)/0.3)] rounded-full mx-auto mb-6" />
-            
+
             <div className="space-y-6">
-               <div className="flex justify-between items-center">
-                 <h2 className="text-xl font-bold">Filter Assets</h2>
-                 <button onClick={() => setShowFilter(false)} className="p-2 bg-[rgb(var(--background))] rounded-full">
-                    <X size={20} />
-                 </button>
-               </div>
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold">Filter Assets</h2>
+                <button onClick={() => setShowFilter(false)} className="p-2 bg-[rgb(var(--background))] rounded-full">
+                  <X size={20} />
+                </button>
+              </div>
 
-               {/* RE-INSERTED INPUTS HERE */}
-               <FilterContent />
+              {/* RE-INSERTED INPUTS HERE */}
+              <FilterContent />
 
-               <button 
+              <button
                 onClick={() => setShowFilter(false)}
                 className="w-full py-4 bg-[rgb(var(--primary))] text-white rounded-2xl font-bold text-lg shadow-lg"
-               >
-                 Show Results
-               </button>
+              >
+                Show Results
+              </button>
             </div>
           </div>
         </div>
