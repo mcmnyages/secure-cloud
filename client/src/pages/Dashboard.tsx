@@ -9,8 +9,7 @@ import FileGridItem from '@/components/ui/dashboard/FileGridItem'
 import { File, Search } from 'lucide-react'
 import { formatFileSize } from '@/utils/helpers/files/fileUtils'
 import DashboardSidebar from '@/components/ui/dashboard/DashboardSidebar'
-import FloatingUploadButton from '@/components/ui/buttons/FloatingUploadButton'
-import MobileUpgradeBanner from '@/components/ui/dashboard/MobileUpgradeBanner'
+// import MobileUpgradeBanner from '@/components/ui/dashboard/MobileUpgradeBanner' // Uncomment if you want to show the mobile upgrade banner
 import { OverlayLoader } from '@/components/ui/spinners'
 
 const Dashboard = () => {
