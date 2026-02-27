@@ -32,10 +32,16 @@ export const fileService = {
     })
   },
 
+  getFileVersions: (id: string) => api.get(`/files/${id}/versions`),
+
+  download: (id: string) =>
+    api.get(`/files/download/${id}`, { responseType: 'blob' }),
+
+  downloadVersion: (fileId: string, versionId: string) =>
+    api.get(`/files/download/${fileId}/versions/${versionId}`, { responseType: 'blob' }),
+
   delete: (id: string) => api.delete(`/files/${id}`),
 
   bulkDelete: (ids: string[]) => api.delete('/files/bulk-delete', { data: { fileIds:ids } }),
 
-  download: (id: string) =>
-    api.get(`/files/download/${id}`, { responseType: 'blob' }),
 }
