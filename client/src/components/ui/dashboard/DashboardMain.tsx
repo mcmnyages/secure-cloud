@@ -24,6 +24,7 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
     const [recentModalOpen, setRecentModalOpen] = useState(false)
     const [recentTimeFilter, setRecentTimeFilter] = useState<TimeFilter>('today')
     const [customDate, setCustomDate] = useState<Date | undefined>()
+    const [customTime, setCustomTime] = useState<string>('')
     const [filesToShow, setFilesToShow] = useState<number>(5)
 
     if (isLoading) return <OverlayLoader label="Loading Dashboard Elements..." />
@@ -114,6 +115,7 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
                 files={files}
                 timeFilter={recentTimeFilter}
                 customDate={customDate}
+                customTime={customTime}
                 title={`Uploads: ${recentTimeFilter.charAt(0).toUpperCase() + recentTimeFilter.slice(1)}`}
                 onClose={() => setRecentModalOpen(false)}
                 onDownload={(id) => {
@@ -121,9 +123,12 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
                     if (file) downloadFile(id, file.currentVersion.name)
                 }}
                 onDelete={deleteFile}
-                onTimeFilterChange={(tf, date) => {
+                onTimeFilterChange={(tf, date, time) => {
                     setRecentTimeFilter(tf)
-                    if (tf === 'custom' && date) setCustomDate(date)
+                    if (tf === 'custom') {
+                        if (date) setCustomDate(date)
+                        if (typeof time === 'string') setCustomTime(time)
+                    }
                 }}
             />
         </div>

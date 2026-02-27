@@ -14,24 +14,29 @@ interface UploadsModalProps {
   files: CloudFile[]
   timeFilter: TimeFilter
   customDate?: Date
+  customTime?: string // 'HH:MM' format
   title?: string
   onClose: () => void
   onDownload: (id: string) => void
   onDelete: (id: string) => void
-  onTimeFilterChange?: (tf: TimeFilter, date?: Date) => void
+  onTimeFilterChange?: (tf: TimeFilter, date?: Date, time?: string) => void
 }
+
+import { useState } from 'react'
 
 const UploadsModal: React.FC<UploadsModalProps> = ({
   isOpen,
   files,
   timeFilter,
   customDate,
+  customTime: customTimeProp,
   title,
   onClose,
   onDownload,
   onDelete,
   onTimeFilterChange
 }) => {
+  const [customTime, setCustomTime] = useState<string>(customTimeProp || '')
   if (!isOpen) return null
 
   const getStartTime = () => {
@@ -45,8 +50,18 @@ const UploadsModal: React.FC<UploadsModalProps> = ({
       case 'last7days': {
         const d = new Date(); d.setDate(d.getDate() - 7); d.setHours(0, 0, 0, 0); return d
       }
-      case 'custom':
-        return customDate ? new Date(customDate.setHours(0, 0, 0, 0)) : new Date(0)
+      case 'custom': {
+        if (!customDate) return new Date(0)
+        const d = new Date(customDate)
+        // If customTime is provided, set hours/minutes
+        if (customTime) {
+          const [h, m] = customTime.split(':')
+          d.setHours(Number(h), Number(m), 0, 0)
+        } else {
+          d.setHours(0, 0, 0, 0)
+        }
+        return d
+      }
     }
   }
 
@@ -89,16 +104,26 @@ const UploadsModal: React.FC<UploadsModalProps> = ({
           ))}
         </div>
 
-        {/* Custom date picker */}
+        {/* Custom date and time picker */}
         {timeFilter === 'custom' && (
-          <div className="mb-4">
+          <div className="mb-4 flex gap-2">
             <input
               type="date"
               className="border border-[rgb(var(--border))] rounded-lg p-2 w-full"
               value={customDate ? customDate.toISOString().slice(0, 10) : ''}
               onChange={e => {
                 const date = e.target.valueAsDate
-                if (date) onTimeFilterChange?.('custom', date)
+                if (date) onTimeFilterChange?.('custom', date, customTime)
+              }}
+            />
+            <input
+              type="time"
+              className="border border-[rgb(var(--border))] rounded-lg p-2 w-full"
+              value={customTime}
+              onChange={e => {
+                const time = e.target.value
+                setCustomTime(time)
+                onTimeFilterChange?.('custom', customDate, time)
               }}
             />
           </div>
@@ -107,7 +132,7 @@ const UploadsModal: React.FC<UploadsModalProps> = ({
         {/* File list */}
         {filteredFiles.length === 0 ? (
           <p className="text-center text-[rgb(var(--text)/0.6)] py-10">
-            No files found for this period.
+            {timeFilter === 'custom' ? 'No files found for this date and time.' : 'No files found for this period.'}
           </p>
         ) : (
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
