@@ -93,7 +93,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
           ) : (
             <Link to="/" className="flex items-center gap-2 group">
               <Cloud className="text-[rgb(var(--primary))] group-hover:scale-110 transition-transform" size={28} />
-              <span className="font-bold text-xl tracking-tight hidden xs:block">
+              <span className="font-bold text-xl tracking-tight  xs:block">
                 Secure<span className="text-[rgb(var(--primary))]">Cloud</span>
               </span>
             </Link>
