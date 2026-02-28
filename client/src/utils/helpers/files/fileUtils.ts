@@ -222,3 +222,18 @@ export const formatDate = (dateString: string): string => {
     year: 'numeric',
   });
 };
+
+
+export const getReadableType = (mimeType: string) => {
+  if (!mimeType) return "File";
+
+  if (mimeType.includes("pdf")) return "PDF";
+  if (mimeType.includes("image")) return "Image";
+  if (mimeType.includes("video")) return "Video";
+  if (mimeType.includes("audio")) return "Audio";
+  if (mimeType.includes("spreadsheet")) return "Spreadsheet";
+  if (mimeType.includes("presentation")) return "Presentation";
+  if (mimeType.includes("word")) return "Document";
+
+  return "File";
+};
