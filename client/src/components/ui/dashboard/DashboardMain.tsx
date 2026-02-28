@@ -82,7 +82,7 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
                                 file={file.currentVersion}
                                 formatSize={formatFileSize}
                                 onDownload={() => downloadFile(file.id, file.currentVersion.name)}
-                                onDelete={() => deleteFile(file.id)}
+                                onDelete={{ mutate: (id: string) => deleteFile(id) }}
                             />
                         ))}
                     </div>
@@ -95,7 +95,7 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
                             file={file.currentVersion}
                             formatSize={formatFileSize}
                             onDownload={() => downloadFile(file.id, file.currentVersion.name)}
-                            onDelete={() => deleteFile(file.id)}
+                            onDelete={{ mutate: (id: string) => deleteFile(id) }}
                         />
                     ))}
                 </div>
