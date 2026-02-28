@@ -1,6 +1,6 @@
 // src/pages/Dashboard.tsx
 import { useRef } from 'react';
-import { useFiles } from '@/hooks/files/queris/useFiles';
+import { useFiles } from '@/hooks/files/queries/useFiles';
 import { useFileActions } from '@/hooks/files/mutations/useFileActions';
 
 // UI Components

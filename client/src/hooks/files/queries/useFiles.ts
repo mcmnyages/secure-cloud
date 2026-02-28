@@ -1,11 +1,10 @@
-// src/files/hooks/queries/useFiles.ts
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fileService } from '@/api/services/fileService';
-import type { CloudFile, FlatFile } from '@/types/fileTypes';
+import type { CloudFile, FlatFile, FileVersion } from '@/types/fileTypes';
 
 export const useFiles = () => {
-  // 1. UI State
+  // 1. UI & Filter State
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,7 +12,12 @@ export const useFiles = () => {
   const [sortBy, setSortBy] = useState<'newest' | 'size' | 'name'>('newest');
   const [typeFilter, setTypeFilter] = useState<'all' | 'image' | 'video' | 'audio' | 'document' | 'other'>('all');
 
-  // 2. Data Fetching
+  // 2. Selection State (For Modular Versions)
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+
+  // 3. Data Fetching
+
+  // Main Files Query
   const filesQuery = useQuery({
     queryKey: ['files'],
     queryFn: async () => {
@@ -34,6 +38,19 @@ export const useFiles = () => {
     },
   });
 
+  // Modular Version Query: Only fetches when selectedFileId changes
+  const versionsQuery = useQuery({
+    queryKey: ['fileVersions', selectedFileId],
+    queryFn: async () => {
+      if (!selectedFileId) return [];
+      const res = await fileService.getFileVersions(selectedFileId);
+      return res.data as FileVersion[];
+    },
+    enabled: !!selectedFileId, // Only runs if an ID is selected
+    staleTime: 1000 * 60 * 5,   // Cache versions for 5 mins
+  });
+
+  // Storage Query
   const storageQuery = useQuery({
     queryKey: ['storage'],
     queryFn: async () => {
@@ -46,7 +63,7 @@ export const useFiles = () => {
     staleTime: 1000 * 60 * 2,
   });
 
-  // 3. Filtering & Sorting Logic
+  // 4. Filtering & Sorting Logic
   const filteredFiles = useMemo(() => {
     const allFiles = filesQuery.data || [];
     
@@ -77,11 +94,20 @@ export const useFiles = () => {
     // Data
     files: filteredFiles,
     allFiles: filesQuery.data || [],
+    versions: versionsQuery.data || [],
     storage: storageQuery.data,
+    
+    // Status
     isLoading: filesQuery.isLoading || storageQuery.isLoading,
-    isError: filesQuery.isError,
+    isVersionsLoading: versionsQuery.isFetching,
+    isError: filesQuery.isError || versionsQuery.isError,
 
-    // UI States
+    // Selection/Modular States
+    selectedFileId,
+    setSelectedFileId,
+    selectedFile: filesQuery.data?.find(f => f.id === selectedFileId),
+
+    // UI States (Restored)
     viewMode,
     setViewMode,
     isModalOpen,
@@ -89,7 +115,7 @@ export const useFiles = () => {
     showFilter,
     setShowFilter,
 
-    // Filters (Passed as a grouped object for cleaner props)
+    // Filters
     filters: {
       search,
       setSearch,
@@ -99,9 +125,11 @@ export const useFiles = () => {
       setSortBy,
     },
 
+    // Refresh
     refresh: () => {
       filesQuery.refetch();
       storageQuery.refetch();
+      if (selectedFileId) versionsQuery.refetch();
     },
   };
 };

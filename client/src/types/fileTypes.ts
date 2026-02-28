@@ -19,6 +19,11 @@ export interface FileVersion {
   size: number
   mimeType: string
   createdAt: string
+  isCurrent?: boolean
+}
+
+export interface VersionsMap {
+  [fileId: string]: FileVersion[];
 }
 
 // CloudFile used in UI

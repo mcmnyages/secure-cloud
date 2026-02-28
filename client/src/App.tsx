@@ -10,7 +10,8 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import { Toaster } from 'sonner';
-import Files from './pages/Files';
+import Files from './pages/files/Files';
+import FileVersionPage from './pages/files/FileVersionPage';
 import Settings from './pages/Settings';
 
 // A simple wrapper to protect private routes
@@ -59,6 +60,16 @@ function App() {
                   </PrivateRoute>
                 } 
               />
+
+              <Route 
+                path="/files/:fileId/versions" 
+                element={ 
+                  <PrivateRoute>
+                    <FileVersionPage />
+                  </PrivateRoute>
+                } 
+              />
+
               <Route 
                 path="/settings" 
                 element={
