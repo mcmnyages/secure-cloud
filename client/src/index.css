@@ -125,3 +125,64 @@ button:hover {
 .empty-state button:hover {
   background-color: rgb(var(--primary-dark));
 }
+
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.25s ease-out forwards;
+}
+
+
+@keyframes premium-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-premium-spin {
+  animation: premium-spin 0.9s linear infinite;
+}
+
+
+
+@keyframes processing-dot {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.animate-processing-dot {
+  animation: processing-dot 1.2s ease-in-out infinite;
+}
+
+
+@keyframes gradientShift {
+  0% { stop-color: #3b82f6; }
+  50% { stop-color: #8b5cf6; }
+  100% { stop-color: #3b82f6; }
+}
+
+.animate-gradient stop {
+  animation: gradientShift 3s infinite;
+}

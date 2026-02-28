@@ -16,7 +16,7 @@ const FileVersionPage = () => {
   } = useFiles();
   console.log('Files:', versions, selectedFile);
 
-  const { downloadFile, deleteFile } = useFileActions();
+  const { downloadFile} = useFileActions();
 
   // Sync the URL ID with our hook's state
   useEffect(() => {

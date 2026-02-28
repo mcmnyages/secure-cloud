@@ -5,6 +5,7 @@ import UploadModal from '@/components/ui/modals/UploadModal'
 import { useFiles } from '@/hooks/files/queries/useFiles'
 import { useFileActions } from '@/hooks/files/mutations/useFileActions'
 import { formatFileSize, formatDate } from '@/utils/helpers/files/fileUtils'
+import { LogoSpinner } from '@/components/ui/spinners'
 
 const Files = () => {
   const navigate = useNavigate();
@@ -79,7 +80,7 @@ const Files = () => {
 
         {isLoading && (
           <div className="flex justify-center py-20 font-medium opacity-70 animate-pulse text-lg">
-            Loading your cloud storage...
+            <LogoSpinner size={120}  src='/favicon.ico' spinLogo={true}/>
           </div>
         )}
 

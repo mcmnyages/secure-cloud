@@ -1,18 +1,37 @@
+import { useEffect } from "react";
 import { Spinner } from "./Spinner";
 
 interface OverlayLoaderProps {
   label?: string;
+  description?: string;
 }
 
 export const OverlayLoader: React.FC<OverlayLoaderProps> = ({
   label = "Loading...",
+  description,
 }) => {
+  // Prevent background scrolling while loader is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50"
-      style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-fadeIn"
+      style={{
+        background:
+          "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55))",
+        backdropFilter: "blur(6px)",
+      }}
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
     >
       <div
-        className="p-8 rounded-2xl shadow-xl flex flex-col items-center gap-4"
+        className="w-full max-w-sm sm:max-w-md p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center gap-5 animate-scaleIn transition-all"
         style={{
           backgroundColor: "rgb(var(--card))",
           border: "1px solid rgb(var(--border))",
@@ -20,14 +39,23 @@ export const OverlayLoader: React.FC<OverlayLoaderProps> = ({
       >
         <Spinner size="lg" />
 
-        <p
-          style={{
-            color: "rgb(var(--text))",
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </p>
+        <div className="text-center space-y-1">
+          <p
+            className="text-base sm:text-lg font-semibold tracking-tight"
+            style={{ color: "rgb(var(--text))" }}
+          >
+            {label}
+          </p>
+
+          {description && (
+            <p
+              className="text-sm opacity-70"
+              style={{ color: "rgb(var(--text))" }}
+            >
+              {description}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
