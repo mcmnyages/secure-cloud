@@ -193,33 +193,35 @@ export const formatFileSize = (bytes: number): string => {
 
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  const now = new Date();
 
-  if (isNaN(date.getTime())) return '';
+  if (isNaN(date.getTime())) return "";
 
-  const isToday = now.toDateString() === date.toDateString();
-  const isYesterday =
-    new Date(now.setDate(now.getDate() - 1)).toDateString() ===
-    date.toDateString();
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const isToday = today.toDateString() === date.toDateString();
+  const isYesterday = yesterday.toDateString() === date.toDateString();
+
+  const time = date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   if (isToday) {
-    return `Today at ${date.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    })}`;
+    return `Today at ${time}`;
   }
 
   if (isYesterday) {
-    return `Yesterday at ${date.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    })}`;
+    return `Yesterday at ${time}`;
   }
 
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 

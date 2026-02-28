@@ -1,11 +1,12 @@
 import { Download, Trash2 } from "lucide-react";
-import { getFileConfig, getReadableType } from "@/utils/helpers/files/fileUtils";
+import { getFileConfig, formatDate } from "@/utils/helpers/files/fileUtils";
 
 interface File {
   id: string;
   name: string;
   mimeType: string;
   size?: number;
+  createdAt: string;
 }
 
 interface FileGridItemProps {
@@ -25,7 +26,7 @@ const FileGridItem = ({
 }: FileGridItemProps) => {
   const config = getFileConfig(file.mimeType);
   const Icon = config?.Icon;
-  const fileType = getReadableType(file.mimeType);
+  const label = config?.label;
 
   return (
     <div
@@ -89,15 +90,15 @@ const FileGridItem = ({
 
       {/* File Icon */}
       <div
-        className="
+        className={`
           aspect-square mb-4
           rounded-xl
           flex items-center justify-center
-          bg-[rgb(var(--background)/0.6)]
-          text-[rgb(var(--primary))]
+          ${config.bg}
+          ${config.color}
           transition-transform duration-300
           group-hover:scale-95
-        "
+        `}
       >
         {Icon && <Icon size={34} />}
       </div>
@@ -108,12 +109,19 @@ const FileGridItem = ({
           {file.name}
         </p>
 
-        <div className="flex items-center gap-2 text-xs text-[rgb(var(--text)/0.5)]">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text)/0.5)]">
           {file.size && formatSize && (
-            <span>{formatSize(file.size)}</span>
+            <>
+              <span>{formatSize(file.size)}</span>
+              <span className="w-1 h-1 rounded-full bg-[rgb(var(--text)/0.3)]" />
+            </>
           )}
+
+          <span>{label}</span>
+
           <span className="w-1 h-1 rounded-full bg-[rgb(var(--text)/0.3)]" />
-          <span>{fileType}</span>
+
+          <span>{formatDate(file.createdAt)}</span>
         </div>
       </div>
     </div>
