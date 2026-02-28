@@ -65,7 +65,31 @@ const UploadsModal: React.FC<UploadsModalProps> = ({
     }
   }
 
-  const filteredFiles = files.filter(f => new Date(f.createdAt) >= getStartTime())
+  // Only filter if a date is selected for custom, otherwise show nothing
+  let filteredFiles: CloudFile[] = [];
+  if (timeFilter === 'custom') {
+    if (customDate) {
+      // Calculate start and end of the selected day (or time window)
+      const start = new Date(customDate);
+      let end = new Date(customDate);
+      if (customTime) {
+        const [h, m] = customTime.split(':');
+        start.setHours(Number(h), Number(m), 0, 0);
+        end.setHours(Number(h), Number(m), 59, 999);
+      } else {
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+      }
+      filteredFiles = files.filter(f => {
+        const created = new Date(f.createdAt);
+        return created >= start && created <= end;
+      });
+    } else {
+      filteredFiles = [];
+    }
+  } else {
+    filteredFiles = files.filter(f => new Date(f.createdAt) >= getStartTime());
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -104,16 +128,16 @@ const UploadsModal: React.FC<UploadsModalProps> = ({
           ))}
         </div>
 
-        {/* Custom date and time picker */}
+        {/* Custom date and time picker with Clear button */}
         {timeFilter === 'custom' && (
-          <div className="mb-4 flex gap-2">
+          <div className="mb-4 flex gap-2 items-center">
             <input
               type="date"
               className="border border-[rgb(var(--border))] rounded-lg p-2 w-full"
               value={customDate ? customDate.toISOString().slice(0, 10) : ''}
               onChange={e => {
-                const date = e.target.valueAsDate
-                if (date) onTimeFilterChange?.('custom', date, customTime)
+                const date = e.target.valueAsDate;
+                if (date) onTimeFilterChange?.('custom', date, customTime);
               }}
             />
             <input
@@ -121,18 +145,32 @@ const UploadsModal: React.FC<UploadsModalProps> = ({
               className="border border-[rgb(var(--border))] rounded-lg p-2 w-full"
               value={customTime}
               onChange={e => {
-                const time = e.target.value
-                setCustomTime(time)
-                onTimeFilterChange?.('custom', customDate, time)
+                const time = e.target.value;
+                setCustomTime(time);
+                onTimeFilterChange?.('custom', customDate, time);
               }}
             />
+            <button
+              type="button"
+              className="ml-2 px-3 py-2 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--background))] text-sm hover:bg-[rgb(var(--muted)/0.2)] transition-colors"
+              onClick={() => {
+                setCustomTime('');
+                onTimeFilterChange?.('custom', undefined, '');
+              }}
+            >
+              Clear
+            </button>
           </div>
         )}
 
         {/* File list */}
         {filteredFiles.length === 0 ? (
           <p className="text-center text-[rgb(var(--text)/0.6)] py-10">
-            {timeFilter === 'custom' ? 'No files found for this date and time.' : 'No files found for this period.'}
+            {timeFilter === 'custom'
+              ? customDate || customTime
+                ? 'No files were uploaded for the selected date and time.'
+                : 'Please select a date and/or time to view uploads.'
+              : 'No files were uploaded during this period.'}
           </p>
         ) : (
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -142,7 +180,7 @@ const UploadsModal: React.FC<UploadsModalProps> = ({
                 file={file.currentVersion}
                 formatSize={formatFileSize}
                 onDownload={() => onDownload(file.id)}
-                onDelete={() => onDelete(file.id)}
+                onDelete={{ mutate: () => onDelete(file.id) }}
               />
             ))}
           </div>

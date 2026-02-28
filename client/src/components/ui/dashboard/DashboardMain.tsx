@@ -27,6 +27,8 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
     const [customTime, setCustomTime] = useState<string>('')
     const [filesToShow, setFilesToShow] = useState<number>(5)
 
+
+
     if (isLoading) return <OverlayLoader label="Loading Dashboard Elements..." />
 
     if (files.length === 0)
@@ -124,10 +126,13 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
                 }}
                 onDelete={deleteFile}
                 onTimeFilterChange={(tf, date, time) => {
-                    setRecentTimeFilter(tf)
+                    setRecentTimeFilter(tf);
                     if (tf === 'custom') {
-                        if (date) setCustomDate(date)
-                        if (typeof time === 'string') setCustomTime(time)
+                        setCustomDate(date);
+                        setCustomTime(typeof time === 'string' ? time : '');
+                    } else {
+                        setCustomDate(undefined);
+                        setCustomTime('');
                     }
                 }}
             />
