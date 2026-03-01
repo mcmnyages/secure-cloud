@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Search, Grid, List, Download, Trash2, 
-   Plus, Edit3, X, Check, 
-  Command
+  Search, Grid, List, Download, Trash2, Edit3, X, Check, 
 } from 'lucide-react';
 
 // Hooks & Types
@@ -40,30 +38,7 @@ const Files: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--text))] font-sans selection:bg-blue-500/30">
-      {/* 1. ULTRA-MINIMAL NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-[rgb(var(--text)/0.05)] bg-[rgb(var(--background)/0.8)] backdrop-blur-xl">
-        <div className="max-w-[1800px] mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <Command size={18} className="text-white" />
-            </div>
-            <span className="font-black tracking-tighter text-xl">GEMINI.OS</span>
-          </div>
-          
-          <div className="flex items-center gap-3">
-             <div className="hidden md:flex flex-col items-end mr-4">
-                <span className="text-[10px] font-bold opacity-30 uppercase">Vault Status</span>
-                <span className="text-xs font-mono">{formatFileSize(storage?.used || 0)} / {formatFileSize(storage?.limit || 0)}</span>
-             </div>
-             <button 
-               onClick={() => setIsModalOpen(true)}
-               className="bg-[rgb(var(--text))] text-[rgb(var(--background))] px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:scale-105 transition-transform"
-             >
-               <Plus size={16} strokeWidth={3} /> Upload
-             </button>
-          </div>
-        </div>
-      </nav>
+      
 
       <main className="max-w-[1800px] mx-auto px-6 pt-32 pb-24">
         {/* 2. CREATIVE SEARCH COMMAND BAR */}
