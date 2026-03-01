@@ -1,82 +1,51 @@
 import type { CloudFile } from '@/types/fileTypes'
-import type { TimeFilter } from '@/components/ui/dashboard/modals/UploadsModal'
+import { subDays, subMonths, isWithinInterval, startOfDay, endOfDay } from 'date-fns' // Recommended: 'date-fns' for cleaner math
 
-// Helpers
-const startOfDay = (date: Date) => {
-  const d = new Date(date)
-  d.setHours(0, 0, 0, 0)
-  return d
-}
-
-const endOfDay = (date: Date) => {
-  const d = new Date(date)
-  d.setHours(23, 59, 59, 999)
-  return d
-}
+export type TimeFilter = 'today' | 'yesterday' | 'last7days' | 'last30days' | 'lastMonth' | 'custom'
 
 export const filterFilesByTime = (
-  files: CloudFile[],
-  timeFilter: TimeFilter,
-  customDate?: Date,
-  customTime?: string
+    files: CloudFile[],
+    timeFilter: TimeFilter,
+    customDate?: Date,
+    customTime?: string
 ): CloudFile[] => {
-  const now = new Date()
+    const now = new Date()
 
-  switch (timeFilter) {
-    case 'today': {
-      const start = startOfDay(now)
-      return files.filter(f => {
-        const created = new Date(f.createdAt)
-        return created >= start && created <= now
-      })
+    const getInterval = () => {
+        switch (timeFilter) {
+            case 'today':
+                return { start: startOfDay(now), end: now }
+            case 'yesterday':
+                const yesterday = subDays(now, 1)
+                return { start: startOfDay(yesterday), end: endOfDay(yesterday) }
+            case 'last7days':
+                return { start: startOfDay(subDays(now, 6)), end: now }
+            case 'last30days':
+                return { start: startOfDay(subDays(now, 29)), end: now }
+            case 'lastMonth':
+                const lastMonth = subMonths(now, 1)
+                return { start: startOfDay(lastMonth), end: endOfDay(now) }
+            case 'custom':
+                if (!customDate) return null
+                const start = new Date(customDate)
+                if (customTime) {
+                    const [h, m] = customTime.split(':').map(Number)
+                    start.setHours(h, m, 0, 0)
+                    const end = new Date(start)
+                    end.setMinutes(end.getMinutes() + 59) // 1-hour window or exact minute
+                    return { start, end }
+                }
+                return { start: startOfDay(customDate), end: endOfDay(customDate) }
+            default:
+                return null
+        }
     }
 
-    case 'yesterday': {
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
+    const interval = getInterval()
+    if (!interval) return []
 
-      const start = startOfDay(yesterday)
-      const end = endOfDay(yesterday)
-
-      return files.filter(f => {
+    return files.filter(f => {
         const created = new Date(f.createdAt)
-        return created >= start && created <= end
-      })
-    }
-
-    case 'last7days': {
-      const start = new Date()
-      start.setDate(start.getDate() - 6) // 6 days ago + today = 7 total
-      start.setHours(0, 0, 0, 0)
-
-      return files.filter(f => {
-        const created = new Date(f.createdAt)
-        return created >= start && created <= now
-      })
-    }
-
-    case 'custom': {
-      if (!customDate) return []
-
-      const start = new Date(customDate)
-      const end = new Date(customDate)
-
-      if (customTime) {
-        const [h, m] = customTime.split(':')
-        start.setHours(Number(h), Number(m), 0, 0)
-        end.setHours(Number(h), Number(m), 59, 999)
-      } else {
-        start.setHours(0, 0, 0, 0)
-        end.setHours(23, 59, 59, 999)
-      }
-
-      return files.filter(f => {
-        const created = new Date(f.createdAt)
-        return created >= start && created <= end
-      })
-    }
-
-    default:
-      return []
-  }
+        return isWithinInterval(created, interval)
+    })
 }

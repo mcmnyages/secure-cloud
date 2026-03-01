@@ -1,15 +1,11 @@
-import type { CloudFile } from '@/types/fileTypes'
+import { useState, useMemo, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, Calendar, Clock, Filter } from 'lucide-react'
 import FileListItem from '@/components/ui/dashboard/FileListItem'
 import { formatFileSize } from '@/utils/helpers/files/fileUtils'
-import { filterFilesByTime } from '@/utils/helpers/files/filterFilesByTime'
-import { X } from 'lucide-react'
-import { useState, useMemo } from 'react'
-
-export type TimeFilter =
-  | 'today'
-  | 'yesterday'
-  | 'last7days'
-  | 'custom'
+import { filterFilesByTime, type TimeFilter } from '@/utils/helpers/files/filterFilesByTime'
+import type { CloudFile } from '@/types/fileTypes'
+import Dropdown from '@/components/ui/dashboard/dropdowns/FilterOptionsDropdown'
 
 interface UploadsModalProps {
   isOpen: boolean
@@ -25,120 +21,116 @@ interface UploadsModalProps {
 }
 
 const UploadsModal: React.FC<UploadsModalProps> = ({
-  isOpen,
-  files,
-  timeFilter,
-  customDate,
-  customTime: customTimeProp,
-  title,
-  onClose,
-  onDownload,
-  onDelete,
-  onTimeFilterChange
+  isOpen, files, timeFilter, customDate, customTime = '', title, onClose, onDownload, onDelete, onTimeFilterChange
 }) => {
-  const [customTime, setCustomTime] = useState<string>(customTimeProp || '')
+  const [localTime, setLocalTime] = useState<string>(customTime)
 
-  // ✅ Hooks must ALWAYS run
+  // Sync local state when prop changes (essential for "custom" filter)
+  useEffect(() => { setLocalTime(customTime) }, [customTime])
+
   const filteredFiles = useMemo(() => {
-    return filterFilesByTime(files, timeFilter, customDate, customTime)
-  }, [files, timeFilter, customDate, customTime])
+    return filterFilesByTime(files, timeFilter, customDate, localTime)
+  }, [files, timeFilter, customDate, localTime])
 
-  // ✅ Early return AFTER hooks
-  if (!isOpen) return null
+  const dropdownOptions = [
+    { label: 'Last 30 Days', value: 'last30days' },
+    { label: 'Last Month', value: 'lastMonth' },
+    { label: 'Custom Range', value: 'custom' },
+    
+  ]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+          <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative z-10 w-full max-w-2xl bg-[rgb(var(--card))] border border-[rgb(var(--border)/0.5)] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+            
+            <div className="p-8 pb-6 border-b border-[rgb(var(--border)/0.5)] flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+                <p className="text-sm font-medium text-[rgb(var(--text)/0.5)]">{filteredFiles.length} files found</p>
+              </div>
+              <button onClick={onClose} className="p-2.5 rounded-full bg-[rgb(var(--muted)/0.2)] hover:bg-[rgb(var(--muted)/0.4)] transition-all">
+                <X size={20} />
+              </button>
+            </div>
 
-      <div className="relative z-10 w-full max-w-3xl bg-[rgb(var(--card))] rounded-xl shadow-2xl p-6 overflow-hidden">
-        <button
-          className="absolute top-4 right-4 text-[rgb(var(--text)/0.5)] hover:text-[rgb(var(--text))] transition-colors"
-          onClick={onClose}
-        >
-          <X size={24} />
-        </button>
+            <div className="px-8 py-4 bg-[rgb(var(--background)/0.3)] border-b border-[rgb(var(--border)/0.3)] space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {['today', 'yesterday', 'last7days'].map(option => (
+                  <button
+                    key={option}
+                    onClick={() => onTimeFilterChange?.(option as TimeFilter)}
+                    className={`px-5 py-2 rounded-full text-xs font-bold transition-all border ${
+                      timeFilter === option ? 'bg-[rgb(var(--primary))] text-white shadow-lg' : 'bg-[rgb(var(--card))] border-[rgb(var(--border))]'
+                    }`}
+                  >
+                    {option === 'last7days' ? 'Last 7 Days' : option.charAt(0).toUpperCase() + option.slice(1)}
+                  </button>
+                ))}
+                
+                <Dropdown 
+                  options={dropdownOptions}
+                  value={['last30days', 'lastMonth', 'custom'].includes(timeFilter) ? timeFilter : ''}
+                  onChange={(val) => onTimeFilterChange?.(val as TimeFilter)}
+                  placeholder="More Options"
+                />
+              </div>
 
-        <h2 className="text-xl font-bold mb-4 text-[rgb(var(--text))]">
-          {title || 'Recent Uploads'}
-        </h2>
+              <AnimatePresence>
+                {timeFilter === 'custom' && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                    <div className="flex flex-wrap gap-3 p-4 bg-[rgb(var(--card))] rounded-2xl border border-[rgb(var(--primary)/0.2)]">
+                      <div className="flex-1 min-w-[140px] relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--primary))]" />
+                        <input
+                          type="date"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[rgb(var(--background)/0.5)] rounded-xl text-sm outline-none"
+                          value={customDate ? customDate.toISOString().slice(0, 10) : ''}
+                          onChange={e => onTimeFilterChange?.('custom', e.target.valueAsDate || undefined, localTime)}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-[140px] relative">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--primary))]" />
+                        <input
+                          type="time"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[rgb(var(--background)/0.5)] rounded-xl text-sm outline-none"
+                          value={localTime}
+                          onChange={e => onTimeFilterChange?.('custom', customDate, e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-        <div className="flex gap-2 mb-4 flex-wrap">
-          {['today', 'yesterday', 'last7days', 'custom'].map(option => (
-            <button
-              key={option}
-              onClick={() => onTimeFilterChange?.(option as TimeFilter)}
-              className={`px-3 py-1 rounded-xl text-sm font-semibold transition-all border
-                ${timeFilter === option
-                  ? 'bg-[rgb(var(--primary))] text-white border-[rgb(var(--primary))]'
-                  : 'bg-[rgb(var(--background))] border-[rgb(var(--border))] hover:bg-[rgb(var(--muted)/0.2)]'}`}
-            >
-              {option === 'custom'
-                ? 'Custom'
-                : option.charAt(0).toUpperCase() + option.slice(1)}
-            </button>
-          ))}
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+              {filteredFiles.length === 0 ? (
+                <div className="py-24 flex flex-col items-center text-[rgb(var(--text)/0.4)]">
+                   <Filter className="w-10 h-10 mb-4 opacity-20" />
+                   <p className="font-semibold">No files found for this period</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredFiles.map(file => (
+                    <motion.div layout key={file.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                      <FileListItem
+                        file={file.currentVersion}
+                        formatSize={formatFileSize}
+                        onDownload={() => onDownload(file.id)}
+                        onDelete={{ mutate: () => onDelete(file.id) }}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
-
-        {timeFilter === 'custom' && (
-          <div className="mb-4 flex gap-2 items-center">
-            <input
-              type="date"
-              className="border border-[rgb(var(--border))] rounded-lg p-2 w-full"
-              value={customDate ? customDate.toISOString().slice(0, 10) : ''}
-              onChange={e => {
-                const date = e.target.valueAsDate
-                if (date) onTimeFilterChange?.('custom', date, customTime)
-              }}
-            />
-            <input
-              type="time"
-              className="border border-[rgb(var(--border))] rounded-lg p-2 w-full"
-              value={customTime}
-              onChange={e => {
-                const time = e.target.value
-                setCustomTime(time)
-                onTimeFilterChange?.('custom', customDate, time)
-              }}
-            />
-            <button
-              type="button"
-              className="ml-2 px-3 py-2 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--background))] text-sm hover:bg-[rgb(var(--muted)/0.2)] transition-colors"
-              onClick={() => {
-                setCustomTime('')
-                onTimeFilterChange?.('custom', undefined, '')
-              }}
-            >
-              Clear
-            </button>
-          </div>
-        )}
-
-        {filteredFiles.length === 0 ? (
-          <p className="text-center text-[rgb(var(--text)/0.6)] py-10">
-            {timeFilter === 'custom'
-              ? customDate || customTime
-                ? 'No files were uploaded for the selected date and time.'
-                : 'Please select a date and/or time to view uploads.'
-              : 'No files were uploaded during this period.'}
-          </p>
-        ) : (
-          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-            {filteredFiles.map(file => (
-              <FileListItem
-                key={file.id}
-                file={file.currentVersion}
-                formatSize={formatFileSize}
-                onDownload={() => onDownload(file.id)}
-                onDelete={{ mutate: () => onDelete(file.id) }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   )
 }
 
