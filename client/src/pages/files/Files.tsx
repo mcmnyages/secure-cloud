@@ -1,174 +1,221 @@
-// client/src/components/dashboard/Files.tsx
-import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom' // Import navigate
-import UploadModal from '@/components/ui/modals/UploadModal'
-import { useFiles } from '@/hooks/files/queries/useFiles'
-import { useFileActions } from '@/hooks/files/mutations/useFileActions'
-import { formatFileSize, formatDate } from '@/utils/helpers/files/fileUtils'
-import { LogoSpinner } from '@/components/ui/spinners'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Search, Grid, List, Download, Trash2, 
+   Plus, Edit3, X, Check, 
+  Command
+} from 'lucide-react';
 
-const Files = () => {
+// Hooks & Types
+import { useFiles } from '@/hooks/files/queries/useFiles';
+import { useFileActions } from '@/hooks/files/mutations/useFileActions';
+import type { CloudFile } from '@/types/fileTypes';
+import { formatFileSize, getFileConfig } from '@/utils/helpers/files/fileUtils';
+
+// UI Components
+import { LogoSpinner } from '@/components/ui/spinners';
+import UploadModal from '@/components/ui/modals/UploadModal';
+
+const Files: React.FC = () => {
   const navigate = useNavigate();
-  const { files, isLoading, isModalOpen, setIsModalOpen } = useFiles()
-
-  const {
-    deleteFile,
-    bulkDeleteFiles,
-    downloadFile,
-    renameFile,
-    uploadNewVersion
-  } = useFileActions()
-
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [renamingId, setRenamingId] = useState<string | null>(null)
-  const [newName, setNewName] = useState('')
-  const [uploadingVersionFor, setUploadingVersionFor] = useState<string | null>(null)
+  const { files, isLoading, isModalOpen, setIsModalOpen, viewMode, setViewMode, filters, storage } = useFiles();
+  const { deleteFile, bulkDeleteFiles, downloadFile, renameFile } = useFileActions();
   
-  const versionInputRef = useRef<HTMLInputElement>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState<string>("");
 
-  const toggleSelect = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // Don't navigate when checking the box
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    )
-  }
+  
 
-  const handleRename = (id: string) => {
-    if (!newName.trim()) return
-    renameFile({ id, name: newName })
-    setRenamingId(null)
-  }
+  const handleStartRename = (e: React.MouseEvent, file: CloudFile): void => {
+    e.stopPropagation();
+    setRenamingId(file.id);
+    setEditName(file.currentVersion.name);
+  };
 
-  const handleVersionUploadClick = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); 
-    setUploadingVersionFor(id)
-    versionInputRef.current?.click()
-  }
-
-  const handleVersionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!uploadingVersionFor || !e.target.files?.[0]) return
-    uploadNewVersion({ id: uploadingVersionFor, file: e.target.files[0] })
-    setUploadingVersionFor(null)
-    e.target.value = ''
-  }
+  const submitRename = (id: string): void => {
+    if (editName.trim()) renameFile({ id, name: editName });
+    setRenamingId(null);
+  };
 
   return (
-    <div className="min-h-screen mt-16 bg-[rgb(var(--background))] text-[rgb(var(--text))] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">File Management</h1>
+    <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--text))] font-sans selection:bg-blue-500/30">
+      {/* 1. ULTRA-MINIMAL NAV */}
+      <nav className="fixed top-0 w-full z-50 border-b border-[rgb(var(--text)/0.05)] bg-[rgb(var(--background)/0.8)] backdrop-blur-xl">
+        <div className="max-w-[1800px] mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Command size={18} className="text-white" />
+            </div>
+            <span className="font-black tracking-tighter text-xl">GEMINI.OS</span>
+          </div>
+          
+          <div className="flex items-center gap-3">
+             <div className="hidden md:flex flex-col items-end mr-4">
+                <span className="text-[10px] font-bold opacity-30 uppercase">Vault Status</span>
+                <span className="text-xs font-mono">{formatFileSize(storage?.used || 0)} / {formatFileSize(storage?.limit || 0)}</span>
+             </div>
+             <button 
+               onClick={() => setIsModalOpen(true)}
+               className="bg-[rgb(var(--text))] text-[rgb(var(--background))] px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:scale-105 transition-transform"
+             >
+               <Plus size={16} strokeWidth={3} /> Upload
+             </button>
+          </div>
+        </div>
+      </nav>
 
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-lg shadow-blue-500/20 transition-all active:scale-95"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Upload New
-          </button>
-
-          {selectedIds.length > 0 && (
-            <button
-              className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all"
-              onClick={() => {
-                bulkDeleteFiles(selectedIds)
-                setSelectedIds([])
-              }}
-            >
-              Delete Selected ({selectedIds.length})
-            </button>
-          )}
+      <main className="max-w-[1800px] mx-auto px-6 pt-32 pb-24">
+        {/* 2. CREATIVE SEARCH COMMAND BAR */}
+        <div className="relative max-w-2xl mx-auto mb-16">
+          <div className="group relative flex items-center bg-[rgb(var(--text)/0.03)] border border-[rgb(var(--text)/0.08)] rounded-2xl p-2 transition-all focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-500/50">
+            <Search className="ml-4 opacity-20 group-focus-within:opacity-100 group-focus-within:text-blue-500 transition-all" size={22} />
+            <input 
+              type="text"
+              placeholder="Type to search assets..."
+              className="w-full bg-transparent border-none outline-none px-4 py-3 text-xl font-medium placeholder:opacity-20"
+              value={filters.search}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => filters.setSearch(e.target.value)}
+            />
+            <div className="hidden sm:flex items-center gap-1 pr-4 opacity-30 pointer-events-none">
+              <kbd className="px-2 py-1 bg-[rgb(var(--text)/0.1)] rounded text-xs font-bold font-mono">⌘</kbd>
+              <kbd className="px-2 py-1 bg-[rgb(var(--text)/0.1)] rounded text-xs font-bold font-mono">K</kbd>
+            </div>
+          </div>
         </div>
 
-        {isLoading && (
-          <div className="flex justify-center py-20 font-medium opacity-70 animate-pulse text-lg">
-            <LogoSpinner size={120}  src='/favicon.ico' spinLogo={true}/>
+        {/* 3. VIEW CONTROLS */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex gap-2">
+            {['all', 'image', 'document', 'video'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => filters.setTypeFilter(cat as any)}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${filters.typeFilter === cat ? 'bg-blue-600 text-white' : 'bg-[rgb(var(--text)/0.05)] opacity-50 hover:opacity-100'}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          
+          <div className="flex items-center bg-[rgb(var(--text)/0.05)] rounded-xl p-1">
+            <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-[rgb(var(--background))] shadow-sm text-blue-500' : 'opacity-30'}`}><List size={18}/></button>
+            <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-[rgb(var(--background))] shadow-sm text-blue-500' : 'opacity-30'}`}><Grid size={18}/></button>
+          </div>
+        </div>
+
+        {/* 4. CONTENT GRID */}
+        {isLoading ? (
+          <div className="h-[40vh] flex flex-col items-center justify-center opacity-20"><LogoSpinner size={80} src='/favicon.ico' spinLogo /></div>
+        ) : (
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4' : 'flex flex-col gap-2'}>
+            {files.map((file) => (
+              <FileCard 
+                key={file.id} 
+                file={file} 
+                viewMode={viewMode}
+                isSelected={selectedIds.includes(file.id)}
+                isRenaming={renamingId === file.id}
+                editName={editName}
+                onSelect={(id) => setSelectedIds(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id])}
+                onRenameClick={(e) => handleStartRename(e, file)}
+                onRenameChange={(val) => setEditName(val)}
+                onRenameSubmit={() => submitRename(file.id)}
+                onRenameCancel={() => setRenamingId(null)}
+                onDownload={() => downloadFile(file.id, file.currentVersion.name)}
+                onDelete={() => deleteFile(file.id)}
+                onNavigate={() => navigate(`/files/${file.id}/versions`)}
+              />
+            ))}
           </div>
         )}
+      </main>
 
-        <div className="grid gap-4">
-          {!isLoading && files.map(file => {
-            const isSelected = selectedIds.includes(file.id)
-            const version = file.currentVersion
-
-            return (
-              <div
-                key={file.id}
-                // NAVIGATE TO NEW PAGE ON CLICK
-                onClick={() => navigate(`/files/${file.id}/versions`)}
-                className={`group p-5 border rounded-xl transition-all duration-200 cursor-pointer
-                  ${isSelected ? 'border-blue-500 bg-blue-500/5 ring-1 ring-blue-500' : 'border-[rgb(var(--text)/0.1)] bg-[rgb(var(--text)/0.03)] hover:bg-[rgb(var(--text)/0.05)]'}
-                `}
-              >
-                <div className="flex items-center space-x-4">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 rounded border-[rgb(var(--text)/0.2)] text-blue-600 focus:ring-blue-500 bg-transparent cursor-pointer"
-                    checked={isSelected}
-                    onClick={(e) => toggleSelect(e, file.id)}
-                    onChange={() => {}} // Handled by onClick
-                  />
-
-                  <div className="flex-1">
-                    {renamingId === file.id ? (
-                      <input
-                        className="w-full max-w-md bg-[rgb(var(--background))] border-2 border-blue-500 px-3 py-1.5 rounded-lg outline-none text-lg font-semibold"
-                        value={newName}
-                        autoFocus
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={e => setNewName(e.target.value)}
-                        onBlur={() => handleRename(file.id)}
-                        onKeyDown={e => e.key === 'Enter' && handleRename(file.id)}
-                      />
-                    ) : (
-                      <span
-                        className="text-lg font-semibold hover:text-blue-500 transition-colors block truncate"
-                        onDoubleClick={(e) => {
-                          e.stopPropagation();
-                          setRenamingId(file.id)
-                          setNewName(version.name)
-                        }}
-                      >
-                        {version.name}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[rgb(var(--text)/0.6)] ml-9">
-                   <span>Size: {formatFileSize(version.size)}</span>
-                   <span>Version: v{version.versionNumber}</span>
-                   <span>Added: {formatDate(file.createdAt)}</span>
-                </div>
-
-                <div className="mt-5 flex flex-wrap gap-3 ml-9">
-                  <button
-                    className="px-4 py-1.5 rounded-md bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 font-medium transition-colors"
-                    onClick={(e) => { e.stopPropagation(); downloadFile(file.id, version.name); }}
-                  >
-                    Download
-                  </button>
-                  <button
-                    className="px-4 py-1.5 rounded-md bg-[rgb(var(--text)/0.05)] text-[rgb(var(--text)/0.8)] hover:bg-[rgb(var(--text)/0.1)] font-medium transition-colors"
-                    onClick={(e) => handleVersionUploadClick(e, file.id)}
-                  >
-                    New Version
-                  </button>
-                  <button
-                    className="px-4 py-1.5 rounded-md bg-red-500/10 text-red-500 hover:bg-red-500/20 font-medium transition-colors"
-                    onClick={(e) => { e.stopPropagation(); deleteFile(file.id); }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )
-          })}
+      {/* 5. FLOATING SELECTION BAR */}
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-8 px-8 py-4 bg-[rgb(var(--text))] text-[rgb(var(--background))] rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-10">
+          <span className="font-black text-sm uppercase tracking-widest">{selectedIds.length} Selected</span>
+          <div className="w-px h-6 bg-[rgb(var(--background)/0.2)]" />
+          <div className="flex gap-4">
+            <button onClick={() => { bulkDeleteFiles(selectedIds); setSelectedIds([]); }} className="hover:text-red-500 transition-colors"><Trash2 size={20}/></button>
+            <button onClick={() => setSelectedIds([])} className="opacity-50 hover:opacity-100"><X size={20}/></button>
+          </div>
         </div>
-      </div>
+      )}
 
-      <input type="file" hidden ref={versionInputRef} onChange={handleVersionChange} />
       <UploadModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
-  )
+  );
+};
+
+/* --- SUBCOMPONENT: FILE CARD --- */
+interface CardProps {
+  file: CloudFile;
+  viewMode: 'grid' | 'list';
+  isSelected: boolean;
+  isRenaming: boolean;
+  editName: string;
+  onSelect: (id: string) => void;
+  onRenameClick: (e: React.MouseEvent) => void;
+  onRenameChange: (val: string) => void;
+  onRenameSubmit: () => void;
+  onRenameCancel: () => void;
+  onDownload: () => void;
+  onDelete: () => void;
+  onNavigate: () => void;
 }
 
-export default Files
+const FileCard: React.FC<CardProps> = ({ file, viewMode, isSelected, isRenaming, editName, onSelect, onRenameClick, onRenameChange, onRenameSubmit, onRenameCancel, onDownload, onDelete, onNavigate }) => {
+  const isGrid = viewMode === 'grid';
+  const config = getFileConfig(file.currentVersion.mimeType);
+  const Icon = config.Icon;
+
+  return (
+    <div 
+      onClick={onNavigate}
+      className={`group relative rounded-3xl transition-all duration-500 cursor-pointer overflow-hidden border
+        ${isSelected ? 'bg-blue-600/10 border-blue-500' : 'bg-[rgb(var(--text)/0.02)] border-[rgb(var(--text)/0.05)] hover:bg-[rgb(var(--text)/0.05)] hover:border-[rgb(var(--text)/0.15)]'}
+        ${isGrid ? 'aspect-[4/5] p-6 flex flex-col justify-between' : 'p-3 flex items-center'}
+      `}
+    >
+      <div 
+        onClick={(e: React.MouseEvent) => { e.stopPropagation(); onSelect(file.id); }}
+        className={`absolute top-4 left-4 z-10 w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center
+          ${isSelected ? 'bg-blue-600 border-blue-600' : 'bg-[rgb(var(--background))] border-[rgb(var(--text)/0.1)] opacity-0 group-hover:opacity-100'}`}
+      >
+        {isSelected && <Check size={12} className="text-white" strokeWidth={4} />}
+      </div>
+
+      <div className={`${isGrid ? 'w-16 h-16 mb-4' : 'w-10 h-10 mr-4 ml-10'} rounded-2xl ${config.bg} flex items-center justify-center ${config.color} transition-transform group-hover:scale-110 duration-500`}>
+        <Icon size={isGrid ? 32 : 20} strokeWidth={2.5} />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        {isRenaming ? (
+          <input 
+            autoFocus 
+            className="w-full bg-[rgb(var(--background))] border-2 border-blue-500 rounded-lg px-2 py-1 text-sm font-bold outline-none"
+            value={editName}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => onRenameChange(e.target.value)}
+            onBlur={onRenameCancel}
+            onKeyDown={(e) => e.key === 'Enter' && onRenameSubmit()}
+          />
+        ) : (
+          <h3 className="font-bold text-sm truncate leading-tight">{file.currentVersion.name}</h3>
+        )}
+        <p className="text-[10px] font-black opacity-30 mt-1 uppercase tracking-tighter">
+          {formatFileSize(file.currentVersion.size)} • v{file.currentVersion.versionNumber}
+        </p>
+      </div>
+
+      <div className={`flex gap-1 ${isGrid ? 'mt-4 pt-4 border-t border-[rgb(var(--text)/0.05)]' : 'ml-auto'}`}>
+         <button onClick={(e) => { e.stopPropagation(); onDownload(); }} className="p-2 hover:bg-[rgb(var(--text)/0.05)] rounded-lg transition-colors"><Download size={16}/></button>
+         <button onClick={onRenameClick} className="p-2 hover:bg-[rgb(var(--text)/0.05)] rounded-lg transition-colors"><Edit3 size={16}/></button>
+         <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="p-2 hover:bg-red-500/10 text-red-500 rounded-lg transition-colors"><Trash2 size={16}/></button>
+      </div>
+    </div>
+  );
+};
+
+export default Files;
