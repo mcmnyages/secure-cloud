@@ -16,7 +16,7 @@ import UploadModal from '@/components/ui/modals/UploadModal';
 
 const Files: React.FC = () => {
   const navigate = useNavigate();
-  const { files, isLoading, isModalOpen, setIsModalOpen, viewMode, setViewMode, filters, storage } = useFiles();
+  const { files, isLoading, isModalOpen, setIsModalOpen, viewMode, setViewMode, filters } = useFiles();
   const { deleteFile, bulkDeleteFiles, downloadFile, renameFile } = useFileActions();
   
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
