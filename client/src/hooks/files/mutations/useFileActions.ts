@@ -11,6 +11,7 @@ export const useFileActions = () => {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['files'] });
     queryClient.invalidateQueries({ queryKey: ['storage'] });
+    queryClient.invalidateQueries({queryKey:['fileVersions']})
   };
 
   // 1. Upload Mutation

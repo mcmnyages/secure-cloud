@@ -29,7 +29,7 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
     const [recentTimeFilter, setRecentTimeFilter] = useState<TimeFilter>('today')
     const [customDate, setCustomDate] = useState<Date | undefined>()
     const [customTime, setCustomTime] = useState<string>('')
-    const [filesToShow, setFilesToShow] = useState<number>(10)
+    const [filesToShow, setFilesToShow] = useState<number>(5)
 
     const displayedFiles = useMemo(() => files.slice(0, filesToShow), [files, filesToShow]);
 
