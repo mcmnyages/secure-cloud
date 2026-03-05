@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useLogin } from '../hooks/auth/useLogin'
@@ -25,11 +25,31 @@ const Login: React.FC = () => {
     password: '',
   })
 
+  // On mount, check localStorage for saved credentials
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    const savedPassword = localStorage.getItem('rememberedPassword');
+    if (savedEmail) {
+      setFormData((prev) => ({ ...prev, email: savedEmail }));
+      setRememberMe(true);
+    }
+    if (savedPassword) {
+      setFormData((prev) => ({ ...prev, password: savedPassword }));
+    }
+  }, []);
+
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+
 
   const { mutate, isPending } = useLogin({
     onSuccess: (data) => {
+      if (rememberMe) {
+        localStorage.setItem("token", data.token)
+      } else {
+        sessionStorage.setItem("token", data.token)
+      }
       login(data.token, data.user)
       navigate('/dashboard')
     },
@@ -56,6 +76,14 @@ const Login: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!validateForm()) return
+    // Save or remove credentials based on rememberMe
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', formData.email);
+      localStorage.setItem('rememberedPassword', formData.password);
+    } else {
+      localStorage.removeItem('rememberedEmail');
+      localStorage.removeItem('rememberedPassword');
+    }
     mutate(formData)
   }
 
@@ -85,7 +113,7 @@ const Login: React.FC = () => {
           </header>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} autoComplete='on' className="space-y-6">
 
             {/* Email */}
             <div>
@@ -96,6 +124,7 @@ const Login: React.FC = () => {
               <input
                 type="email"
                 name="email"
+                autoComplete='email'
                 value={formData.email}
                 onChange={handleChange}
                 disabled={isPending}
@@ -125,6 +154,7 @@ const Login: React.FC = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
+                  autoComplete='current-password'
                   value={formData.password}
                   onChange={handleChange}
                   disabled={isPending}
@@ -152,14 +182,24 @@ const Login: React.FC = () => {
                 </p>
               )}
 
-              <div className="text-right mt-2">
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-[rgb(var(--primary))] hover:underline"
-                >
-                  Forgot Password?
-                </Link>
-              </div>
+            </div>
+            <div className="flex items-center justify-between mt-2">
+              <label className="flex items-center text-sm text-[rgb(var(--text)/0.7)]">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="mr-2"
+                />
+                Remember me
+              </label>
+
+              <Link
+                to="/forgot-password"
+                className="text-sm text-[rgb(var(--primary))] hover:underline"
+              >
+                Forgot Password?
+              </Link>
             </div>
 
             {/* Submit Button */}

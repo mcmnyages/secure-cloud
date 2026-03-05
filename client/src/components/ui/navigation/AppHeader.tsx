@@ -49,9 +49,9 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   }, [])
 
   const handleLogout = async () => {
-    await logout()
+    logout()
     closeMenus()
-    navigate('/')
+    navigate('/login')
   }
 
   /* ---------------- Responsive Constants ---------------- */
