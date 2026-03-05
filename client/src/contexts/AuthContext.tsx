@@ -6,6 +6,8 @@ import {
   useMemo,
   type ReactNode,
 } from 'react'
+import { decodeJwt } from '../utils/auth/tokenHelper'// Helper to decode JWT
+
 import { toast } from 'sonner'
 
 interface User {
@@ -34,9 +36,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   )
   const [user, setUser] = useState<User | null>(null)
 
-  // Initialize user safely
+  // Initialize user safely and check token expiry
   useEffect(() => {
     if (!token) return
+
+    // Check token expiration
+    const decoded = decodeJwt(token);
+    if (decoded && decoded.exp) {
+      const now = Math.floor(Date.now() / 1000);
+      if (decoded.exp < now) {
+        toast.error('Session expired. Please log in again.');
+        logout();
+        return;
+      }
+      // Set timeout to auto-logout when token expires
+      const msUntilExpiry = (decoded.exp - now) * 1000;
+      const timeout = setTimeout(() => {
+        toast.error('Session expired. Please log in again.');
+        logout();
+      }, msUntilExpiry);
+      return () => clearTimeout(timeout);
+    }
 
     try {
       const storedUser = localStorage.getItem(USER_KEY)
