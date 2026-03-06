@@ -11,7 +11,7 @@ export const useFileActions = () => {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['files'] });
     queryClient.invalidateQueries({ queryKey: ['storage'] });
-    queryClient.invalidateQueries({queryKey:['fileVersions']})
+    queryClient.invalidateQueries({ queryKey: ['fileVersions'] })
   };
 
   // 1. Upload Mutation
@@ -46,7 +46,7 @@ export const useFileActions = () => {
 
   // 4. Rename Mutation
   const rename = useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) => 
+    mutationFn: ({ id, name }: { id: string; name: string }) =>
       fileService.renameFile(id, name),
     onSuccess: () => {
       invalidate();
@@ -57,7 +57,7 @@ export const useFileActions = () => {
 
   // 5. Upload New Version Mutation (FIXED: Added this)
   const newVersion = useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) => 
+    mutationFn: ({ id, file }: { id: string; file: File }) =>
       fileService.uploadNewVersion(id, file),
     onSuccess: () => {
       invalidate();
@@ -68,7 +68,9 @@ export const useFileActions = () => {
 
   // 6. Download (Standard Function, not a mutation)
   const downloadFile = async (id: string, name: string) => {
+    let toastId: string | number | undefined;
     try {
+      toastId = toast.loading('Download started...', { description: 'Your download is being prepared.' });
       const res = await fileService.download(id);
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
@@ -78,8 +80,9 @@ export const useFileActions = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
+      toast.success('Download initiated. Check your browser downloads.', { id: toastId });
     } catch (err) {
-      toast.error(getErrorMessage(err));
+      toast.error(getErrorMessage(err), { id: toastId });
     }
   };
 
