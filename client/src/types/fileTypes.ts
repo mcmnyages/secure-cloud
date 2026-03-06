@@ -14,9 +14,9 @@ export interface FlatFile {
 // Frontend-friendly version info
 export interface FileVersion {
   id: string
-  versionNumber: string
+  versionNumber: number
   name: string
-  size: string
+  size: number
   mimeType: string
   createdAt: string
   isCurrent?: boolean
