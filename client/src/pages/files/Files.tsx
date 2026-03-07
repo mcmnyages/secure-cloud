@@ -29,6 +29,17 @@ const Files: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [editName, setEditName] = useState<string>("");
+  const allSelected = files.length > 0 && selectedIds.length === files.length;
+
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(files.map((f) => f.id));
+    }
+  };
+
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -66,6 +77,7 @@ const Files: React.FC = () => {
         onChange={(e) => filters.setSearch(e.target.value)}
       />
 
+
       {/* Filters */}
       <div className="flex gap-2">
         <button onClick={() => filters.setTypeFilter("all")}>All</button>
@@ -74,6 +86,9 @@ const Files: React.FC = () => {
           Documents
         </button>
         <button onClick={() => filters.setTypeFilter("video")}>Videos</button>
+        <button onClick={toggleSelectAll}>
+          {allSelected ? "Deselect All" : "Select All"}
+        </button>
       </div>
 
       {/* View Mode */}
