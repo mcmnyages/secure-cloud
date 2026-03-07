@@ -9,6 +9,7 @@ import UploadModal from "@/components/ui/modals/UploadModal";
 import { LoadingSpinner } from "@/components/ui/spinners";
 import { formatDistanceToNow } from "date-fns";
 import { filesize } from "filesize";
+import { toast } from "sonner";
 
 const Files: React.FC = () => {
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ const Files: React.FC = () => {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [editName, setEditName] = useState<string>("");
   const allSelected = files.length > 0 && selectedIds.length === files.length;
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+
 
 
   const toggleSelectAll = () => {
@@ -41,11 +44,26 @@ const Files: React.FC = () => {
   };
 
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = (
+  id: string,
+  index: number,
+  shiftKey: boolean
+) => {
+  if (shiftKey && lastSelectedIndex !== null) {
+    const start = Math.min(lastSelectedIndex, index);
+    const end = Math.max(lastSelectedIndex, index);
+
+    const rangeIds = files.slice(start, end + 1).map((f) => f.id);
+
+    setSelectedIds((prev) => Array.from(new Set([...prev, ...rangeIds])));
+  } else {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
-  };
+  }
+
+  setLastSelectedIndex(index);
+};
 
   const startRename = (file: CloudFile) => {
     setRenamingId(file.id);
@@ -53,10 +71,30 @@ const Files: React.FC = () => {
   };
 
   const submitRename = (id: string) => {
-    if (editName.trim()) {
-      renameFile({ id, name: editName });
+    if (!editName.trim()) return;
+
+    const exists = files.some(
+      (f) =>
+        f.currentVersion.name === editName &&
+        f.id !== id
+    );
+
+    if (exists) {
+      toast.error("A file with this name already exists.");
+      return;
     }
+
+    renameFile({ id, name: editName });
     setRenamingId(null);
+  };
+
+  const handleBulkDownload = () => {
+    selectedIds.forEach((id) => {
+      const file = files.find((f) => f.id === id);
+      if (file) {
+        downloadFile(id, file.currentVersion.name);
+      }
+    });
   };
 
   const handleBulkDelete = () => {
@@ -89,6 +127,9 @@ const Files: React.FC = () => {
         <button onClick={toggleSelectAll}>
           {allSelected ? "Deselect All" : "Select All"}
         </button>
+        <button onClick={handleBulkDownload}>
+          Download Selected
+        </button>
       </div>
 
       {/* View Mode */}
@@ -116,7 +157,7 @@ const Files: React.FC = () => {
             : "flex flex-col gap-2"
         }
       >
-        {files.map((file) => (
+        {files.map((file, index) => (
           <div
             key={file.id}
             className={
@@ -130,8 +171,7 @@ const Files: React.FC = () => {
               <input
                 type="checkbox"
                 checked={selectedIds.includes(file.id)}
-                onChange={() => toggleSelect(file.id)}
-                className="mr-2"
+                onClick={(e) => toggleSelect(file.id, index, e.shiftKey)}
               />
               {/* Rename UI */}
               {renamingId === file.id ? (
