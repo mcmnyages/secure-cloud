@@ -19,9 +19,12 @@ const Files: React.FC = () => {
     isLoading,
     isModalOpen,
     viewMode,
+    filters,
+    showFilter,
     setIsModalOpen,
     setViewMode,
-    filters,
+    setShowFilter,
+
   } = useFiles();
 
   const { deleteFile, bulkDeleteFiles, downloadFile, renameFile } =
@@ -32,6 +35,16 @@ const Files: React.FC = () => {
   const [editName, setEditName] = useState<string>("");
   const allSelected = files.length > 0 && selectedIds.length === files.length;
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+
+  
+  const hasActiveFilters =
+    filters.search ||
+    filters.typeFilter !== "all" ||
+    filters.extension ||
+    filters.minSize ||
+    filters.maxSize ||
+    filters.dateFrom ||
+    filters.dateTo;
 
 
 
@@ -45,25 +58,25 @@ const Files: React.FC = () => {
 
 
   const toggleSelect = (
-  id: string,
-  index: number,
-  shiftKey: boolean
-) => {
-  if (shiftKey && lastSelectedIndex !== null) {
-    const start = Math.min(lastSelectedIndex, index);
-    const end = Math.max(lastSelectedIndex, index);
+    id: string,
+    index: number,
+    shiftKey: boolean
+  ) => {
+    if (shiftKey && lastSelectedIndex !== null) {
+      const start = Math.min(lastSelectedIndex, index);
+      const end = Math.max(lastSelectedIndex, index);
 
-    const rangeIds = files.slice(start, end + 1).map((f) => f.id);
+      const rangeIds = files.slice(start, end + 1).map((f) => f.id);
 
-    setSelectedIds((prev) => Array.from(new Set([...prev, ...rangeIds])));
-  } else {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  }
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...rangeIds])));
+    } else {
+      setSelectedIds((prev) =>
+        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      );
+    }
 
-  setLastSelectedIndex(index);
-};
+    setLastSelectedIndex(index);
+  };
 
   const startRename = (file: CloudFile) => {
     setRenamingId(file.id);
@@ -108,12 +121,16 @@ const Files: React.FC = () => {
     <div className="mt-15">
       {/* Search */}
       <input
-        className="border-blue-600"
-        type="text"
-        placeholder="Search"
         value={filters.search}
         onChange={(e) => filters.setSearch(e.target.value)}
+        placeholder="search files"
       />
+
+      {filters.search && (
+        <button onClick={() => filters.setSearch("")}>
+          ✕
+        </button>
+      )}
 
 
       {/* Filters */}
@@ -148,6 +165,66 @@ const Files: React.FC = () => {
           Grid
         </button>
       </div>
+
+      <button onClick={() => setShowFilter(!showFilter)}>
+        Advanced Filters
+      </button>
+
+      {showFilter && (
+        <div className="border p-4 rounded flex flex-col gap-2">
+
+          <input
+            type="text"
+            placeholder="Extension (pdf, png...)"
+            value={filters.extension}
+            onChange={(e) => filters.setExtension(e.target.value)}
+          />
+
+          <input
+            type="number"
+            placeholder="Min Size (bytes)"
+            onChange={(e) => filters.setMinSize(Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Max Size (bytes)"
+            onChange={(e) => filters.setMaxSize(Number(e.target.value))}
+          />
+
+          <input
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => filters.setDateFrom(e.target.value)}
+          />
+
+          <input
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => filters.setDateTo(e.target.value)}
+          />
+
+          <select
+            value={filters.sortBy}
+            onChange={(e) =>
+              filters.setSortBy(e.target.value as "newest" | "size" | "name")
+            }
+          >
+            <option value="newest">Newest</option>
+            <option value="size">Largest</option>
+            <option value="name">Name</option>
+          </select>
+          <button
+          disabled={!hasActiveFilters}
+            onClick={() => {
+              filters.resetFilters();
+              setSelectedIds([]);
+            }}
+          >
+            Reset Everything
+          </button>
+        </div>
+      )}
 
       {/* Files */}
       <div

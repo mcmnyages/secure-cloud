@@ -11,6 +11,26 @@ export const useFiles = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [sortBy, setSortBy] = useState<'newest' | 'size' | 'name'>('newest');
   const [typeFilter, setTypeFilter] = useState<'all' | 'image' | 'video' | 'audio' | 'document' | 'other'>('all');
+  const [extension, setExtension] = useState<string>("");
+  const [minSize, setMinSize] = useState<number | null>(null);
+  const [maxSize, setMaxSize] = useState<number | null>(null);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  
+
+
+
+  const resetFilters = () => {
+    setSearch("");
+    setTypeFilter("all");
+    setSortBy("newest");
+
+    setExtension("");
+    setMinSize(null);
+    setMaxSize(null);
+    setDateFrom("");
+    setDateTo("");
+  };
 
   // 2. Selection State (For Modular Versions)
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
@@ -66,29 +86,73 @@ export const useFiles = () => {
   // 4. Filtering & Sorting Logic
   const filteredFiles = useMemo(() => {
     const allFiles = filesQuery.data || [];
-    
+
     return allFiles
-      .filter(file => {
+      .filter((file) => {
         const name = file.currentVersion.name.toLowerCase();
-        const matchesSearch = name.includes(search.toLowerCase());
-        
         const mime = file.currentVersion.mimeType;
+        const size = file.currentVersion.size;
+        const created = new Date(file.createdAt);
+
+        // Search
+        const matchesSearch =
+          !search ||
+          name.includes(search.toLowerCase());
+
+        // Extension
+        const matchesExtension =
+          !extension ||
+          name.endsWith(`.${extension.toLowerCase()}`);
+
+        // Type filter
         let matchesType = true;
-        if (typeFilter === 'document') matchesType = mime.startsWith('application/');
-        else if (typeFilter === 'other') {
-          matchesType = !['image', 'video', 'audio', 'application'].some(p => mime.startsWith(p));
-        } else if (typeFilter !== 'all') {
+        if (typeFilter === "document") matchesType = mime.startsWith("application/");
+        else if (typeFilter === "other") {
+          matchesType = !["image", "video", "audio", "application"].some((p) =>
+            mime.startsWith(p)
+          );
+        } else if (typeFilter !== "all") {
           matchesType = mime.startsWith(typeFilter);
         }
 
-        return matchesSearch && matchesType;
+        // Size filters
+        const matchesMinSize = minSize ? size >= minSize : true;
+        const matchesMaxSize = maxSize ? size <= maxSize : true;
+
+        // Date filters
+        const matchesDateFrom = dateFrom ? created >= new Date(dateFrom) : true;
+        const matchesDateTo = dateTo ? created <= new Date(dateTo) : true;
+
+        return (
+          matchesSearch &&
+          matchesExtension &&
+          matchesType &&
+          matchesMinSize &&
+          matchesMaxSize &&
+          matchesDateFrom &&
+          matchesDateTo
+        );
       })
       .sort((a, b) => {
-        if (sortBy === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        if (sortBy === 'size') return b.currentVersion.size - a.currentVersion.size;
+        if (sortBy === "newest")
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+        if (sortBy === "size")
+          return b.currentVersion.size - a.currentVersion.size;
+
         return a.currentVersion.name.localeCompare(b.currentVersion.name);
       });
-  }, [filesQuery.data, search, typeFilter, sortBy]);
+  }, [
+    filesQuery.data,
+    search,
+    typeFilter,
+    extension,
+    minSize,
+    maxSize,
+    dateFrom,
+    dateTo,
+    sortBy,
+  ]);
 
   return {
     // Data
@@ -96,7 +160,7 @@ export const useFiles = () => {
     allFiles: filesQuery.data || [],
     versions: versionsQuery.data || [],
     storage: storageQuery.data,
-    
+
     // Status
     isLoading: filesQuery.isLoading || storageQuery.isLoading,
     isVersionsLoading: versionsQuery.isFetching,
@@ -123,8 +187,18 @@ export const useFiles = () => {
       setTypeFilter,
       sortBy,
       setSortBy,
+      extension,
+      setExtension,
+      minSize,
+      setMinSize,
+      maxSize,
+      setMaxSize,
+      dateFrom,
+      setDateFrom,
+      dateTo,
+      setDateTo,
+      resetFilters,
     },
-
     // Refresh
     refresh: () => {
       filesQuery.refetch();
