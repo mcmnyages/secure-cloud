@@ -115,8 +115,8 @@ const FileIconBubble = ({
     size === "sm"
       ? "w-8 h-8 rounded-lg"
       : size === "lg"
-      ? "w-14 h-14 rounded-2xl"
-      : "w-9 h-9 rounded-xl";
+        ? "w-14 h-14 rounded-2xl"
+        : "w-9 h-9 rounded-xl";
   const iconSz = size === "sm" ? 14 : size === "lg" ? 26 : 16;
   return (
     <div
@@ -163,8 +163,8 @@ const IconBtn = ({
       danger
         ? "border-[rgba(var(--danger),0.25)] text-[rgba(var(--danger),0.55)] hover:border-[rgba(var(--danger),0.55)] hover:text-[rgb(var(--danger))] hover:bg-[rgba(var(--danger),0.08)]"
         : active
-        ? "border-[rgba(var(--primary),0.5)] text-[rgb(var(--primary))] bg-[rgba(var(--primary),0.1)]"
-        : "border-[rgba(var(--border-rgb),0.45)] text-[rgba(var(--text),0.5)] hover:border-[rgba(var(--primary),0.4)] hover:text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.07)]",
+          ? "border-[rgba(var(--primary),0.5)] text-[rgb(var(--primary))] bg-[rgba(var(--primary),0.1)]"
+          : "border-[rgba(var(--border-rgb),0.45)] text-[rgba(var(--text),0.5)] hover:border-[rgba(var(--primary),0.4)] hover:text-[rgb(var(--primary))] hover:bg-[rgba(var(--primary),0.07)]",
     ].join(" ")}
   >
     <Icon size={size} />
@@ -306,10 +306,10 @@ const GridCard = ({
 
     {/* Actions row — visible on hover */}
     <div className="flex gap-1.5 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-      <IconBtn icon={PencilLine} title="Rename"   onClick={() => onRename(file)} size={13} />
-      <IconBtn icon={Download}   title="Download" onClick={() => onDownload(file.id, file.currentVersion.name)} size={13} />
-      <IconBtn icon={Trash2}     title="Delete"   onClick={() => onDelete(file.id)} danger size={13} />
-      <IconBtn icon={FolderOpen} title="Open"     onClick={() => onOpen(file.id)} size={13} />
+      <IconBtn icon={PencilLine} title="Rename" onClick={() => onRename(file)} size={13} />
+      <IconBtn icon={Download} title="Download" onClick={() => onDownload(file.id, file.currentVersion.name)} size={13} />
+      <IconBtn icon={Trash2} title="Delete" onClick={() => onDelete(file.id)} danger size={13} />
+      <IconBtn icon={FolderOpen} title="Open" onClick={() => onOpen(file.id)} size={13} />
     </div>
   </div>
 );
@@ -394,10 +394,10 @@ const ListRow = ({
 
     {/* Action buttons */}
     <div className="flex gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-      <IconBtn icon={PencilLine} title="Rename"   onClick={() => onRename(file)} size={13} />
-      <IconBtn icon={Download}   title="Download" onClick={() => onDownload(file.id, file.currentVersion.name)} size={13} />
-      <IconBtn icon={Trash2}     title="Delete"   onClick={() => onDelete(file.id)} danger size={13} />
-      <IconBtn icon={FolderOpen} title="Open"     onClick={() => onOpen(file.id)} size={13} />
+      <IconBtn icon={PencilLine} title="Rename" onClick={() => onRename(file)} size={13} />
+      <IconBtn icon={Download} title="Download" onClick={() => onDownload(file.id, file.currentVersion.name)} size={13} />
+      <IconBtn icon={Trash2} title="Delete" onClick={() => onDelete(file.id)} danger size={13} />
+      <IconBtn icon={FolderOpen} title="Open" onClick={() => onOpen(file.id)} size={13} />
     </div>
   </div>
 );
@@ -423,9 +423,9 @@ const Files: React.FC = () => {
   const { deleteFile, bulkDeleteFiles, downloadFile, renameFile } =
     useFileActions();
 
-  const [selectedIds, setSelectedIds]       = useState<string[]>([]);
-  const [renamingId, setRenamingId]         = useState<string | null>(null);
-  const [editName, setEditName]             = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState<string>("");
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
 
   const allSelected =
@@ -448,7 +448,7 @@ const Files: React.FC = () => {
   const toggleSelect = (id: string, index: number, shiftKey: boolean) => {
     if (shiftKey && lastSelectedIndex !== null) {
       const start = Math.min(lastSelectedIndex, index);
-      const end   = Math.max(lastSelectedIndex, index);
+      const end = Math.max(lastSelectedIndex, index);
       setSelectedIds((prev) =>
         Array.from(new Set([...prev, ...files.slice(start, end + 1).map((f) => f.id)]))
       );
@@ -492,65 +492,66 @@ const Files: React.FC = () => {
   const sharedProps = (file: CloudFile, index: number) => ({
     file,
     index,
-    selected:  selectedIds.includes(file.id),
-    renaming:  renamingId === file.id,
+    selected: selectedIds.includes(file.id),
+    renaming: renamingId === file.id,
     editName,
-    onSelect:        toggleSelect,
-    onRename:        startRename,
-    onEditName:      setEditName,
-    onSubmitRename:  submitRename,
-    onCancelRename:  () => setRenamingId(null),
-    onDownload:      downloadFile,
-    onDelete:        deleteFile,
-    onOpen:          (id: string) => navigate(`/files/${id}/versions`),
+    onSelect: toggleSelect,
+    onRename: startRename,
+    onEditName: setEditName,
+    onSubmitRename: submitRename,
+    onCancelRename: () => setRenamingId(null),
+    onDownload: downloadFile,
+    onDelete: deleteFile,
+    onOpen: (id: string) => navigate(`/files/${id}/versions`),
   });
 
   if (isLoading) return <LoadingSpinner />;
 
   const typeFilters = [
-    { key: "all",      label: "All",      icon: Layers    },
-    { key: "image",    label: "Images",   icon: ImageIcon },
-    { key: "video",    label: "Videos",   icon: Film      },
-    { key: "document", label: "Docs",     icon: FileText  },
+    { key: "all", label: "All", icon: Layers },
+    { key: "image", label: "Images", icon: ImageIcon },
+    { key: "video", label: "Videos", icon: Film },
+    { key: "document", label: "Docs", icon: FileText },
   ] as const;
 
+
   return (
-    <div className="min-h-screen pb-24 px-4 sm:px-6 pt-10 max-w-[1400px] mx-auto">
+    <div className="min-h-screen pb-24 px-4 sm:px-6 pt-10 max-w-[1400px] mx-auto relative">
 
       {/* ══════════════════════════════════════════════════════════════════
           Page header
       ══════════════════════════════════════════════════════════════════ */}
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-7">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold tracking-tight text-[rgb(var(--text))]">
-            My{" "}
-            <span className="text-[rgb(var(--primary))]">Files</span>
-          </h1>
-          {files.length > 0 && (
-            <span className="
-              text-[11px] font-bold uppercase tracking-widest
-              px-2.5 py-0.5 rounded-full
-              bg-[rgba(var(--primary),0.12)] text-[rgb(var(--primary))]
-            ">
-              {files.length}
-            </span>
-          )}
-        </div>
-
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="
-            inline-flex items-center gap-2 px-4 py-2 rounded-xl
-            text-sm font-semibold bg-[rgb(var(--primary))] text-white border-none
-            hover:bg-[rgb(var(--primary-dark))] hover:-translate-y-px
-            hover:shadow-[0_6px_20px_rgba(var(--primary),0.38)]
-            transition-all duration-150
-          "
-        >
-          <Upload size={14} />
-          Upload
-        </button>
+      <div className="flex items-center gap-2 min-w-0 mb-7">
+        <h1 className="text-2xl font-bold tracking-tight text-[rgb(var(--text))]">
+          My{" "}
+          <span className="text-[rgb(var(--primary))]">Files</span>
+        </h1>
+        {files.length > 0 && (
+          <span className="
+            text-[11px] font-bold uppercase tracking-widest
+            px-2.5 py-0.5 rounded-full
+            bg-[rgba(var(--primary),0.12)] text-[rgb(var(--primary))]
+          ">
+            {files.length}
+          </span>
+        )}
       </div>
+
+      {/* Floating Upload Button: Always bottom-right, responsive FAB */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="
+          fixed bottom-6 right-6 z-50 shadow-lg
+          bg-[rgb(var(--primary))] text-white rounded-full flex items-center justify-center
+          transition-all duration-150
+          p-4 lg:p-5
+          hover:bg-[rgb(var(--primary-dark))]
+        "
+        aria-label="Upload file"
+      >
+        <Upload size={22} />
+        <span className="hidden lg:inline ml-2 text-base font-semibold">Upload</span>
+      </button>
 
       {/* ══════════════════════════════════════════════════════════════════
           Toolbar  (search · type pills · view/filter toggles)
