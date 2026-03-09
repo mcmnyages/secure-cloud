@@ -16,8 +16,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(helmet());
-app.use(morgan('dev'));
+
 const allowedOrigins = [
   'http://localhost:5173', // Local development
   'https://secure-cloud-delta.vercel.app' // Your future production URL
@@ -34,7 +33,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+
 
 // Ensure uploads folder exists on the server disk
 const uploadDir = path.join(process.cwd(), 'uploads');
@@ -42,13 +41,16 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-
+app.use(express.static(path.resolve("public")));
+app.use("/assets", express.static(path.resolve("assets")));
 
 // Middleware
 app.use('/uploads', express.static(uploadDir));
-app.use(express.json()); // CRITICAL: This allows Express to read the body of your request
 app.use(helmet()); // Basic security
 app.use(morgan('dev')); // Logging
+app.use(express.json()); // CRITICAL: This allows Express to read the body of your request
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+
 
 
 // Routes
