@@ -7,52 +7,62 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(uuid())
-  email        String  @unique
-  password     String
-  name         String?
-  verified     Boolean @default(false)
-  storageUsed  BigInt  @default(0)
-  storageLimit BigInt  @default(104857600)
-  files        File[]
-  tokens       Token[]
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  name          String?
+  verified      Boolean  @default(false)
+
+  storageUsed   BigInt   @default(0)
+  storageLimit BigInt   @default(104857600)
+
+  files         File[]
+  tokens        Token[]
 }
 
 model File {
-  id        String        @id @default(uuid())
+  id        String   @id @default(uuid())
   ownerId   String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  owner     User     @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   deletedAt DateTime?
-  owner     User          @relation(fields: [ownerId], references: [id])
+
   versions  FileVersion[]
 
   @@index([ownerId])
 }
 
 model FileVersion {
-  id           String   @id @default(uuid())
-  fileId       String
-  storageKey   String
-  size         Int
-  mimeType     String
-  checksum     String?
-  originalName String
-  displayName  String
-  createdAt    DateTime @default(now())
-  isCurrent    Boolean  @default(true)
-  file         File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  id            String   @id @default(uuid())
+  fileId        String
+  file          File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  versionNumber Int
+  storageKey    String
+  size          Int
+  mimeType      String
+  checksum      String?
+
+  originalName  String
+  displayName   String
+
+  createdAt     DateTime @default(now())
+  isCurrent     Boolean  @default(true)
 
   @@index([fileId])
+  @@unique([fileId, versionNumber])
 }
 
 model Token {
-  id        String       @id @default(uuid())
-  token     String       @unique
+  id        String   @id @default(uuid())
+  token     String   @unique
   purpose   TokenPurpose
   expiresAt DateTime
   userId    String
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token, purpose])
 }
