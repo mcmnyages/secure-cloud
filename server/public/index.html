@@ -1,14 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="../assets/images/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Cloud Backend</title>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/png" href="/assets/images/favicon.ico" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Secure Cloud API</title>
+
+<link rel="stylesheet" href="/styles.css" />
 </head>
+
 <body>
-    <h1>Secure Cloud Backend</h1>
-    <p>This is the backend server for the Secure Cloud application. It serves API endpoints and handles server-side logic.</p>
+
+<div class="container">
+
+<header>
+<h1>☁️ Secure Cloud API</h1>
+<p class="subtitle">Backend Service</p>
+</header>
+
+<section class="status">
+<div class="status-dot"></div>
+<span>Server Online</span>
+</section>
+
+<section class="description">
+<p>
+Welcome to the <strong>Secure Cloud Backend</strong>.  
+This service powers authentication, file storage, and email delivery for the Secure Cloud platform.
+</p>
+</section>
+
+<section class="api">
+<h2>Available API Routes</h2>
+
+<ul>
+<li><code>/api/auth</code> — Authentication endpoints</li>
+<li><code>/api/files</code> — File upload & management</li>
+<li><code>/api/email</code> — Email services</li>
+<li><code>/health</code> — Health check endpoint</li>
+</ul>
+
+</section>
+
+<section class="info">
+
+<div class="card">
+<h3>⚡ Tech Stack</h3>
+<p>Node.js + Express + TypeScript</p>
+</div>
+
+<div class="card">
+<h3>🔐 Security</h3>
+<p>Helmet + CORS protection</p>
+</div>
+
+<div class="card">
+<h3>📂 Storage</h3>
+<p>Secure file uploads</p>
+</div>
+
+</section>
+
+<footer>
+<p>Secure Cloud Backend • <span id="year"></span></p>
+</footer>
+
+</div>
+
+<script src="/script.js"></script>
 
 </body>
 </html>
