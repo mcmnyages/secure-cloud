@@ -2,101 +2,133 @@ import { prisma } from '../../../lib/prisma.js';
 
 export class FileQueryService {
 
-    async listUserFiles(userId: string) {
-
-        return prisma.file.findMany({
-            where: {
-                ownerId: userId,
-                deletedAt: null
-            },
-            include: {
-                versions: {
-                    where: { isCurrent: true }
-                }
-            }
-        });
-
-    }
-
-    async getFileForUser(
-        fileId: string,
-        userId: string
-    ) {
-
-        const file = await prisma.file.findFirst({
-            where: {
-                id: fileId,
-                ownerId: userId,
-                deletedAt: null
-            },
-            include: {
-                versions: true
-            }
-        });
-
-        if (!file) {
-            throw new Error("File not found");
+  async listUserFiles(userId: string) {
+    return prisma.file.findMany({
+      where: {
+        ownerId: userId,
+        deletedAt: null
+      },
+      select: {
+        id: true,
+        createdAt: true,
+        versions: {
+          where: { isCurrent: true },
+          select: {
+            id: true,
+            versionNumber: true,
+            displayName: true,
+            size: true,
+            mimeType: true
+          }
         }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+  }
 
-        const current =
-            file.versions.find(
-                v => v.isCurrent
-            );
+  async getFileForUser(fileId: string, userId: string) {
 
-        if (!current) {
-            throw new Error(
-                "No version found"
-            );
+    const file = await prisma.file.findFirst({
+      where: {
+        id: fileId,
+        ownerId: userId,
+        deletedAt: null
+      },
+      select: {
+        versions: {
+          where: { isCurrent: true },
+          select: {
+            storageKey: true,
+            displayName: true
+          }
         }
+      }
+    });
 
-        return {
-            path: current.storageKey,
-            name: current.displayName
-        };
-
+    if (!file) {
+      throw new Error("File not found");
     }
 
-    async getFileVersionForUser(
-        fileId: string,
-        versionId: string,
-        userId: string
-    ) {
-        const version = await prisma.fileVersion.findFirst({
-            where: {
-                id: versionId,
-                fileId,
-                file: {
-                    ownerId: userId,
-                    deletedAt: null
-                }
-            }
-        });
+    const current = file.versions[0];
 
-        if (!version) {
-            throw new Error("Version not found");
+    if (!current) {
+      throw new Error("No current version found");
+    }
+
+    return {
+      path: current.storageKey,
+      name: current.displayName
+    };
+  }
+
+  async getFileVersionForUser(
+    fileId: string,
+    versionId: string,
+    userId: string
+  ) {
+
+    const version = await prisma.fileVersion.findFirst({
+      where: {
+        id: versionId,
+        fileId,
+        file: {
+          ownerId: userId,
+          deletedAt: null
         }
-        return version;
+      },
+      select: {
+        id: true,
+        versionNumber: true,
+        displayName: true,
+        storageKey: true,
+        size: true,
+        mimeType: true,
+        createdAt: true,
+        isCurrent: true
+      }
+    });
+
+    if (!version) {
+      throw new Error("Version not found");
     }
 
-    async getFileVersions(
-        fileId: string,
-        userId: string
-    ) {
+    return version;
+  }
 
-        return prisma.fileVersion.findMany({
-            where: {
-                fileId,
-                file: {
-                    ownerId: userId,
-                    deletedAt: null
-                }
-            },
-            orderBy: {
-                versionNumber: 'desc'
-            }
-        });
+  async getFileVersions(fileId: string, userId: string) {
 
+    const fileExists = await prisma.file.findFirst({
+      where: {
+        id: fileId,
+        ownerId: userId,
+        deletedAt: null
+      },
+      select: { id: true }
+    });
+
+    if (!fileExists) {
+      throw new Error("File not found");
     }
 
+    return prisma.fileVersion.findMany({
+      where: {
+        fileId
+      },
+      select: {
+        id: true,
+        versionNumber: true,
+        displayName: true,
+        size: true,
+        mimeType: true,
+        createdAt: true,
+        isCurrent: true
+      },
+      orderBy: {
+        versionNumber: 'desc'
+      }
+    });
+  }
 
 }
