@@ -15,7 +15,7 @@ export class AuthController {
        // 1. Create user
       const user = await this.authService.registerUser(email, password, name);
        // Trigger verification email
-      await sendVerificationEmail({ body: { userId: user.id, email } } as any);
+      await sendVerificationEmail({ body: { userId: user.id, email } } as any, res);
       // 4. Respond immediately
     res.status(201).json({user});
     } catch (err) {
