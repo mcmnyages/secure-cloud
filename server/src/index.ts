@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { transporter } from './features/email/email.service.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import authRoutes from './features/auth/auth.routes.js';
 import fileRoutes from './features/files/file.routes.js';
@@ -16,8 +17,14 @@ import { env } from './config/env.js';
 
 const app = express();
 
-
-
+// Verify SMTP connection on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("SMTP connection failed:", error);
+  } else {
+    console.log("SMTP server is ready to send emails");
+  }
+});
 
 app.use(cors({
   origin: (origin, callback) => {
