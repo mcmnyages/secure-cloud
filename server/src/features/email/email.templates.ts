@@ -1,46 +1,88 @@
 import { TokenPurpose } from '@prisma/client';
+import { env } from '../../config/env.js';
 
-export function getEmailTemplate(purpose: TokenPurpose, url: string) {
+export function getEmailTemplate(purpose: TokenPurpose, path: string) {
+  // Construct absolute frontend URL safely
+  const link = path.startsWith('http://') || path.startsWith('https://')
+    ? path
+    : `${env.frontendUrl}${path.startsWith('/') ? path : `/${path}`}`;
+
+  const baseTemplate = (title: string, message: string, buttonText: string, color: string) => `
+    <div style="background:#f4f6f8;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
+      <div style="max-width:600px;margin:auto;background:white;border-radius:10px;
+                  padding:40px;text-align:center;
+                  box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+
+        <!-- Logo served from backend -->
+        <img src="${env.baseUrl}/assets/images/logo.png" alt="Secure Cloud"
+             width="120"
+             style="margin-bottom:25px;" />
+
+        <h2 style="color:#1f2937;margin-bottom:10px;">${title}</h2>
+
+        <p style="color:#4b5563;font-size:16px;line-height:1.6;">${message}</p>
+
+        <a href="${link}"
+          style="
+          display:inline-block;
+          margin-top:30px;
+          padding:14px 28px;
+          background:${color};
+          color:white;
+          text-decoration:none;
+          border-radius:8px;
+          font-weight:bold;
+          font-size:15px;">
+          ${buttonText}
+        </a>
+
+        <p style="margin-top:30px;color:#6b7280;font-size:13px;">
+          If the button above doesn't work, copy and paste this link into your browser:
+        </p>
+
+        <p style="word-break:break-all;font-size:13px;">
+          <a href="${link}" style="color:${color};">${link}</a>
+        </p>
+
+        <hr style="margin:35px 0;border:none;border-top:1px solid #eee;" />
+
+        <p style="font-size:12px;color:#9ca3af;">
+          This email was sent by <strong>Secure Cloud</strong>.
+          If you didn't request this, you can safely ignore this message.
+        </p>
+
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;">
+          © ${new Date().getFullYear()} Secure Cloud. All rights reserved.
+        </p>
+
+      </div>
+    </div>
+  `;
+
   switch (purpose) {
     case TokenPurpose.EMAIL_VERIFY:
       return {
-        subject: 'Verify Your Email',
-        html: `
-        <img src="https://yourdomain.com/logo.png" alt="My App" width="120" style="margin-bottom:20px;">
-
-          <div style="font-family: Arial, sans-serif; text-align:center; padding:20px;">
-            <h2 style="color:#333;">Welcome to Secure Cloud!</h2>
-            <p>Click the button below to verify your email address:</p>
-            <a href="${url}" 
-               style="display:inline-block; padding:12px 24px; margin-top:20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
-              Verify Email
-            </a>
-            <p style="margin-top:20px; font-size:12px; color:#666;">
-              If you did not create an account, you can ignore this email.
-            </p>
-          </div>
-        `,
+        subject: "Verify Your Email",
+        html: baseTemplate(
+          "Welcome to Secure Cloud ☁️",
+          "Thank you for creating an account. Please confirm your email address to activate your account.",
+          "Verify Email",
+          "#22c55e"
+        ),
       };
 
     case TokenPurpose.PASSWORD_RESET:
-  return {
-    subject: 'Reset Your Password',
-    html: `
-      <div style="font-family: Arial, sans-serif; text-align:center; padding:20px;">
-        <img src="https://yourdomain.com/logo.png" alt="My App" width="120" style="margin-bottom:20px;">
-        <h2 style="color:#333;">Password Reset Request</h2>
-        <p>Click the button below to reset your password:</p>
-        <a href="${url}" 
-           style="display:inline-block; padding:12px 24px; margin-top:20px; background-color:#FF5722; color:white; text-decoration:none; border-radius:5px;">
-          Reset Password
-        </a>
-        <p style="margin-top:20px; font-size:12px; color:#666;">
-          If you did not request a password reset, you can safely ignore this email.
-        </p>
-        <p>If the button doesn’t work, copy this link into your browser:</p>
-        <a href="${url}">${url}</a>
-      </div>
-    `,
-  };
+      return {
+        subject: "Reset Your Password",
+        html: baseTemplate(
+          "Password Reset Request 🔐",
+          "We received a request to reset your password. Click the button below to set a new password.",
+          "Reset Password",
+          "#ef4444"
+        ),
+      };
+
+    default:
+      throw new Error(`Unknown TokenPurpose: ${purpose}`);
   }
 }

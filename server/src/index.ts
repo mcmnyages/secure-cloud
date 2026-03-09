@@ -11,28 +11,24 @@ import authRoutes from './features/auth/auth.routes.js';
 import fileRoutes from './features/files/file.routes.js';
 import { emailRoutes } from './features/email/index.js';
 import { multerErrorHandler } from './middleware/errors/multerError.middleware.js';
+import { env } from './config/env.js';
 
-dotenv.config();
 
 const app = express();
 
 
-const allowedOrigins = [
-  'http://localhost:5173', // Local development
-  'https://secure-cloud-delta.vercel.app' // Your future production URL
-];
+
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || env.allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true
 }));
-
 
 
 // Ensure uploads folder exists on the server disk
