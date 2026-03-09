@@ -3,9 +3,11 @@ import { env } from '../../config/env.js';
 
 export function getEmailTemplate(purpose: TokenPurpose, path: string) {
   // Construct absolute frontend URL safely
-  const link = path.startsWith('http://') || path.startsWith('https://')
-    ? path
-    : `${env.frontendUrl}${path.startsWith('/') ? path : `/${path}`}`;
+ const link = path.startsWith("http")
+  ? path
+  : new URL(path, env.frontendUrl).toString();
+  const logoUrl = new URL("/favicon.ico", env.frontendUrl).toString();
+  console.log("Constructed link:", link);
 
   const baseTemplate = (title: string, message: string, buttonText: string, color: string) => `
     <div style="background:#f4f6f8;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
@@ -14,9 +16,10 @@ export function getEmailTemplate(purpose: TokenPurpose, path: string) {
                   box-shadow:0 5px 15px rgba(0,0,0,0.08);">
 
         <!-- Logo served from backend -->
-        <img src="${env.baseUrl}/assets/images/logo.png" alt="Secure Cloud"
+        <img src="${logoUrl}" alt="Secure Cloud"
              width="120"
              style="margin-bottom:25px;" />
+             <p>${logoUrl}</p>
 
         <h2 style="color:#1f2937;margin-bottom:10px;">${title}</h2>
 

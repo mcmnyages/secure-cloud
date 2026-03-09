@@ -8,70 +8,115 @@ import bcrypt from 'bcrypt';
 
 // Send verification email
 export async function sendVerificationEmail(req: Request, res: Response) {
-  const { userId, email } = req.body;
+  try {
+    const { userId, email } = req.body;
 
-  const token = await createEmailToken(userId, TokenPurpose.EMAIL_VERIFY);
-  const path = `/verify?token=${token}`; // Only the path
+    const token = await createEmailToken(userId, TokenPurpose.EMAIL_VERIFY);
+    const path = `/verify?token=${token}`;
 
-  const { subject, html } = getEmailTemplate(TokenPurpose.EMAIL_VERIFY, path);
-  await sendEmail(email, subject, html);
+    const { subject, html } = getEmailTemplate(TokenPurpose.EMAIL_VERIFY, path);
+    await sendEmail(email, subject, html);
 
-  res.json({ message: "Verification email sent" });
+    return res.json({ message: "Verification email sent" });
+
+  } catch (error) {
+    console.error("sendVerificationEmail error:", error);
+    return res.status(500).json({
+      message: "Failed to send verification email"
+    });
+  }
 }
 
 // Verify email
 export async function verifyEmail(req: Request, res: Response) {
-  const token = String(req.query.token);
-  const userId = await consumeEmailToken(token, TokenPurpose.EMAIL_VERIFY);
+  try {
+    const token = String(req.query.token);
 
-  if (!userId) return res.status(400).send('Invalid or expired token');
+    const userId = await consumeEmailToken(token, TokenPurpose.EMAIL_VERIFY);
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { verified: true },
-  });
+    if (!userId) {
+      return res.status(400).json({
+        message: "Invalid or expired token"
+      });
+    }
 
-  res.send({ verified: true });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { verified: true },
+    });
+
+    return res.json({ verified: true });
+
+  } catch (error) {
+    console.error("verifyEmail error:", error);
+    return res.status(500).json({
+      message: "Email verification failed"
+    });
+  }
 }
 
 // Request password reset
 export async function requestPasswordReset(req: Request, res: Response) {
-  const { email } = req.body;
-  const user = await prisma.user.findUnique({ where: { email } });
+  try {
+    const { email } = req.body;
 
-  if (!user) {
-    return res.status(200).json({
-      message: 'An account with that email does not exist',
-      sent: false,
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      return res.status(200).json({
+        message: 'An account with that email does not exist',
+        sent: false,
+      });
+    }
+
+    const token = await createEmailToken(user.id, TokenPurpose.PASSWORD_RESET);
+    const path = `/reset-password?token=${token}`;
+
+    const { subject, html } = getEmailTemplate(TokenPurpose.PASSWORD_RESET, path);
+    await sendEmail(email, subject, html);
+
+    return res.json({
+      message: 'Check your email for password reset instructions',
+      sent: true,
+    });
+
+  } catch (error) {
+    console.error("requestPasswordReset error:", error);
+    return res.status(500).json({
+      message: "Failed to send password reset email"
     });
   }
-
-  const token = await createEmailToken(user.id, TokenPurpose.PASSWORD_RESET);
-  const path = `/reset-password?token=${token}`; // Only the path
-
-  const { subject, html } = getEmailTemplate(TokenPurpose.PASSWORD_RESET, path);
-  await sendEmail(email, subject, html);
-
-  res.json({
-    message: 'Check your email for password reset instructions',
-    sent: true,
-  });
 }
 
 // Reset password
 export async function resetPassword(req: Request, res: Response) {
-  const { token, newPassword } = req.body;
-  const userId = await consumeEmailToken(token, TokenPurpose.PASSWORD_RESET);
+  try {
+    const { token, newPassword } = req.body;
 
-  if (!userId) return res.status(400).send('Invalid or expired token');
+    const userId = await consumeEmailToken(token, TokenPurpose.PASSWORD_RESET);
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(newPassword, salt);
+    if (!userId) {
+      return res.status(400).json({
+        message: "Invalid or expired token"
+      });
+    }
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedPassword },
-  });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-  res.send({ success: true });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return res.json({ success: true });
+
+  } catch (error) {
+    console.error("resetPassword error:", error);
+    return res.status(500).json({
+      message: "Password reset failed"
+    });
+  }
 }
