@@ -334,14 +334,16 @@ export class FileCommandService {
             );
 
         if (!file) {
-            throw new Error(
-                "File not found"
-            );
+            return { notFound: true };
+        }
+
+        // If already deleted, return idempotent response
+        if (file.deletedAt) {
+            return { message: "File already deleted", notFound: true };
         }
 
         return prisma.$transaction(
             async (tx) => {
-
                 await tx.file.update({
                     where: {
                         id: fileId
@@ -351,11 +353,9 @@ export class FileCommandService {
                     }
                 });
 
-                const totalSize =
-                    file.versions.reduce(
-                        (a, v) => a + v.size,
-                        0
-                    );
+                const totalSize = file.versions && file.versions.length > 0
+                    ? file.versions.reduce((a, v) => a + v.size, 0)
+                    : 0;
 
                 await this.repo.decrementStorage(
                     tx,
@@ -363,17 +363,15 @@ export class FileCommandService {
                     totalSize
                 );
 
-                await this.fsService.deleteMany(
-                    file.versions.map(
-                        v => v.storageKey
-                    )
-                );
+                if (file.versions && file.versions.length > 0) {
+                    await this.fsService.deleteMany(
+                        file.versions.map(v => v.storageKey)
+                    );
+                }
 
                 return {
-                    message:
-                        "File deleted successfully"
+                    message: "File deleted successfully"
                 };
-
             }
         );
 
@@ -391,20 +389,21 @@ export class FileCommandService {
             );
 
         if (!files.length) {
-            throw new Error(
-                "No files found"
-            );
+            return { notFound: true };
         }
 
         return prisma.$transaction(
             async (tx) => {
-
                 let totalSize = 0;
 
                 for (const file of files) {
+                    // If already deleted, skip
+                    if (file.deletedAt) continue;
 
-                    for (const version of file.versions) {
-                        totalSize += version.size;
+                    if (file.versions && file.versions.length > 0) {
+                        for (const version of file.versions) {
+                            totalSize += version.size;
+                        }
                     }
 
                     await tx.file.update({
@@ -416,12 +415,11 @@ export class FileCommandService {
                         }
                     });
 
-                    await this.fsService.deleteMany(
-                        file.versions.map(
-                            v => v.storageKey
-                        )
-                    );
-
+                    if (file.versions && file.versions.length > 0) {
+                        await this.fsService.deleteMany(
+                            file.versions.map(v => v.storageKey)
+                        );
+                    }
                 }
 
                 await this.repo.decrementStorage(
@@ -431,10 +429,8 @@ export class FileCommandService {
                 );
 
                 return {
-                    message:
-                        "Files deleted successfully"
+                    message: "Files deleted successfully"
                 };
-
             }
         );
 

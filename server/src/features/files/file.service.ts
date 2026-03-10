@@ -77,8 +77,8 @@ export class FileService {
       newName
     );
   }
-  
-   restoreVersion(
+
+  restoreVersion(
     fileId: string,
     versionId: string,
     userId: string
@@ -90,24 +90,34 @@ export class FileService {
     );
   }
 
-   deleteFile(
+  async deleteFile(
     fileId: string,
     userId: string
   ) {
-    return this.command.deleteFile(
-      fileId,
-      userId
-    );
+    try {
+      const result = await this.command.deleteFile(fileId, userId);
+      return result;
+    } catch (error: any) {
+      if (error.message === "File not found") {
+        return { notFound: true };
+      }
+      throw error;
+    }
   }
 
-  bulkDeleteFiles(
+  async bulkDeleteFiles(
     fileIds: string[],
     userId: string
   ) {
-    return this.command.bulkDeleteFiles(
-      fileIds,
-      userId
-    );
+    try {
+      const result = await this.command.bulkDeleteFiles(fileIds, userId);
+      return result;
+    } catch (error: any) {
+      if (error.message === "No files found") {
+        return { notFound: true };
+      }
+      throw error;
+    }
   }
 
 }

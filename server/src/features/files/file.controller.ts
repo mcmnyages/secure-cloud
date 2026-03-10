@@ -209,38 +209,46 @@ export class FileController {
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).userId;
+    const { fileId } = req.params;
+
+    if (typeof fileId !== 'string') {
+      return res.status(400).json({ message: "Invalid file id" });
+    }
+
     try {
-      const userId = (req as any).userId;
-      const { fileId } = req.params;
-
-      if (typeof fileId !== 'string') {
-        return res.status(400).json({ message: "Invalid file id" });
-      }
-
       const result = await fileService.deleteFile(fileId, userId);
-
+      if ('notFound' in result && result.notFound) {
+        return res.status(404).json({ message: "File not found or already deleted" });
+      }
       res.status(200).json(result);
-
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "File not found") {
+        return res.status(404).json({ message: "File not found" });
+      }
       console.error("Delete file error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
 
   bulkDelete = asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).userId;
+    const { fileIds } = req.body;
+
+    if (!Array.isArray(fileIds) || !fileIds.every(id => typeof id === 'string')) {
+      return res.status(400).json({ message: "Invalid file ids" });
+    }
+
     try {
-      const userId = (req as any).userId;
-      const { fileIds } = req.body;
-
-      if (!Array.isArray(fileIds) || !fileIds.every(id => typeof id === 'string')) {
-        return res.status(400).json({ message: "Invalid file ids" });
-      }
-
       const result = await fileService.bulkDeleteFiles(fileIds, userId);
-
+      if ('notFound' in result && result.notFound) {
+        return res.status(404).json({ message: "No files found or already deleted" });
+      }
       res.status(200).json(result);
-
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "No files found") {
+        return res.status(404).json({ message: "No files found" });
+      }
       console.error("Bulk delete error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
