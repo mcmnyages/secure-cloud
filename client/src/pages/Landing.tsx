@@ -1,168 +1,192 @@
-import { Shield, Upload, HardDrive, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Shield, ArrowRight, CheckCircle2, Zap, Globe } from 'lucide-react'
 import type { JSX } from 'react'
 import { Link } from 'react-router-dom'
 import AppHeader from '../components/ui/navigation/AppHeader'
+import  Footer  from '../components/ui/navigation/Footer'
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
-      {/* The AppHeader now handles all Navigation 
-          (Logo, Login, Register, and User Profile)
-      */}
+    <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))] selection:bg-[rgb(var(--primary)/0.3)]">
       <AppHeader
         collapsed={false}
         onToggleDesktop={() => { }}
         onOpenMobile={() => { }}
       />
 
-      <main>
+      <main className="relative overflow-hidden">
+        {/* Background Decorative Blobs */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[rgb(var(--primary)/0.15)] rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute top-[10%] right-[-5%] w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px]" />
+        </div>
+
         {/* Hero Section */}
-        <section className="relative max-w-7xl mx-auto px-6 py-20 md:py-32 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] text-xs font-bold mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--primary))] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[rgb(var(--primary))]"></span>
-              </span>
-              TRUSTED BY 10K+ USERS
+        <section className="relative max-w-7xl mx-auto px-6 pt-32 pb-20 md:pt-48 md:pb-32 grid lg:grid-cols-2 gap-16 items-center">
+          <div className="z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--card))] border border-[rgb(var(--border))] text-[rgb(var(--text)/0.8)] text-xs font-medium mb-8 backdrop-blur-md shadow-sm">
+              <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="opacity-70">v2.0 is now live:</span>
+              <span className="font-bold text-[rgb(var(--primary))]">Ultra-Fast Sync</span>
+              <ArrowRight size={14} />
             </div>
 
-            <h2 className="text-5xl md:text-6xl font-extrabold text-[rgb(var(--text))] leading-[1.1] tracking-tight">
-              Secure cloud storage, <br />
-              <span className="text-[rgb(var(--primary))]">made simple.</span>
-            </h2>
+            <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-[0.95] mb-8">
+              Your data, <br />
+              <span className="bg-gradient-to-r from-[rgb(var(--primary))] to-blue-400 bg-clip-text text-transparent">
+                fortified.
+              </span>
+            </h1>
 
-            <p className="mt-8 text-lg text-[rgb(var(--text)/0.7)] max-w-lg leading-relaxed">
-              Upload, manage, and access your files from anywhere.
-              Built with military-grade security and a focus on lightning-fast speed.
+            <p className="text-xl text-[rgb(var(--text)/0.6)] max-w-lg leading-relaxed mb-10">
+              Experience the next generation of cloud storage.
+              Zero-knowledge encryption paired with blazing fast speeds across all your devices.
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 bg-[rgb(var(--primary))] text-white px-8 py-4 rounded-xl font-bold hover:bg-[rgb(var(--primary),0.85)] transition-all shadow-lg shadow-[rgb(var(--primary))/0.25] active:scale-95"
+                className="group relative inline-flex items-center justify-center gap-2 bg-[rgb(var(--primary))] text-white px-10 py-5 rounded-2xl font-bold transition-all hover:shadow-[0_0_40px_rgba(var(--primary),0.3)] active:scale-95 overflow-hidden"
               >
-                Start for free
-                <ArrowRight size={18} />
+                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <span className="relative">Get 2GB Free</span>
+                <ArrowRight size={20} className="relative group-hover:translate-x-1 transition-transform" />
               </Link>
 
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--card))] text-[rgb(var(--text)/0.85)] font-semibold hover:bg-[rgb(var(--bg))] transition-all active:scale-95"
+                className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--card)/0.5)] backdrop-blur-md text-[rgb(var(--text))] font-bold hover:bg-[rgb(var(--card))] transition-all active:scale-95"
               >
-                View Demo
+                Explore Demo
               </Link>
             </div>
 
-            <div className="mt-8 flex items-center gap-6 text-sm text-[rgb(var(--text)/0.6)]">
-              <div className="flex items-center gap-1">
-                <CheckCircle2 size={16} className="text-green-500" /> No credit card
+            <div className="mt-12 flex items-center gap-8 border-t border-[rgb(var(--border))] pt-8">
+              <div>
+                <p className="text-2xl font-bold">99.9%</p>
+                <p className="text-sm text-[rgb(var(--text)/0.5)]">Uptime SLA</p>
               </div>
-              <div className="flex items-center gap-1">
-                <CheckCircle2 size={16} className="text-green-500" /> 2GB free storage
+              <div className="w-[1px] h-10 bg-[rgb(var(--border))]" />
+              <div>
+                <p className="text-2xl font-bold">256-bit</p>
+                <p className="text-sm text-[rgb(var(--text)/0.5)]">AES Encryption</p>
               </div>
             </div>
           </div>
 
-          {/* Visual UI Mockup */}
-          <div className="relative hidden md:block">
-            <div className="absolute -inset-4 bg-gradient-to-tr from-[rgb(var(--primary))/0.05] to-[rgb(var(--primary))/0.1] rounded-[2rem] blur-2xl opacity-50" />
-            <div className="relative bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-2xl shadow-2xl p-6 overflow-hidden">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
+          {/* Premium Visual Mockup */}
+          <div className="relative lg:h-[600px] flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--primary)/0.2)] to-transparent rounded-full blur-3xl scale-150 opacity-20" />
+
+            <div className="relative w-full max-w-md aspect-[4/3] bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] p-8 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-10">
+                <div className="space-y-1">
+                  <div className="h-2 w-20 bg-[rgb(var(--text)/0.1)] rounded-full" />
+                  <div className="h-2 w-12 bg-[rgb(var(--text)/0.05)] rounded-full" />
                 </div>
-                <div className="h-4 w-32 bg-[rgb(var(--bg)/0.7)] rounded-full" />
+                <div className="w-10 h-10 rounded-full bg-[rgb(var(--primary)/0.1)] border border-[rgb(var(--primary)/0.2)]" />
               </div>
 
-              <div className="space-y-4">
-                {[80, 45, 60].map((width, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-[rgb(var(--primary)/0.1)] flex items-center justify-center text-[rgb(var(--primary))]">
-                      <Upload size={18} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="h-2 w-full bg-[rgb(var(--bg)/0.7)] rounded-full overflow-hidden">
-                        <div className="h-full bg-[rgb(var(--primary))]" style={{ width: `${width}%` }} />
-                      </div>
-                    </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="p-4 rounded-2xl bg-[rgb(var(--bg)/0.5)] border border-[rgb(var(--border))] animate-pulse" style={{ animationDelay: `${i * 150}ms` }}>
+                    <div className="w-8 h-8 rounded-lg bg-[rgb(var(--primary)/0.1)] mb-3" />
+                    <div className="h-2 w-full bg-[rgb(var(--text)/0.1)] rounded-full" />
                   </div>
                 ))}
+              </div>
+
+              {/* Floating Tooltip */}
+              <div className="absolute -right-8 top-1/4 p-4 rounded-2xl bg-white dark:bg-zinc-900 shadow-2xl border border-[rgb(var(--border))] flex items-center gap-3 animate-bounce shadow-primary/20">
+                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-500">
+                  <CheckCircle2 size={20} />
+                </div>
+                <div className="pr-4">
+                  <p className="text-xs font-bold">Sync Complete</p>
+                  <p className="text-[10px] opacity-50">1.2 GB uploaded</p>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="bg-[rgb(var(--card))] py-24 border-y border-[rgb(var(--border))]">
+        {/* Bento Grid Features */}
+        <section className="py-24 relative">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center max-w-2xl mx-auto mb-16">
-              <h3 className="text-3xl font-bold text-[rgb(var(--text))]">Everything you need to manage data</h3>
-              <p className="text-[rgb(var(--text)/0.6)] mt-4">Powerful features to help you keep your digital life organized and secure.</p>
+            <div className="mb-16">
+              <h2 className="text-4xl font-bold mb-4">Built for power users.</h2>
+              <p className="text-[rgb(var(--text)/0.5)] text-lg">Sophisticated tools, simplified for everyone.</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              <Feature
-                icon={<Upload size={24} />}
-                title="Easy uploads"
-                description="Drag and drop your files directly into your browser. We handle the rest."
+            <div className="grid md:grid-cols-6 md:grid-rows-2 gap-4 h-full">
+              <FeatureCard
+                className="md:col-span-3 md:row-span-2"
+                icon={<Shield size={32} />}
+                title="Privacy is not an option"
+                description="Our end-to-end encryption means even we can't see your files. Your data belongs to you, and only you."
               />
-              <Feature
-                icon={<Shield size={24} />}
-                title="Secure by default"
-                description="End-to-end encryption ensures that only you have access to your sensitive files."
+              <FeatureCard
+                className="md:col-span-3"
+                icon={<Zap size={24} />}
+                title="Instant Sync"
+                description="Proprietary delta-sync technology ensures only changes are uploaded."
               />
-              <Feature
-                icon={<HardDrive size={24} />}
-                title="Storage insights"
-                description="Get detailed breakdowns of your storage usage by file type and date."
+              <FeatureCard
+                className="md:col-span-3"
+                icon={<Globe size={24} />}
+                title="Global Edge Nodes"
+                description="Access your files at local speeds from anywhere in the world."
               />
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="max-w-7xl mx-auto px-6 py-20">
-          <div className="bg-[rgb(var(--primary))] rounded-[2rem] px-8 py-16 text-center text-white shadow-2xl shadow-[rgb(var(--primary))/0.15]">
-            <h3 className="text-4xl font-bold mb-4">Ready to get started?</h3>
-            <p className="text-[rgb(var(--primary)/0.2)] text-lg mb-10 max-w-md mx-auto">
-              Create an account today and get 2GB of secure storage for free.
-            </p>
-            <Link
-              to="/register"
-              className="inline-block bg-white text-[rgb(var(--primary))] px-10 py-4 rounded-xl font-bold hover:bg-[rgb(var(--primary)/0.1)] transition-all hover:scale-105"
-            >
-              Create free account
-            </Link>
+        <section className="max-w-7xl mx-auto px-6 py-32">
+          <div className="relative rounded-[3rem] overflow-hidden bg-blue-500 px-8 py-20 text-center text-white border border-white/10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary),0.2),transparent)]" />
+            <div className="relative z-10">
+              <h3 className="text-4xl md:text-5xl font-bold mb-6 italic tracking-tight">Secure your digital legacy.</h3>
+              <p className="text-zinc-400 text-lg mb-12 max-w-lg mx-auto leading-relaxed">
+                Join 10,000+ users who trust SecureCloud with their most important assets.
+              </p>
+              <Link
+                to="/register"
+                className="inline-block bg-white text-black px-12 py-5 rounded-2xl font-black hover:scale-105 transition-transform shadow-xl"
+              >
+                Create Your Vault
+              </Link>
+            </div>
           </div>
         </section>
       </main>
+      <Footer />
 
-      {/* Footer */}
-      <footer className="py-12 text-center text-[rgb(var(--text)/0.4)] border-t border-[rgb(var(--border))]">
-        <p className="text-sm">© {new Date().getFullYear()} SecureCloud. All rights reserved.</p>
-      </footer>
     </div>
   )
 }
 
-const Feature = ({
+const FeatureCard = ({
   icon,
   title,
   description,
+  className
 }: {
-  icon: JSX.Element
-  title: string
-  description: string
+  icon: JSX.Element,
+  title: string,
+  description: string,
+  className?: string
 }) => (
-  <div className="group bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-3xl p-8 hover:bg-[rgb(var(--bg))] hover:shadow-xl hover:border-transparent transition-all duration-300">
-    <div className="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-[rgb(var(--bg))] text-[rgb(var(--primary))] shadow-sm group-hover:bg-[rgb(var(--primary))] group-hover:text-white transition-colors">
+  <div className={`group p-8 rounded-[2.5rem] bg-[rgb(var(--card))] border border-[rgb(var(--border))] hover:border-[rgb(var(--primary)/0.5)] transition-all duration-500 flex flex-col justify-between overflow-hidden relative ${className}`}>
+    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] group-hover:scale-110 transition-all duration-700">
       {icon}
     </div>
-    <h4 className="font-bold text-xl text-[rgb(var(--text))]">{title}</h4>
-    <p className="mt-3 text-[rgb(var(--text)/0.6)] leading-relaxed">{description}</p>
+    <div>
+      <div className="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-[rgb(var(--bg))] text-[rgb(var(--primary))] border border-[rgb(var(--border))] group-hover:scale-110 group-hover:bg-[rgb(var(--primary))] group-hover:text-white transition-all duration-500">
+        {icon}
+      </div>
+      <h4 className="font-black text-2xl text-[rgb(var(--text))] mb-4 leading-tight">{title}</h4>
+      <p className="text-[rgb(var(--text)/0.5)] leading-relaxed font-medium">{description}</p>
+    </div>
   </div>
 )
 
