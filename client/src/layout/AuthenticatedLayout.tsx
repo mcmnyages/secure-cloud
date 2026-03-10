@@ -22,13 +22,13 @@ const AuthLayout = () => {
       />
 
       {/* Main content */}
-      <AppHeader
-        collapsed={collapsed}
-        onToggleDesktop={() => setCollapsed(c => !c)}
-        onOpenMobile={() => setMobileOpen(true)}
-      />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-6">
+        <AppHeader
+          collapsed={collapsed}
+          onToggleDesktop={() => setCollapsed(c => !c)}
+          onOpenMobile={() => setMobileOpen(true)}
+        />
+        <main className="flex-1 overflow-auto p-6 animate-in fade-in duration-300">
           <Outlet />
         </main>
       </div>

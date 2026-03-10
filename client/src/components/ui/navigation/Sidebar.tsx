@@ -12,6 +12,9 @@ const APP_NAME = 'Secure Cloud'
 const APP_INITIALS = 'SC'
 
 const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
+  // Placeholder user info for avatar/profile
+  const user = { name: 'Jane Doe', email: 'jane@example.com' };
+  const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
   return (
     <>
       {/* Mobile backdrop */}
@@ -25,13 +28,13 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
       {/* Sidebar */}
       <aside
         className={`
-          fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out
+          fixed md:absolute inset-y-0 left-0 transition-all duration-300 ease-in-out
           bg-[rgb(var(--card))] border-r border-[rgb(var(--border))]
-          w-64 md:sticky md:top-0 md:h-screen md:relative
-          flex flex-col z-50
-          ${collapsed ? 'md:w-20' : 'md:w-64'}
+          flex flex-col z-50 shadow-lg
+          ${collapsed ? 'w-20' : 'w-64'}
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
         `}
+        style={{ width: collapsed ? '5rem' : '16rem', maxWidth: '100vw' }}
       >
         {/* Header */}
         <div className="h-16 flex items-center px-4 border-b border-[rgb(var(--border))] flex-shrink-0 relative">
@@ -74,6 +77,19 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
           <NavItem to="/files" icon={<Folder size={20} />} label="Files" collapsed={collapsed} />
           <NavItem to="/settings" icon={<Settings size={20} />} label="Settings" collapsed={collapsed} />
         </nav>
+
+        {/* User avatar/profile at bottom */}
+        <div className="mt-auto px-4 py-3 border-t border-[rgb(var(--border))] flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-[rgb(var(--primary))] text-white flex items-center justify-center text-sm font-bold shadow-md">
+            {initials}
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="font-semibold text-sm">{user.name}</span>
+              <span className="text-xs text-[rgb(var(--text)/0.5)]">{user.email}</span>
+            </div>
+          )}
+        </div>
       </aside>
     </>
   )
@@ -94,12 +110,13 @@ const NavItem = ({
     to={to}
     className={({ isActive }) =>
       `
-        group flex items-center gap-3 px-3 py-2 rounded-lg transition-all
+        group flex items-center gap-3 px-3 py-2 rounded-lg transition-all relative
         ${isActive
-          ? 'bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]'
-          : 'text-[rgb(var(--text)/0.7)] hover:bg-[rgb(var(--bg))]'}
+        ? 'bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] border-l-4 border-[rgb(var(--primary))]'
+        : 'text-[rgb(var(--text)/0.7)] hover:bg-[rgb(var(--bg))]'}
       `
     }
+    title={collapsed ? label : undefined}
   >
     <div className="shrink-0">{icon}</div>
     <span
@@ -110,6 +127,11 @@ const NavItem = ({
     >
       {label}
     </span>
+    {collapsed && (
+      <span className="absolute left-12 bg-[rgb(var(--card))] text-xs rounded shadow-lg px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        {label}
+      </span>
+    )}
   </NavLink>
 )
 

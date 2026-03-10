@@ -56,17 +56,33 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
   /* ---------------- Responsive Constants ---------------- */
   // These should match your Sidebar widths exactly
-  const sidebarWidth = collapsed ? 'md:left-20' : 'md:left-64'
+  // Responsive sidebar width
+  const sidebarWidth = collapsed ? '5rem' : '16rem'
+  const [headerStyle, setHeaderStyle] = useState({ left: sidebarWidth, width: `calc(100% - ${sidebarWidth})`, transition: 'left 0.3s, width 0.3s', minWidth: '0' });
+
+  useEffect(() => {
+    const updateHeaderStyle = () => {
+      if (!isAuthenticated || window.innerWidth < 768) {
+        setHeaderStyle({ left: '0', width: '100%', transition: 'left 0.3s, width 0.3s', minWidth: '0' });
+      } else {
+        setHeaderStyle({ left: sidebarWidth, width: `calc(100% - ${sidebarWidth})`, transition: 'left 0.3s, width 0.3s', minWidth: '0' });
+      }
+    };
+    updateHeaderStyle();
+    window.addEventListener('resize', updateHeaderStyle);
+    return () => window.removeEventListener('resize', updateHeaderStyle);
+  }, [sidebarWidth, isAuthenticated]);
 
   return (
     <header
       className={`
-        fixed top-0 right-0 h-16 z-40 transition-all duration-300 ease-in-out
+        fixed top-0 right-0 h-16 z-40 transition-all duration-300 ease-in-out shadow-lg
         ${isAuthenticated
-          ? `left-0 ${sidebarWidth} bg-[rgb(var(--card))] border-b border-[rgb(var(--border))] shadow-sm`
-          : `left-0 w-full ${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
+          ? `bg-[rgb(var(--card))] border-b border-[rgb(var(--border))]`
+          : `${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
         }
       `}
+      style={headerStyle}
     >
       <div className={`h-full flex items-center justify-between px-4 sm:px-6 lg:px-8 ${!isAuthenticated && 'max-w-7xl mx-auto'}`}>
 
@@ -78,6 +94,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
               <button
                 onClick={onOpenMobile}
                 className="md:hidden p-2 -ml-2 rounded-md text-[rgb(var(--text))] hover:bg-[rgb(var(--bg))] transition-colors"
+                aria-label="Open sidebar"
               >
                 <Menu size={24} />
               </button>
@@ -86,6 +103,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
               <button
                 onClick={onToggleDesktop}
                 className="hidden md:flex items-center justify-center w-8 h-8 rounded-md border border-[rgb(var(--border))] hover:bg-[rgb(var(--primary)/0.1)] hover:text-[rgb(var(--primary))] transition-all"
+                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
                 {collapsed ? <Menu size={18} /> : <X size={18} />}
               </button>
@@ -102,15 +120,25 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
         {/* RIGHT SECTION: Actions & Profile */}
         <div className="flex items-center gap-2 sm:gap-4">
+          {/* Notification icon placeholder */}
+          {isAuthenticated && (
+            <button className="p-2 rounded-full hover:bg-[rgb(var(--bg))] transition-colors" aria-label="Notifications">
+              <span className="relative">
+                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
+                <span className="absolute top-0 right-0 w-2 h-2 bg-[rgb(var(--primary))] rounded-full"></span>
+              </span>
+            </button>
+          )}
           <ThemeToggle />
 
           {isAuthenticated ? (
             <div ref={menuRef} className="relative">
               <button
                 onClick={() => setOpen(!open)}
-                className="flex items-center gap-2 p-1 rounded-full hover:bg-[rgb(var(--bg))] transition-colors"
+                className="flex items-center gap-2 p-1 rounded-full hover:bg-[rgb(var(--bg))] transition-colors group"
+                aria-label="Open profile menu"
               >
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[rgb(var(--primary))] text-white flex items-center justify-center text-xs font-bold shadow-inner">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[rgb(var(--primary))] text-white flex items-center justify-center text-xs font-bold shadow-inner group-hover:ring-2 group-hover:ring-[rgb(var(--primary))] transition-all">
                   {initials}
                 </div>
                 {/* Desktop only: Show Name */}
@@ -119,7 +147,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
               {/* Dropdown Menu */}
               {open && (
-                <div className="absolute right-0 mt-2 w-56 origin-top-right bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute right-0 mt-2 w-56 origin-top-right bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                   <div className="px-4 py-3 border-b border-[rgb(var(--border))]">
                     <p className="text-sm font-semibold truncate">{user?.name}</p>
                     <p className="text-xs text-[rgb(var(--text)/0.5)] truncate">{user?.email}</p>
@@ -146,11 +174,12 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="p-2 rounded-md border border-[rgb(var(--border))]"
+                  aria-label="Open mobile menu"
                 >
                   {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
                 {mobileMenuOpen && (
-                  <div className="absolute right-4 mt-2 w-48 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg shadow-lg p-2 flex flex-col gap-1">
+                  <div className="absolute right-4 mt-2 w-48 bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-lg shadow-lg p-2 flex flex-col gap-1 animate-in fade-in duration-200">
                     <Link to="/login" className="p-2 text-sm" onClick={closeMenus}>Log In</Link>
                     <Link to="/register" className="p-2 text-sm bg-[rgb(var(--primary))] text-white rounded-md text-center" onClick={closeMenus}>Sign Up</Link>
                   </div>
