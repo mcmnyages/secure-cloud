@@ -1,8 +1,8 @@
 import { Menu, X, LogOut, User, Settings, Cloud } from 'lucide-react'
-import { useAuth } from '../../../contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import getInitials from '../../../utils/helpers/getInitials'
+import getInitials from '@/utils/helpers/getInitials'
 import MenuItem from './MenuItem'
 import ThemeToggle from '../buttons/ThemeToggleButton'
 
