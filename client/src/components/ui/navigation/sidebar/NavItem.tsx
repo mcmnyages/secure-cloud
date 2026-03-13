@@ -8,39 +8,52 @@ interface Props {
   collapsed: boolean
 }
 
-const NavItem = ({ to, icon, label, collapsed }: Props) => (
-  <NavLink
-    to={to}
-    className={({ isActive }) => `
-      group relative flex items-center h-12 rounded-xl transition-all duration-200
-      ${
-        isActive
-          ? "bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] shadow-sm"
-          : "text-[rgb(var(--text)/0.5)] hover:bg-[rgb(var(--bg))] hover:text-[rgb(var(--text))]"
-      }
-    `}
-  >
-    <div className="w-20 shrink-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-      {icon}
-    </div>
+const NavItem = ({ to, icon, label, collapsed }: Props) => {
+  return (
+    <NavLink to={to}>
+      {({ isActive }) => (
+        <div
+          className={`
+            group relative flex items-center h-12 w-full
+            px-3 rounded-xl
+            transition-all duration-200
+            
+            ${
+              isActive
+                ? "bg-[rgb(var(--primary)/0.12)] text-[rgb(var(--primary))]"
+                : "text-[rgb(var(--text)/0.6)] hover:bg-[rgb(var(--bg))] hover:text-[rgb(var(--text))]"
+            }
 
-    <span
-      className={`font-bold text-sm whitespace-nowrap transition-all duration-300
-      ${
-        collapsed
-          ? "md:opacity-0 md:-translate-x-4 md:pointer-events-none"
-          : "opacity-100 translate-x-0"
-      }`}
-    >
-      {label}
-    </span>
+            ${collapsed ? "md:justify-center" : "gap-3"}
+          `}
+        >
+          {/* Active indicator */}
+          {isActive && (
+            <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-[rgb(var(--primary))]" />
+          )}
 
-    {collapsed && (
-      <div className="hidden md:block absolute left-20 px-3 py-2 bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all pointer-events-none z-[80] shadow-xl">
-        {label}
-      </div>
-    )}
-  </NavLink>
-)
+          {/* Icon */}
+          <div className="flex items-center justify-center shrink-0">
+            {icon}
+          </div>
+
+          {/* Label */}
+          {!collapsed && (
+            <span className="font-semibold text-sm truncate">
+              {label}
+            </span>
+          )}
+
+          {/* Tooltip when collapsed */}
+          {collapsed && (
+            <div className="hidden md:block absolute left-14 px-3 py-1.5 bg-zinc-900 text-white text-[11px] font-medium rounded-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap shadow-lg z-50">
+              {label}
+            </div>
+          )}
+        </div>
+      )}
+    </NavLink>
+  )
+}
 
 export default NavItem

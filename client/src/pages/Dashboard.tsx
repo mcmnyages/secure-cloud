@@ -37,7 +37,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen mt-4 bg-[rgb(var(--background))] text-[rgb(var(--text))] transition-colors duration-300 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className=" mx-auto px-4 sm:px-6 py-8 space-y-8">
         
         {/* Toolbar: Handles searching, sorting, and view toggles */}
         <DashboardToolbar
