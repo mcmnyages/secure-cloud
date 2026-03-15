@@ -5,15 +5,20 @@ import AppHeader from "../components/ui/navigation/AppHeader";
 const Register = () => {
   const { mutate, isPending } = useRegister();
 
-
   return (
-    <div className="">
-      <AppHeader collapsed={false} onToggleDesktop={() => { }} onOpenMobile={() => { }} />
+    <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
+
+      <AppHeader
+        collapsed={false}
+        onToggleDesktop={() => {}}
+        onOpenMobile={() => {}}
+      />
 
       <RegisterForm
         loading={isPending}
         onSubmit={(data) => mutate(data)}
       />
+
     </div>
   );
 };
