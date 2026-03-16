@@ -14,17 +14,19 @@ const NavItem = ({ to, icon, label, collapsed }: Props) => {
       {({ isActive }) => (
         <div
           className={`
-            group relative flex items-center h-12 w-full
-            px-3 rounded-xl
+            group relative flex items-center
+            h-12 w-full
+            px-3 gap-3
+            rounded-xl
             transition-all duration-200
-            
+
+            ${collapsed ? "md:justify-center" : ""}
+
             ${
               isActive
                 ? "bg-[rgb(var(--primary)/0.12)] text-[rgb(var(--primary))]"
-                : "text-[rgb(var(--text)/0.6)] hover:bg-[rgb(var(--bg))] hover:text-[rgb(var(--text))]"
+                : "text-[rgb(var(--text)/0.65)] hover:bg-[rgb(var(--bg))] hover:text-[rgb(var(--text))]"
             }
-
-            ${collapsed ? "md:justify-center" : "gap-3"}
           `}
         >
           {/* Active indicator */}
@@ -38,15 +40,38 @@ const NavItem = ({ to, icon, label, collapsed }: Props) => {
           </div>
 
           {/* Label */}
-          {!collapsed && (
-            <span className="font-semibold text-sm truncate">
-              {label}
-            </span>
-          )}
+          <span
+            className={`
+              text-sm font-semibold truncate
+              ${collapsed ? "md:hidden" : "block"}
+            `}
+          >
+            {label}
+          </span>
 
-          {/* Tooltip when collapsed */}
+          {/* Tooltip when collapsed (desktop only) */}
           {collapsed && (
-            <div className="hidden md:block absolute left-14 px-3 py-1.5 bg-zinc-900 text-white text-[11px] font-medium rounded-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap shadow-lg z-50">
+            <div
+              className="
+                hidden md:block
+                absolute left-14
+                px-3 py-1.5
+                bg-zinc-900
+                text-white
+                text-[11px]
+                font-medium
+                rounded-md
+                opacity-0
+                translate-x-2
+                group-hover:opacity-100
+                group-hover:translate-x-0
+                transition-all
+                pointer-events-none
+                whitespace-nowrap
+                shadow-lg
+                z-50
+              "
+            >
               {label}
             </div>
           )}

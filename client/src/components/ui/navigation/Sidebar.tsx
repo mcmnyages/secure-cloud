@@ -16,7 +16,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
 
   const initials = user?.name
     ?.split(" ")
-    .map((n) => n[0])
+    .map((n: string) => n[0])
     .join("")
     .toUpperCase()
 
@@ -35,9 +35,10 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
         fixed inset-y-0 left-0 z-[70] flex flex-col
         bg-[rgb(var(--card))]/95 backdrop-blur-xl
         border-r border-[rgb(var(--border))]
-        transition-[width,transform] duration-300 ease-out
+        transition-[width,transform] duration-300 ease-[cubic-bezier(.4,0,.2,1)]
+        shadow-xl md:shadow-none
         
-        ${collapsed ? "md:w-20" : "md:w-64"}
+        ${collapsed ? "md:w-[80px]" : "md:w-[260px]"}
         
         w-64 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} 
         md:translate-x-0
@@ -45,17 +46,19 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
       >
         {/* Header */}
         <div className="h-16 flex items-center px-5 border-b border-[rgb(var(--border))] shrink-0 overflow-hidden">
-          <div className="flex items-center gap-3 min-w-max">
+          <div className="flex items-center gap-3 min-w-max group">
             <div
               className="
               w-10 h-10
-              rounded-xl
+              rounded-2xl
               bg-gradient-to-br
               from-[rgb(var(--primary))]
               to-blue-500
               flex items-center justify-center
               text-white
-              shadow-lg
+              shadow-md
+              transition
+              group-hover:scale-105
             "
             >
               <Cloud size={22} />
@@ -72,14 +75,14 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
 
           <button
             onClick={onCloseMobile}
-            className="ml-auto md:hidden p-2 rounded-lg hover:bg-[rgb(var(--bg))]"
+            className="ml-auto md:hidden p-2 rounded-lg hover:bg-[rgb(var(--bg))] transition"
           >
-            <X size={20} color="red" />
+            <X size={20} className="text-[rgb(var(--text)/0.7)]" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="relative flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 space-y-1.5 no-scrollbar">
+        <nav className="relative flex-1 overflow-y-auto overflow-x-hidden px-3 py-5 space-y-2 no-scrollbar">
           {menuItems.map((item) => {
             const Icon = item.icon
 
@@ -91,9 +94,12 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
                       collapsed ? "md:opacity-0" : "opacity-100"
                     }`}
                   >
-                    <p className="text-[10px] font-bold text-[rgb(var(--text)/0.4)] uppercase tracking-widest">
-                      {item.section}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-[10px] font-semibold text-[rgb(var(--text)/0.45)] uppercase tracking-[0.18em]">
+                        {item.section}
+                      </p>
+                      <div className="flex-1 h-px bg-[rgb(var(--border))]" />
+                    </div>
                   </div>
                 )}
 
@@ -107,8 +113,8 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
             )
           })}
 
-          {/* Scroll fade */}
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[rgb(var(--card))] to-transparent" />
+          {/* Scroll Fade */}
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[rgb(var(--card))] to-transparent" />
         </nav>
 
         {/* Storage Card */}
@@ -119,7 +125,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
               : "opacity-100 translate-y-0"
           }`}
         >
-          <div className="p-4 rounded-2xl bg-[rgb(var(--primary)/0.08)] border border-[rgb(var(--primary)/0.12)]">
+          <div className="p-3 rounded-xl bg-[rgb(var(--primary)/0.07)] border border-[rgb(var(--primary)/0.15)] backdrop-blur">
             <div className="flex items-center gap-2 mb-3">
               <Zap size={14} className="text-[rgb(var(--primary))]" />
               <span className="text-xs font-bold uppercase tracking-tight">
@@ -127,23 +133,27 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
               </span>
             </div>
 
-            <div className="h-2 w-full bg-[rgb(var(--border))] rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-[rgb(var(--primary))] to-blue-400 w-[80%] rounded-full transition-all duration-500" />
+            <div className="h-2 w-full bg-[rgb(var(--border))] rounded-full overflow-hidden mb-2">
+              <div className="h-full bg-gradient-to-r from-[rgb(var(--primary))] to-blue-400 w-[80%] rounded-full transition-all duration-700 ease-out" />
             </div>
+
+            <span className="text-[10px] text-[rgb(var(--text)/0.45)]">
+              8GB of 10GB used
+            </span>
           </div>
         </div>
 
         {/* User Profile */}
         <div className="p-4 border-t border-[rgb(var(--border))] bg-[rgb(var(--card))]">
           <div
-            className={`flex items-center gap-3 p-2 rounded-xl transition-all duration-200 ${
+            className={`flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 ${
               collapsed
                 ? "md:justify-center"
-                : "hover:bg-[rgb(var(--bg))] hover:scale-[1.02] cursor-pointer"
+                : "hover:bg-[rgb(var(--bg))] hover:shadow-sm cursor-pointer"
             }`}
           >
             <div className="relative shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-[rgb(var(--primary))] flex items-center justify-center text-white text-sm font-black shadow-inner">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-[rgb(var(--primary))] flex items-center justify-center text-white text-sm font-black shadow-inner">
                 {initials}
               </div>
 
@@ -161,7 +171,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
                 {user?.name}
               </span>
 
-              <span className="text-[10px] font-medium text-[rgb(var(--text)/0.4)] truncate">
+              <span className="text-[10px] font-medium text-[rgb(var(--text)/0.45)] truncate">
                 {user?.email}
               </span>
             </div>
