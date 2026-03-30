@@ -12,12 +12,12 @@ export class AuthController {
   register = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password, name } = req.body;
-       // 1. Create user
+      // 1. Create user
       const user = await this.authService.registerUser(email, password, name);
-       // Trigger verification email
-      await sendVerificationEmail({ body: { userId: user.id, email } } as any, res);
+      // Trigger verification email
+      await sendVerificationEmail({ userId: user.id, email });
       // 4. Respond immediately
-    res.status(201).json({user});
+      res.status(201).json({ user });
     } catch (err) {
       next(err);
     }

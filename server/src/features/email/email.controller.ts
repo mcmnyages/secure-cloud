@@ -7,23 +7,16 @@ import { prisma } from '../../lib/prisma.js';
 import bcrypt from 'bcrypt';
 
 // Send verification email
-export async function sendVerificationEmail(req: Request, res: Response) {
+export async function sendVerificationEmail({ userId, email }: { userId: string, email: string }) {
   try {
-    const { userId, email } = req.body;
-
     const token = await createEmailToken(userId, TokenPurpose.EMAIL_VERIFY);
     const path = `/verify?token=${token}`;
 
     const { subject, html } = getEmailTemplate(TokenPurpose.EMAIL_VERIFY, path);
     await sendEmail(email, subject, html);
-
-    return res.json({ message: "Verification email sent" });
-
   } catch (error) {
     console.error("sendVerificationEmail error:", error);
-    return res.status(500).json({
-      message: "Failed to send verification email"
-    });
+    throw new Error("Failed to send verification email");
   }
 }
 
