@@ -33,6 +33,24 @@ export class AuthController {
       next(err);
     }
   };
+
+
+user=async(req:Request,res:Response,next:NextFunction)=>{
+  try{
+
+    if(!(req as any).userId) throw new Error("Unauthorized or token missing");
+
+  const user = await this.authService.getUser((req as any).userId);
+  res.json(user);
+  
+
+  }catch(err){
+    next(err)
+  }
+}
+
+
+
 }
 
 

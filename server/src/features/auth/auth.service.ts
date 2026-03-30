@@ -30,4 +30,14 @@ export class AuthService {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1d' });
     return { user: { id: user.id, email: user.email, name: user.name, isVerifed:user.verified }, token };
   }
+
+  async getUser(id:string){
+    const user = await prisma.user.findUnique({
+      where:{id},
+      select:{email:true,name:true,storageUsed:true,storageLimit:true}
+    });
+    return user;
+  }
+
+
 }

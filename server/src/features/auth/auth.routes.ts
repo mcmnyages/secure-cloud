@@ -11,13 +11,6 @@ const authController = new AuthController();
 
 router.post('/register', validate(RegisterSchema), authController.register);
 router.post('/login', authRateLimiter, validate(LoginSchema), authController.login);
-router.get('/me', authenticate, async (req, res) => {
-  
-  const user = await prisma.user.findUnique({
-    where: { id: (req as any).userId },
-    select: { email: true, name: true, storageUsed: true, storageLimit: true }
-  });
-  res.json(user);
-});
+router.get('/me', authenticate, authController.user);
 
 export default router;
