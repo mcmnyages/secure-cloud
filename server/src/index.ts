@@ -53,12 +53,12 @@ app.use(helmet()); // Basic security
 app.use(morgan('dev')); // Logging
 app.use(express.json()); // CRITICAL: This allows Express to read the body of your request
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
-app.use(globalRateLimiter); // Apply global rate limiter to all routes
-
 
 
 // Routes
-app.get('/health', (req, res) => res.status(200).send('OK'));
+app.get('/health', (req, res) => res.status(200).send('OK'));// Health check endpoint remember to not rate limit this endpoint in production, as monitoring tools will hit it frequently
+
+app.use('/api', globalRateLimiter); // Apply global rate limiter to all routes
 app.use('/api/auth', authRoutes);
 app.use('/api/files', fileRoutes); 
 app.use('/api/email', emailRoutes);
