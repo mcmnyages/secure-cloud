@@ -6,13 +6,14 @@ import path from 'path';
 import fs from 'fs';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { env } from './config/env.js';
 import { transporter } from './features/email/email.service.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import authRoutes from './features/auth/auth.routes.js';
 import fileRoutes from './features/files/file.routes.js';
 import { emailRoutes } from './features/email/index.js';
 import { multerErrorHandler } from './middleware/errors/multerError.middleware.js';
-import { env } from './config/env.js';
+import { globalRateLimiter } from './middleware/rateLimit.middleware.js';
 
 
 const app = express();
@@ -53,6 +54,7 @@ app.use(helmet()); // Basic security
 app.use(morgan('dev')); // Logging
 app.use(express.json()); // CRITICAL: This allows Express to read the body of your request
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(globalRateLimiter); // Apply global rate limiter to all routes
 
 
 
