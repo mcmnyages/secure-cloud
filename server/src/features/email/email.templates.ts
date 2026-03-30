@@ -7,7 +7,7 @@ export function getEmailTemplate(purpose: TokenPurpose, path: string) {
   ? path
   : new URL(path, env.frontendUrl).toString();
   const logoUrl = new URL("/favicon.ico", env.frontendUrl).toString();
-  console.log("Constructed link:", link);
+ 
 
   const baseTemplate = (title: string, message: string, buttonText: string, color: string) => `
     <div style="background:#f4f6f8;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
