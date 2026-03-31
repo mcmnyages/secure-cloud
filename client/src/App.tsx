@@ -13,7 +13,7 @@ import { Toaster } from 'sonner';
 import Files from './pages/files/Files';
 import FileVersionPage from './pages/files/FileVersionPage';
 import Settings from './pages/Settings';
-import {OverlayLoader, LogoSpinner} from '@/components/ui/spinners';
+import { OverlayLoader, LogoSpinner } from '@/components/ui/spinners';
 
 // A simple wrapper to protect private routes
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -34,7 +34,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 const HomeRedirect = () => {
   const { isAuthenticated, loading } = useAuth();
 
-  if (loading) return <OverlayLoader description='loading your pages'/>; // or a spinner
+  if (loading) return <OverlayLoader description='loading your pages' />; // or a spinner
 
   return isAuthenticated
     ? <Navigate to="/dashboard" replace />
@@ -44,13 +44,13 @@ const HomeRedirect = () => {
 function App() {
 
   const { loading } = useAuth();
-if (loading) {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <LogoSpinner src="/favicon.ico"  spinLogo={true} size={100}/>
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[rgb(var(--bg))]">
+        <LogoSpinner src="/favicon.ico" spinLogo={true} size={100} />
+      </div>
+    );
+  }
 
   return (
     <>
