@@ -13,14 +13,45 @@ import { Toaster } from 'sonner';
 import Files from './pages/files/Files';
 import FileVersionPage from './pages/files/FileVersionPage';
 import Settings from './pages/Settings';
+import {OverlayLoader, LogoSpinner} from '@/components/ui/spinners';
 
 // A simple wrapper to protect private routes
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <OverlayLoader />;
+
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <OverlayLoader />;
+
+  return !isAuthenticated ? <>{children}</> : <Navigate to="/dashboard" />;
+};
+const HomeRedirect = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <OverlayLoader description='loading your pages'/>; // or a spinner
+
+  return isAuthenticated
+    ? <Navigate to="/dashboard" replace />
+    : <Navigate to="/landing" replace />;
+};
+
 function App() {
+
+  const { loading } = useAuth();
+if (loading) {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <LogoSpinner src="/favicon.ico"  spinLogo={true} size={100}/>
+    </div>
+  );
+}
+
   return (
     <>
       <Toaster
@@ -33,10 +64,19 @@ function App() {
         <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
           <Routes>
             {/* Public routes */}
+            <Route path="/" element={<HomeRedirect />} />
             <Route path="/landing" element={<Landing />} />
-            <Route path="/" element={<Navigate to="/landing" />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+
+            <Route path="/register" element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            } />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/verify" element={<VerifyEmailCallback />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -44,39 +84,39 @@ function App() {
 
             {/* Authenticated routes */}
             <Route path="/" element={<AuthenticatedLayout />}>
-              <Route 
-                path="/dashboard" 
+              <Route
+                path="/dashboard"
                 element={
                   <PrivateRoute>
                     <Dashboard />
                   </PrivateRoute>
-                } 
+                }
               />
-              <Route 
-                path="/files" 
+              <Route
+                path="/files"
                 element={
                   <PrivateRoute>
                     <Files />
                   </PrivateRoute>
-                } 
+                }
               />
 
-              <Route 
-                path="/files/:fileId/versions" 
-                element={ 
+              <Route
+                path="/files/:fileId/versions"
+                element={
                   <PrivateRoute>
                     <FileVersionPage />
                   </PrivateRoute>
-                } 
+                }
               />
 
-              <Route 
-                path="/settings" 
+              <Route
+                path="/settings"
                 element={
                   <PrivateRoute>
                     <Settings />
                   </PrivateRoute>
-                } 
+                }
               />
             </Route>
           </Routes>
