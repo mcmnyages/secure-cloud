@@ -57,7 +57,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   /* ---------------- Responsive Constants ---------------- */
   // These should match your Sidebar widths exactly
   // Responsive sidebar width
-  const sidebarWidth = collapsed ? '5rem' : '16rem'
+  const sidebarWidth = collapsed ? '4.0625rem' : '16rem'
   const [headerStyle, setHeaderStyle] = useState({ left: sidebarWidth, width: `calc(100% - ${sidebarWidth})`, transition: 'left 0.3s, width 0.3s', minWidth: '0' });
 
   useEffect(() => {
@@ -82,6 +82,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
           : `${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
         }
       `}
+    
       style={headerStyle}
     >
       <div className={`h-full flex items-center justify-between px-4 sm:px-6 lg:px-8 ${!isAuthenticated && 'max-w-7xl mx-auto'}`}>

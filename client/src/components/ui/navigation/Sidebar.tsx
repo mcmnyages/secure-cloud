@@ -38,7 +38,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }: Props) => {
         transition-[width,transform] duration-300 ease-[cubic-bezier(.4,0,.2,1)]
         shadow-xl md:shadow-none
         
-        ${collapsed ? "md:w-[80px]" : "md:w-[260px]"}
+        ${collapsed ? "md:w-[65px]" : "md:w-[260px]"}
         
         w-64 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} 
         md:translate-x-0

@@ -31,7 +31,7 @@ const AuthLayout = () => {
       <div
         className={`
           min-h-screen flex flex-col transition-all duration-300
-          ${collapsed ? "md:pl-20" : "md:pl-[260px]"}
+          ${collapsed ? "md:pl-2" : "md:pl-[260px]"}
         `}
       >
         {/* Header */}
