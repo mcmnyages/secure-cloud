@@ -35,3 +35,21 @@ export interface CloudFile {
 
 // File category enum
 export type FileCategory = 'all' | 'image' | 'video' | 'audio' | 'document' | 'other'
+
+
+
+export interface FileItemProps {
+  file: CloudFile;
+  index: number;
+  selected: boolean;
+  renaming: boolean;
+  editName: string;
+  onSelect: (id: string, index: number, shiftKey: boolean) => void;
+  onRename: (file: CloudFile) => void;
+  onEditName: (name: string) => void;
+  onSubmitRename: (id: string) => void;
+  onCancelRename: () => void;
+  onDownload: (id: string, name: string) => void;
+  onDelete: (id: string) => void;
+  onOpen: (id: string) => void;
+}

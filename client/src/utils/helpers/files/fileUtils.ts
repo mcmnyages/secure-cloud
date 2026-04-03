@@ -241,7 +241,14 @@ export function getFileCategory(mimeType: string): string {
   return "other";
 }
 
-
+export const inputCls =
+  "w-full px-3 py-2 text-sm rounded-lg " +
+  "border border-[rgba(var(--border-rgb),0.5)] " +
+  "bg-[rgba(var(--bg),0.6)] text-[rgb(var(--text))] " +
+  "outline-none transition-colors duration-150 " +
+  "focus:border-[rgba(var(--primary),0.6)] " +
+  "focus:ring-2 focus:ring-[rgba(var(--primary),0.1)] " +
+  "placeholder:text-[rgba(var(--text),0.3)]";
 
 export function downloadFileAsBlob(_fileId: string, fileName: string) {
   // Simulate download
