@@ -12,6 +12,9 @@ import {
   FileJson,
   type LucideIcon,
 } from 'lucide-react';
+import { format, isToday, isYesterday, parseISO } from 'date-fns';
+
+
 
 export interface FileTypeConfig {
   Icon: LucideIcon;
@@ -192,50 +195,63 @@ export const formatFileSize = (bytes: number): string => {
 };
 
 export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
+  if (!dateString) return "";
 
+  const date = parseISO(dateString);
   if (isNaN(date.getTime())) return "";
 
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-
-  const isToday = today.toDateString() === date.toDateString();
-  const isYesterday = yesterday.toDateString() === date.toDateString();
-
-  const time = date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  if (isToday) {
-    return `Today at ${time}`;
+  if (isToday(date)) {
+    return `Today at ${format(date, "hh:mm a")}`;
   }
 
-  if (isYesterday) {
-    return `Yesterday at ${time}`;
+  if (isYesterday(date)) {
+    return `Yesterday at ${format(date, "hh:mm a")}`;
   }
 
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return format(date, "MMM d, yyyy, hh:mm a");
 };
 
+
+const readableMap: Record<string, string> = {
+  pdf: "PDF",
+  image: "Image",
+  video: "Video",
+  audio: "Audio",
+  spreadsheet: "Spreadsheet",
+  presentation: "Presentation",
+  word: "Document",
+};
 
 export const getReadableType = (mimeType: string) => {
   if (!mimeType) return "File";
 
-  if (mimeType.includes("pdf")) return "PDF";
-  if (mimeType.includes("image")) return "Image";
-  if (mimeType.includes("video")) return "Video";
-  if (mimeType.includes("audio")) return "Audio";
-  if (mimeType.includes("spreadsheet")) return "Spreadsheet";
-  if (mimeType.includes("presentation")) return "Presentation";
-  if (mimeType.includes("word")) return "Document";
+  const match = Object.keys(readableMap).find((key) =>
+    mimeType.includes(key)
+  );
 
-  return "File";
+  return match ? readableMap[match] : "File";
 };
+
+
+export function getFileCategory(mimeType: string): string {
+  if (mimeType.startsWith("image")) return "image";
+  if (mimeType.startsWith("video")) return "video";
+  if (mimeType.startsWith("audio")) return "audio";
+  if (mimeType.includes("pdf") || mimeType.includes("document") || mimeType.includes("text") || mimeType.includes("sheet")) return "document";
+  return "other";
+}
+
+
+
+export function downloadFileAsBlob(_fileId: string, fileName: string) {
+  // Simulate download
+  const blob = new Blob(["Simulated file content"], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
