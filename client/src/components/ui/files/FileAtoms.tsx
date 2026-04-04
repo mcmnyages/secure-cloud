@@ -189,6 +189,8 @@ interface IconBtnProps {
   active?: boolean;
   danger?: boolean;
   size?: Size;
+  children?: React.ReactNode;
+  className?: string;
 }
 
 export const IconBtn: React.FC<IconBtnProps> = ({
@@ -230,6 +232,7 @@ interface TypePillProps {
   active: boolean;
   onClick: () => void;
   size?: Size;
+  children?: React.ReactNode;
 }
 
 export const TypePill: React.FC<TypePillProps> = ({

@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { IconBtn, TypePill } from "./Index";
 
-interface FilesToolBarProps {
+interface FilesToolbarProps {
   search: string;
   onSearchChange: (v: string) => void;
   typeFilter: string;
@@ -23,14 +23,13 @@ const TYPE_FILTERS = [
   { key: "document", label: "Docs", icon: FileText },
 ] as const;
 
-const FilesToolBar: React.FC<FilesToolBarProps> = ({
+const FilesToolbar: React.FC<FilesToolbarProps> = ({
   search, onSearchChange,
   typeFilter, onTypeFilterChange,
   viewMode, onViewModeChange,
   showFilter, onToggleFilter,
 }) => (
   <div className="flex flex-wrap items-center gap-2 mb-5">
-
     {/* Search */}
     <div className="relative flex-1 min-w-[180px] max-w-xs">
       <Search
@@ -38,64 +37,61 @@ const FilesToolBar: React.FC<FilesToolBarProps> = ({
         className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(var(--text),0.35)] pointer-events-none"
       />
       <input
+        type="text"
         value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-        placeholder="Search files…"
-        className="w-full pl-9 pr-8 py-2 rounded-lg text-sm
-          border border-[rgba(var(--border-rgb),0.5)]
-          bg-[rgb(var(--card))] text-[rgb(var(--text))]
-          outline-none placeholder:text-[rgba(var(--text),0.3)]
-          focus:border-[rgba(var(--primary),0.5)]
-          focus:ring-2 focus:ring-[rgba(var(--primary),0.08)]
-          transition-all duration-150"
+        onChange={e => onSearchChange(e.target.value)}
+        placeholder="Search files..."
+        className="w-full pl-9 pr-3 py-2 rounded-md bg-[rgba(var(--bg),0.7)] border border-[rgba(var(--text),0.07)] focus:outline-none focus:ring-2 focus:ring-primary"
       />
       {search && (
         <button
+          type="button"
+          className="absolute right-2 top-1/2 -translate-y-1/2"
           onClick={() => onSearchChange("")}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2
-            text-[rgba(var(--text),0.35)] hover:text-[rgba(var(--text),0.7)] transition-colors"
         >
-          <X size={13} />
+          <X size={14} />
         </button>
       )}
     </div>
 
-    {/* Type pills */}
-    <div className="flex gap-1.5 flex-wrap">
-      {TYPE_FILTERS.map(({ key, label, icon }) => (
+    {/* Type Filter */}
+    <div className="flex gap-1">
+      {TYPE_FILTERS.map(({ key, label, icon: Icon }) => (
         <TypePill
           key={key}
-          label={label}
-          icon={icon}
           active={typeFilter === key}
-          onClick={() => onTypeFilterChange(key)}
-        />
+          onClick={() => onTypeFilterChange(key)} label={""} icon={"symbol"}        >
+          <Icon size={12} className="mr-1" />
+          {label}
+        </TypePill>
       ))}
     </div>
 
-    {/* Right side controls */}
-    <div className="flex items-center gap-1.5 ml-auto">
+    {/* View Mode */}
+    <div className="flex gap-1 ml-auto">
       <IconBtn
-        icon={SlidersHorizontal}
-        title="Filters"
-        active={showFilter}
-        onClick={onToggleFilter}
-      />
-      <div className="w-px h-5 bg-[rgba(var(--border-rgb),0.5)]" />
-      <IconBtn
-        icon={List}
-        title="List"
         active={viewMode === "list"}
         onClick={() => onViewModeChange("list")}
-      />
+        aria-label="List view" icon={"symbol"} title={""}      >
+        <List size={14} />
+      </IconBtn>
       <IconBtn
-        icon={LayoutGrid}
-        title="Grid"
         active={viewMode === "grid"}
         onClick={() => onViewModeChange("grid")}
-      />
+        aria-label="Grid view" icon={"symbol"} title={""}      >
+        <LayoutGrid size={14} />
+      </IconBtn>
     </div>
+
+    {/* Filter Toggle */}
+    <IconBtn
+      active={showFilter}
+      onClick={onToggleFilter}
+      aria-label="Show filters"
+      className="ml-2" icon={"symbol"} title={""}    >
+      <SlidersHorizontal size={14} />
+    </IconBtn>
   </div>
 );
 
-export default FilesToolBar;
+export default FilesToolbar;
