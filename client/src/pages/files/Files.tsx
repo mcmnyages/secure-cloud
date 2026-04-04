@@ -9,7 +9,7 @@ import { LoadingSpinner } from "@/components/ui/spinners";
 import { toast } from "sonner";
 import {
   GridCard, ListRow,
-  FilesToolbar, FilesFilterPanel,
+  FilesToolBar, FilesFilterPanel,
   FilesEmptyState, FilesBulkBar,
 } from "@/components/ui/files/Index";
 
@@ -118,7 +118,7 @@ const Files: React.FC = () => {
       </div>
 
       {/* Toolbar */}
-      <FilesToolbar
+      <FilesToolBar
         search={filters.search}
         onSearchChange={filters.setSearch}
         typeFilter={filters.typeFilter}

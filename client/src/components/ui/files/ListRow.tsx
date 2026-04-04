@@ -8,7 +8,7 @@ import {
   Square,
 } from "lucide-react";
 
-import { FileIcon, TypeBadge, IconBtn, RenameForm } from "./Fileatoms";
+import { FileIcon, TypeBadge, IconBtn, RenameForm } from "./FileAtoms";
 import { formatDate, formatFileSize } from "@/utils/helpers/files/fileUtils";
 import type { FileItemProps } from "@/types/fileTypes";
 
