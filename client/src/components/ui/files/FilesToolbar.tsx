@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { IconBtn, TypePill } from "./Index";
 
-interface FilesToolbarProps {
+interface FilesToolBarProps {
   search: string;
   onSearchChange: (v: string) => void;
   typeFilter: string;
@@ -17,13 +17,13 @@ interface FilesToolbarProps {
 }
 
 const TYPE_FILTERS = [
-  { key: "all",      label: "All",    icon: Layers    },
-  { key: "image",    label: "Images", icon: ImageIcon },
-  { key: "video",    label: "Videos", icon: Film      },
-  { key: "document", label: "Docs",   icon: FileText  },
+  { key: "all", label: "All", icon: Layers },
+  { key: "image", label: "Images", icon: ImageIcon },
+  { key: "video", label: "Videos", icon: Film },
+  { key: "document", label: "Docs", icon: FileText },
 ] as const;
 
-const FilesToolbar: React.FC<FilesToolbarProps> = ({
+const FilesToolBar: React.FC<FilesToolBarProps> = ({
   search, onSearchChange,
   typeFilter, onTypeFilterChange,
   viewMode, onViewModeChange,
@@ -98,4 +98,4 @@ const FilesToolbar: React.FC<FilesToolbarProps> = ({
   </div>
 );
 
-export default FilesToolbar;
+export default FilesToolBar;
