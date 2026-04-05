@@ -15,7 +15,6 @@ import FilesEmptyState from "@/components/ui/files/FilesEmptyState";
 import FilesFilterPanel from "@/components/ui/files/FilesFilterPanel";
 
 
-
 const Files: React.FC = () => {
   const navigate = useNavigate();
 
