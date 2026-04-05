@@ -10,7 +10,10 @@ import { toast } from "sonner";
 import  GridCard from "@/components/ui/files/GridCard";
 import  ListRow  from "@/components/ui/files/ListRow";
 import FilesToolbar from "@/components/ui/files/FilesToolbar";
-import { FilesBulkBar, FilesEmptyState, FilesFilterPanel } from "@/components/ui/files/Index";
+import FilesBulkBar from "@/components/ui/files/FilesBulkBar";
+import FilesEmptyState from "@/components/ui/files/FilesEmptyState";
+import FilesFilterPanel from "@/components/ui/files/FilesFilterPanel";
+
 
 
 const Files: React.FC = () => {
