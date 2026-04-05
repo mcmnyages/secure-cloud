@@ -7,11 +7,11 @@ import UploadModal from "@/components/ui/modals/UploadModal";
 import UploadFabButton from "@/components/ui/buttons/UploadFabButton";
 import { LoadingSpinner } from "@/components/ui/spinners";
 import { toast } from "sonner";
-import {
-  GridCard, ListRow,
-  FilesToolbar, FilesFilterPanel,
-  FilesEmptyState, FilesBulkBar,
-} from "@/components/ui/files/Index";
+import  GridCard from "@/components/ui/files/GridCard";
+import  ListRow  from "@/components/ui/files/ListRow";
+import FilesToolbar from "@/components/ui/files/FilesToolbar";
+import { FilesBulkBar, FilesEmptyState, FilesFilterPanel } from "@/components/ui/files/Index";
+
 
 const Files: React.FC = () => {
   const navigate = useNavigate();

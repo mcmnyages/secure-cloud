@@ -1,6 +1,6 @@
 import React from "react";
 import { Download, Trash2, PencilLine, FolderOpen, CheckSquare, Square } from "lucide-react";
-import { FileIcon, TypeBadge, IconBtn, RenameForm } from "./Index";
+import { FileIcon, TypeBadge, IconBtn, RenameForm } from "@/components/ui/files/FileAtoms";
 import { formatDate,formatFileSize } from "@/utils/helpers/files/fileUtils";
 import type { FileItemProps } from "@/types/fileTypes";
 

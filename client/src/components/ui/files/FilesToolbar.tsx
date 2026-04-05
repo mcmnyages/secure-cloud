@@ -3,7 +3,7 @@ import {
   Search, X, LayoutGrid, List, SlidersHorizontal,
   ImageIcon, Film, FileText, Layers,
 } from "lucide-react";
-import { IconBtn, TypePill } from "./Index";
+import { IconBtn, TypePill } from "@/components/ui/files/FileAtoms";
 
 interface FilesToolbarProps {
   search: string;
