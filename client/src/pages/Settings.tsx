@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, HardDrive, Shield, Camera, Mail, UserPen, ChevronRight, Check } from "lucide-react";
+import { User, HardDrive, Shield, Camera, Mail, UserPen, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFiles } from "@/hooks/files/queries/useFiles";
 import { toast } from "sonner";
@@ -8,8 +8,9 @@ const Settings = () => {
   const { user } = useAuth();
   const { storage } = useFiles();
 
+  // Dummy avatar state for frontend-only persistence
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
   const [editingProfile, setEditingProfile] = useState(false);
   const [newName, setNewName] = useState(user?.name || "");
   const [newEmail, setNewEmail] = useState(user?.email || "");
@@ -21,6 +22,12 @@ const Settings = () => {
     };
   }, [avatarPreview]);
 
+  // On mount, load dummy avatar from localStorage (optional)
+  useEffect(() => {
+    const stored = localStorage.getItem('dummyAvatar');
+    if (stored) setSavedAvatar(stored);
+  }, []);
+
   const usedMB = storage?.used ? storage.used / (1024 * 1024) : 0;
   const usagePercent = Math.min(storage?.used ? (storage.used / (100 * 1024 * 1024)) * 100 : 0, 100);
   const isStorageCritical = usagePercent > 85;
@@ -29,13 +36,16 @@ const Settings = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image must be under 2MB");
-        return;
+      toast.error("Image must be under 2MB");
+      return;
     }
 
-    const previewUrl = URL.createObjectURL(file);
-    setAvatarFile(file);
-    setAvatarPreview(previewUrl);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    // setAvatarFile(file); // No longer needed
     toast.success("Preview updated. Save to apply.");
   };
 
@@ -44,6 +54,13 @@ const Settings = () => {
       toast.error("Information incomplete");
       return;
     }
+    // Save avatar preview as the current avatar (dummy, frontend only)
+    if (avatarPreview) {
+      setSavedAvatar(avatarPreview);
+      localStorage.setItem('dummyAvatar', avatarPreview);
+      setAvatarPreview(null);
+      // setAvatarFile(null); // No longer needed
+    }
     setEditingProfile(false);
     toast.success("Profile saved successfully");
   };
@@ -51,7 +68,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--foreground))] px-4 py-8 md:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
-        
+
         {/* PAGE HEADER */}
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
@@ -59,18 +76,18 @@ const Settings = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* SIDEBAR: IDENTITY & QUICK STATS */}
           <div className="lg:col-span-4 space-y-6">
             <div className="relative group p-8 rounded-3xl border border-[rgb(var(--border))] bg-gradient-to-b from-[rgb(var(--card))] to-transparent flex flex-col items-center text-center overflow-hidden">
               {/* Background Glow */}
               <div className="absolute -top-24 -left-24 w-48 h-48 bg-[rgb(var(--primary))] opacity-10 blur-[80px]" />
-              
+
               {/* Avatar Logic */}
               <div className="relative mb-4">
                 <div className="w-24 h-24 rounded-full p-1 ring-2 ring-[rgb(var(--border))] group-hover:ring-[rgb(var(--primary))] transition-all duration-500 overflow-hidden bg-[rgb(var(--background))]">
-                  {avatarPreview || user?.avatar ? (
-                    <img src={avatarPreview || user?.avatar} className="w-full h-full object-cover rounded-full" alt="Avatar" />
+                  {avatarPreview || savedAvatar || user?.avatar ? (
+                    <img src={avatarPreview || savedAvatar || user?.avatar} className="w-full h-full object-cover rounded-full" alt="Avatar" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center opacity-20"><User size={40} /></div>
                   )}
@@ -91,7 +108,7 @@ const Settings = () => {
                   <span className={isStorageCritical ? "text-red-500" : ""}>{usagePercent.toFixed(1)}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-[rgb(var(--border))] rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className={`h-full transition-all duration-1000 ${isStorageCritical ? 'bg-red-500' : 'bg-[rgb(var(--primary))]'}`}
                     style={{ width: `${usagePercent}%` }}
                   />
@@ -102,7 +119,7 @@ const Settings = () => {
 
           {/* MAIN CONTENT AREA */}
           <div className="lg:col-span-8 space-y-6">
-            
+
             {/* PROFILE SECTION */}
             <section className="p-6 rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--card))] shadow-sm">
               <div className="flex items-center justify-between mb-8">
@@ -114,11 +131,10 @@ const Settings = () => {
                 </div>
                 <button
                   onClick={() => editingProfile ? handleProfileSave() : setEditingProfile(true)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                    editingProfile 
-                    ? "bg-[rgb(var(--primary))] text-white" 
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${editingProfile
+                    ? "bg-[rgb(var(--primary))] text-white"
                     : "hover:bg-[rgb(var(--border))] border border-[rgb(var(--border))]"
-                  }`}
+                    }`}
                 >
                   {editingProfile ? "Save Changes" : "Edit Profile"}
                 </button>
@@ -128,8 +144,8 @@ const Settings = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium opacity-50 ml-1">Full Name</label>
                   {editingProfile ? (
-                    <input 
-                      value={newName} 
+                    <input
+                      value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))] focus:ring-2 ring-[rgb(var(--primary))]/20 outline-none transition-all"
                     />
@@ -143,8 +159,8 @@ const Settings = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium opacity-50 ml-1">Email Address</label>
                   {editingProfile ? (
-                    <input 
-                      value={newEmail} 
+                    <input
+                      value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))] focus:ring-2 ring-[rgb(var(--primary))]/20 outline-none transition-all"
                     />
@@ -160,7 +176,7 @@ const Settings = () => {
 
             {/* SECURITY & STORAGE ROW */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               {/* Storage Detailed */}
               <div className="p-6 rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--card))]">
                 <div className="flex items-center gap-3 mb-4">
