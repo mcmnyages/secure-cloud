@@ -28,6 +28,10 @@ const inputCls =
 const Files: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleOpenVersions = (id: string) => {
+    navigate(`/files/${id}/versions`);
+  };
+  
   const {
     files, isLoading, isModalOpen, viewMode,
     filters, showFilter, setIsModalOpen, setViewMode, setShowFilter,
@@ -98,7 +102,7 @@ const Files: React.FC = () => {
     onCancelRename: () => setRenamingId(null),
     onDownload: downloadFile,
     onDelete: deleteFile,
-    onOpen: (id: string) => navigate(`/files/${id}/versions`),
+    onOpen: handleOpenVersions,
   });
 
   if (isLoading) return (
@@ -129,7 +133,7 @@ const Files: React.FC = () => {
         </div>
 
         {/* Desktop Create Button */}
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm
             bg-[rgb(var(--primary))] text-white shadow-lg shadow-[rgba(var(--primary),0.25)]
@@ -186,7 +190,7 @@ const Files: React.FC = () => {
               <span className="hidden md:block w-36 text-right">Created At</span>
               <div className="w-[140px]" /> {/* Actions space */}
             </div>
-            
+
             <div className="flex flex-col gap-1 mt-2">
               {files.map((file, i) => <ListRow key={file.id} {...sp(file, i)} />)}
             </div>
@@ -199,7 +203,7 @@ const Files: React.FC = () => {
       </main>
 
       {/* ── Floating Action Button (Mobile Only) ── */}
-      <button 
+      <button
         onClick={() => setIsModalOpen(true)}
         className="sm:hidden fixed bottom-24 right-6 w-14 h-14 rounded-full z-40
           bg-[rgb(var(--primary))] text-white shadow-2xl flex items-center justify-center
