@@ -31,7 +31,7 @@ const Files: React.FC = () => {
   const handleOpenVersions = (id: string) => {
     navigate(`/files/${id}/versions`);
   };
-  
+
   const {
     files, isLoading, isModalOpen, viewMode,
     filters, showFilter, setIsModalOpen, setViewMode, setShowFilter,
@@ -133,15 +133,19 @@ const Files: React.FC = () => {
         </div>
 
         {/* Desktop Create Button */}
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm
-            bg-[rgb(var(--primary))] text-white shadow-lg shadow-[rgba(var(--primary),0.25)]
-            hover:brightness-110 active:scale-95 transition-all"
-        >
-          <Plus size={18} strokeWidth={2.5} />
-          Upload File
-        </button>
+        <div className="hidden sm:block">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-sm
+      bg-[rgb(var(--primary))] text-white 
+      hover:shadow-[0_0_20px_rgba(var(--primary),0.3)]
+      hover:-translate-y-0.5 active:translate-y-0
+      transition-all duration-200"
+          >
+            <Plus size={18} strokeWidth={3} />
+            <span>Upload New File</span>
+          </button>
+        </div>
       </header>
 
       {/* ── Toolbar ── */}
@@ -205,14 +209,21 @@ const Files: React.FC = () => {
       {/* ── Floating Action Button (Mobile Only) ── */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="sm:hidden fixed bottom-24 right-6 w-14 h-14 rounded-full z-40
-          bg-[rgb(var(--primary))] text-white shadow-2xl flex items-center justify-center
-          active:scale-90 transition-transform"
+        className={`
+    sm:hidden fixed z-50 rounded-full
+    bg-[rgb(var(--primary))] text-white 
+    shadow-[0_8px_30px_rgb(var(--primary),0.4)]
+    flex items-center justify-center
+    active:scale-95 transition-all duration-300
+    /* Position */
+    right-6 
+    ${selectedIds.length > 0 ? "bottom-8" : "bottom-4"} 
+  `}
+        style={{ width: '56px', height: '56px' }} // Standard FAB size
         aria-label="Upload file"
       >
-        <Plus size={28} strokeWidth={2.5} />
+        <Plus size={32} strokeWidth={2.5} />
       </button>
-
       {/* ── Overlays ── */}
       <BulkBar
         selectedCount={selectedIds.length}
@@ -220,7 +231,6 @@ const Files: React.FC = () => {
         onDelete={handleBulkDelete}
         onClear={() => setSelectedIds([])}
       />
-
       <UploadModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
