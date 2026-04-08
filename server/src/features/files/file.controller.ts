@@ -2,8 +2,10 @@ import type { Request, Response } from 'express';
 import { FileService } from './file.service.js';
 import path from 'path';
 import { asyncHandler } from '../../utils/asyncHandler.js';
+import { NotificationService } from '../notifications/notification.service.js';
 
 const fileService = new FileService();
+const notificationService = new NotificationService(); 
 
 export class FileController {
 
@@ -19,6 +21,12 @@ export class FileController {
       const replace = req.body.replace === 'true';
 
       const result = await fileService.uploadBatch(userId, files, replace);
+        await notificationService.createNotification({
+          userId,
+          type: "FILE_UPLOADED",
+          title: "Files Uploaded",
+          message: `${files.length} file(s) were uploaded${replace ? " and replaced existing ones" : ""}.`
+        });
 
       res.status(201).json({
         message: "Files uploaded successfully",
@@ -218,6 +226,14 @@ export class FileController {
 
     try {
       const result = await fileService.deleteFile(fileId, userId);
+      await notificationService.createNotification({
+        userId,
+        type: "FILE_DELETED",
+        title: "File Deleted",
+        message: "A file has been deleted."
+      });
+
+
       if ('notFound' in result && result.notFound) {
         return res.status(404).json({ message: "File not found or already deleted" });
       }

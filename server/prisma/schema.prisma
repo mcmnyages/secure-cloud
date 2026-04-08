@@ -7,37 +7,38 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  password      String
-  name          String?
-  verified      Boolean  @default(false)
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String
+  name     String?
+  verified Boolean @default(false)
 
-  storageUsed   BigInt   @default(0)
-  storageLimit BigInt   @default(104857600)
+  storageUsed   BigInt         @default(0)
+  storageLimit  BigInt         @default(104857600)
+  notifications Notification[]
 
-  files         File[]
-  tokens        Token[]
+  files  File[]
+  tokens Token[]
 }
 
 model File {
-  id        String   @id @default(uuid())
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id])
+  id      String @id @default(uuid())
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  versions  FileVersion[]
+  versions FileVersion[]
 
   @@index([ownerId])
 }
 
 model FileVersion {
-  id            String   @id @default(uuid())
-  fileId        String
-  file          File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  fileId String
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
   versionNumber Int
   storageKey    String
@@ -45,19 +46,19 @@ model FileVersion {
   mimeType      String
   checksum      String?
 
-  originalName  String
-  displayName   String
+  originalName String
+  displayName  String
 
-  createdAt     DateTime @default(now())
-  isCurrent     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  isCurrent Boolean  @default(true)
 
-  @@index([fileId])
   @@unique([fileId, versionNumber])
+  @@index([fileId])
 }
 
 model Token {
-  id        String   @id @default(uuid())
-  token     String   @unique
+  id        String       @id @default(uuid())
+  token     String       @unique
   purpose   TokenPurpose
   expiresAt DateTime
   userId    String
@@ -70,4 +71,28 @@ model Token {
 enum TokenPurpose {
   EMAIL_VERIFY
   PASSWORD_RESET
+}
+
+model Notification {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type    NotificationType
+  title   String
+  message String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+}
+
+enum NotificationType {
+  FILE_UPLOADED
+  FILE_DELETED
+  PASSWORD_RESET
+  SYSTEM
+  FILE_RENAMED
 }

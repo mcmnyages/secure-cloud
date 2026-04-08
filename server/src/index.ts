@@ -11,6 +11,7 @@ import { errorHandler } from './middleware/error.middleware.js';
 import authRoutes from './features/auth/auth.routes.js';
 import fileRoutes from './features/files/file.routes.js';
 import { emailRoutes } from './features/email/index.js';
+import notificationRoutes from './features/notifications/notification.routes.js';
 import { multerErrorHandler } from './middleware/errors/multerError.middleware.js';
 import { globalRateLimiter } from './middleware/rateLimit.middleware.js';
 
@@ -62,6 +63,7 @@ app.use('/api', globalRateLimiter); // Apply global rate limiter to all routes
 app.use('/api/auth', authRoutes);
 app.use('/api/files', fileRoutes); 
 app.use('/api/email', emailRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // I am told this must be the last middleware in the chain, to catch any errors from above routes or middlewares
 app.use(multerErrorHandler); // Handle Multer errors before the general error handler
