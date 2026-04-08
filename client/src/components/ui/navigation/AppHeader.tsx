@@ -1,10 +1,14 @@
-import { Menu, X, LogOut, User, Settings, Cloud } from 'lucide-react'
+import { Menu, X, LogOut, User, Settings, Cloud, Bell } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import getInitials from '@/utils/helpers/getInitials'
 import MenuItem from './MenuItem'
 import ThemeToggle from '../buttons/ThemeToggleButton'
+import { NotificationModal } from '../modals/NotificationModal'
+import { notificationMock } from '@/mocks/notificationMock'
+import type { NotificationItem } from "@/types/notificationType";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   collapsed: boolean
@@ -15,6 +19,23 @@ interface Props {
 const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+
+  const [showNotification, setShowNotification] = useState(false)
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+
+
+  useEffect(() => {
+    const transformed: NotificationItem[] = notificationMock.messages.map(
+      (msg, index) => ({
+        ...msg,
+        id: `notif-${index}`, // unique id for UI
+        read: false, // default unread
+      })
+    );
+
+    setNotifications(transformed);
+  }, []);
 
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -82,7 +103,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
           : `${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
         }
       `}
-    
+
       style={headerStyle}
     >
       <div className={`h-full flex items-center justify-between px-4 sm:px-6 lg:px-8 ${!isAuthenticated && 'max-w-7xl mx-auto'}`}>
@@ -123,11 +144,46 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Notification icon placeholder */}
           {isAuthenticated && (
-            <button className="p-2 rounded-full hover:bg-[rgb(var(--bg))] transition-colors" aria-label="Notifications">
-              <span className="relative">
-                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
-                <span className="absolute top-0 right-0 w-2 h-2 bg-[rgb(var(--primary))] rounded-full"></span>
-              </span>
+            <button
+              type="button"
+              onClick={() => setShowNotification(true)}
+              className="group relative p-2 rounded-xl transition-all active:scale-90 hover:bg-[rgb(var(--primary)/0.1)]"
+              aria-label={`View ${notifications.length} notifications`}
+            >
+              <div className="relative">
+                {/* The Bell Icon */}
+                <Bell
+                  size={22}
+                  strokeWidth={2.5}
+                  className="transition-transform group-hover:rotate-12"
+                  style={{ color: 'rgb(var(--text))' }}
+                />
+
+                {/* Notification Badge */}
+                <AnimatePresence>
+                  {notifications.length > 0 && (
+                    <motion.span
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black leading-none text-white rounded-full border-2"
+                      style={{
+                        backgroundColor: 'rgb(var(--primary))',
+                        borderColor: 'rgb(var(--bg))' // Creates a gap between badge and bell
+                      }}
+                    >
+                      {notifications.length > 99 ? '99+' : notifications.length}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+
+                {/* Optional: Subtle Ping Animation for unread items */}
+                {notifications.some(n => !n.read) && (
+                  <span className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] rounded-full animate-ping opacity-40 pointer-events-none"
+                    style={{ backgroundColor: 'rgb(var(--primary))' }}
+                  />
+                )}
+              </div>
             </button>
           )}
           <ThemeToggle />
@@ -190,6 +246,11 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
           )}
         </div>
       </div>
+      <NotificationModal
+        messages={notifications}
+        onClose={() => setShowNotification(false)}
+        isOpen={showNotification}
+      />
     </header>
   )
 }
