@@ -9,26 +9,33 @@ const StorageCard = ({ used, limit }: StorageCardProps) => {
   const percentage = Math.min((used / limit) * 100, 100)
 
   return (
-    <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] p-6 rounded-2xl shadow-sm">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4 text-[rgb(var(--primary))]">
-        <HardDrive size={22} />
-        <h2 className="font-semibold text-lg text-[rgb(var(--text))]">Storage</h2>
+    <div className="
+      flex items-center gap-4
+      px-4 py-3
+      rounded-xl
+      bg-[rgb(var(--card))]
+      border border-[rgb(var(--border))]
+    ">
+      {/* Icon */}
+      <div className="p-2 rounded-md bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]">
+        <HardDrive size={16} />
       </div>
 
-      {/* Progress bar */}
-      <div className="w-full bg-[rgb(var(--border)/0.2)] rounded-full h-3 mb-2">
-        <div
-          className="bg-[rgb(var(--primary))] h-3 rounded-full transition-all duration-500"
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
+      {/* Info */}
+      <div className="flex-1">
+        <div className="flex justify-between text-xs text-[rgb(var(--text)/0.6)] mb-1">
+          <span>Storage</span>
+          <span>{percentage.toFixed(0)}%</span>
+        </div>
 
-      {/* Usage text */}
-      <p className="text-sm text-[rgb(var(--text)/0.7)]">
-        {(used / 1024 / 1024).toFixed(2)} MB of{' '}
-        {(limit / 1024 / 1024).toFixed(0)} MB used
-      </p>
+        {/* Progress */}
+        <div className="h-1.5 rounded-full bg-[rgb(var(--border)/0.3)] overflow-hidden">
+          <div
+            className="h-full bg-[rgb(var(--primary))] transition-all duration-500"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
     </div>
   )
 }

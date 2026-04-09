@@ -1,4 +1,3 @@
-// components/ui/dashboard/QuickStat.tsx
 import React from 'react'
 
 interface QuickStatProps {
@@ -7,14 +6,33 @@ interface QuickStatProps {
   icon: React.ReactNode
 }
 
-const QuickStat: React.FC<QuickStatProps> = ({ label, value, icon }) => (
-  <div className="bg-[rgb(var(--card))] border border-[rgb(var(--border))] p-6 rounded-3xl flex items-center gap-4 transition-transform hover:-translate-y-1">
-    <div className="p-3 bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] rounded-2xl">{icon}</div>
-    <div>
-      <p className="text-xs font-bold text-[rgb(var(--text)/0.5)] uppercase tracking-widest">{label}</p>
-      <p className="text-2xl font-black">{value}</p>
+const QuickStat: React.FC<QuickStatProps> = ({ label, value, icon }) => {
+  return (
+    <div className="
+      flex items-center gap-3
+      px-3 py-2
+      rounded-xl
+      bg-[rgb(var(--card))]
+      border border-[rgb(var(--border))]
+      transition-all duration-200
+      hover:bg-[rgb(var(--card)/0.7)]
+    ">
+      {/* Icon */}
+      <div className="p-2 rounded-md bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]">
+        {icon}
+      </div>
+
+      {/* Text */}
+      <div className="leading-tight">
+        <p className="text-xs text-[rgb(var(--text)/0.5)]">
+          {label}
+        </p>
+        <p className="text-sm font-semibold">
+          {value.toLocaleString()}
+        </p>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default QuickStat

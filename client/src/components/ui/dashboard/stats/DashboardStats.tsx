@@ -7,13 +7,30 @@ interface DashboardStatsProps {
   filteredFilesCount: number
   storage?: any
 }
+const DashboardStats: React.FC<DashboardStatsProps> = ({
+  totalFiles,
+  filteredFilesCount,
+  storage
+}) => {
+  return (
+    <div className="
+      flex flex-wrap items-center gap-3
+    ">
+      {storage && <StorageCard {...storage} />}
 
-const DashboardStats: React.FC<DashboardStatsProps> = ({ totalFiles, filteredFilesCount, storage }) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {storage && <StorageCard {...storage} />}
-    <QuickStat label="Total Files" value={totalFiles} icon={<File size={20} />} />
-    <QuickStat label="Search Matches" value={filteredFilesCount} icon={<Search size={20} />} />
-  </div>
-)
+      <QuickStat
+        label="Files"
+        value={totalFiles}
+        icon={<File size={16} />}
+      />
+
+      <QuickStat
+        label="Matches"
+        value={filteredFilesCount}
+        icon={<Search size={16} />}
+      />
+    </div>
+  )
+}
 
 export default DashboardStats
