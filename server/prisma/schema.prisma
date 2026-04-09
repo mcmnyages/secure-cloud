@@ -9,16 +9,86 @@ datasource db {
 model User {
   id       String  @id @default(uuid())
   email    String  @unique
-  password String
+  password String? // optional for future OAuth
   name     String?
   verified Boolean @default(false)
 
-  storageUsed   BigInt         @default(0)
-  storageLimit  BigInt         @default(104857600)
-  notifications Notification[]
+  // keep existing storage logic (no breaking changes)
+  storageUsed  BigInt @default(0)
+  storageLimit BigInt @default(104857600)
 
-  files  File[]
-  tokens Token[]
+  // new fields
+  avatarUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // existing relations
+  notifications Notification[]
+  files         File[]
+  tokens        Token[]
+
+  // future-ready relations (optional, won’t break anything)
+  profile  UserProfile?
+  settings UserSettings?
+  accounts Account[]
+  sessions Session[]
+}
+
+
+model UserProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio      String?
+  location String?
+  website  String?
+
+  createdAt DateTime @default(now())
+}
+
+
+model UserSettings {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  theme                String  @default("light")
+  language             String  @default("en")
+  emailNotifications   Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Account {
+  id                String @id @default(uuid())
+  userId            String
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider          String
+  providerAccountId String
+
+  accessToken  String?
+  refreshToken String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([provider, providerAccountId])
+}
+
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token     String   @unique
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
 }
 
 model File {
