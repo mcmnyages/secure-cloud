@@ -119,6 +119,13 @@ export class FileController {
 
       const result = await fileService.restoreVersion(fileId, versionId, userId);
 
+        await notificationService.createNotification({
+          userId,
+          type: "FILE_RESTORED",
+          title: "File Version Restored",
+          message: "A previous version of a file has been restored."
+        });
+
       res.status(200).json(result);
 
     } catch (error) {
@@ -142,6 +149,13 @@ export class FileController {
       }
 
       await fileService.renameFile(fileId, userId, name);
+        await notificationService.createNotification({
+          userId,
+          type: "FILE_RENAMED",
+          title: "File Renamed",
+          message: "A file has been renamed."
+        });
+
 
       res.json({ message: "File renamed successfully" });
 
@@ -165,6 +179,12 @@ export class FileController {
       }
 
       await fileService.uploadNewVersion(fileId, userId, req.file);
+        await notificationService.createNotification({
+          userId,
+          type: "FILE_UPDATED",
+          title: "File Updated",
+          message: "A new version of a file has been uploaded."
+        });
 
       res.json({ message: "File updated successfully" });
 
