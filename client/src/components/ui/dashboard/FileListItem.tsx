@@ -1,4 +1,4 @@
-import { Download, Trash2 } from "lucide-react";
+import { Download, Trash2, FileIcon, Copy } from "lucide-react";
 import { getFileConfig, formatDate } from "@/utils/helpers/files/fileUtils";
 
 interface File {
@@ -18,65 +18,78 @@ interface FileListItemProps {
   };
 }
 
-const FileListItem = ({
-  file,
-  formatSize,
-  onDownload,
-  onDelete,
-}: FileListItemProps) => {
+const FileListItem = ({ file, formatSize, onDownload, onDelete }: FileListItemProps) => {
   const fileConfig = getFileConfig(file.mimeType);
-  const Icon = fileConfig?.Icon;
-  const label = fileConfig?.label;
+  const Icon = fileConfig?.Icon || FileIcon;
+
+  // --- Creative Middle Truncation Logic ---
+  const formatLongName = (name: string) => {
+    if (name.length <= 32) return name;
+    // Keep first 18 chars and last 10 chars (usually includes extension)
+    return `${name.substring(0, 18)}...${name.substring(name.length - 10)}`;
+  };
+
+  const handleCopyName = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(file.name);
+    // You could trigger a small "Copied!" toast here
+  };
 
   return (
     <div
       onClick={() => onDownload(file.id, file.name)}
       className="
         group flex items-center justify-between
-        px-4 py-3
-        rounded-xl
-        hover:bg-[rgb(var(--muted)/0.25)]
-        transition-all duration-200
+        px-4 py-3.5 gap-4
+        rounded-2xl
+        hover:bg-[rgb(var(--primary)/0.04)]
+        border border-transparent hover:border-[rgb(var(--primary)/0.1)]
+        transition-all duration-300
         cursor-pointer
       "
     >
-      {/* Left Section */}
-      <div className="flex items-center gap-4 min-w-0">
-        {/* Icon */}
-        <div
-          className={`
-            p-2.5 rounded-xl border
-            ${fileConfig.bg}
-            ${fileConfig.color}
-            border-[rgb(var(--border)/0.5)]
-            transition-transform duration-200
-            group-hover:scale-95
-          `}
-        >
-          {Icon && <Icon size={20} />}
+      <div className="flex items-center gap-4 min-w-0 flex-1">
+        {/* Animated Icon Wrapper */}
+        <div className={`
+          shrink-0 h-12 w-12 flex items-center justify-center rounded-2xl border
+          ${fileConfig?.bg || 'bg-[rgb(var(--text)/0.05)]'}
+          ${fileConfig?.color || 'text-[rgb(var(--text)/0.5)]'}
+          border-[rgb(var(--border)/0.5)]
+          shadow-sm group-hover:shadow-md transition-all duration-500
+          group-hover:-rotate-2 group-hover:scale-105
+        `}>
+          <Icon size={24} strokeWidth={1.5} />
         </div>
 
-        {/* File Info */}
-        <div className="min-w-0">
-          <p className="text-sm font-semibold truncate">
-            {file.name}
-          </p>
+        {/* Info Area */}
+        <div className="min-w-0 flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-bold text-[rgb(var(--text))] tracking-tight">
+              {formatLongName(file.name)}
+            </p>
+            <button 
+              onClick={handleCopyName}
+              className="opacity-0 group-hover:opacity-40 hover:!opacity-100 transition-opacity p-1"
+              title="Copy full name"
+            >
+              <Copy size={12} />
+            </button>
+          </div>
 
-          <p className="text-xs text-[rgb(var(--text)/0.5)] truncate">
-            {file.size ? formatSize(file.size) : "—"} • {label} •{" "}
-            {formatDate(file.createdAt)}
-          </p>
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--text)/0.4)]">
+            <span className="bg-[rgb(var(--text)/0.05)] px-1.5 py-0.5 rounded text-[rgb(var(--text)/0.6)]">
+               {fileConfig?.label || "FILE"}
+            </span>
+            <span className="w-1 h-1 rounded-full bg-[rgb(var(--border))]" />
+            <span>{file.size ? formatSize(file.size) : "—"}</span>
+            <span className="w-1 h-1 rounded-full bg-[rgb(var(--border))]" />
+            <span className="truncate">{formatDate(file.createdAt)}</span>
+          </div>
         </div>
       </div>
 
-      {/* Actions */}
-      <div
-        className="
-          flex gap-1
-          opacity-0 group-hover:opacity-100
-          transition-opacity duration-200
-        "
-      >
+      {/* Modern Floating Action Pills */}
+      <div className="flex items-center gap-2 pl-2">
         <button
           type="button"
           onClick={(e) => {
@@ -84,12 +97,15 @@ const FileListItem = ({
             onDownload(file.id, file.name);
           }}
           className="
-            p-2 rounded-lg
-            hover:bg-[rgb(var(--background))]
-            transition-colors
+            flex items-center gap-2 px-3 py-2 rounded-xl
+            bg-[rgb(var(--card))] border border-[rgb(var(--border))]
+            text-[rgb(var(--text)/0.6)] hover:text-[rgb(var(--primary))]
+            hover:border-[rgb(var(--primary)/0.3)] hover:shadow-lg
+            transition-all duration-200 active:scale-90
           "
         >
-          <Download size={16} />
+          <Download size={15} strokeWidth={2.5} />
+          <span className="text-[10px] font-bold uppercase hidden md:block">Get</span>
         </button>
 
         <button
@@ -99,13 +115,13 @@ const FileListItem = ({
             onDelete.mutate(file.id);
           }}
           className="
-            p-2 rounded-lg
-            text-red-500
-            hover:bg-red-500/10
-            transition-colors
+            p-2.5 rounded-xl
+            text-[rgb(var(--destructive)/0.5)] hover:text-[rgb(var(--destructive))]
+            hover:bg-[rgb(var(--destructive)/0.1)]
+            transition-all duration-200 active:scale-90
           "
         >
-          <Trash2 size={16} />
+          <Trash2 size={16} strokeWidth={2} />
         </button>
       </div>
     </div>

@@ -119,7 +119,7 @@ const Files: React.FC = () => {
   ] as const;
 
   return (
-    <div className="min-h-screen px-4 sm:px-8 pt-6 pb-32 max-w-[1400px] mx-auto animate-in fade-in duration-500">
+    <div className="min-h-screen px-4 sm:px-8 pb-32 max-w-[1400px] mx-auto animate-in fade-in duration-500">
 
       {/* ── Header ── */}
       <header className="flex items-center justify-between mb-8">
