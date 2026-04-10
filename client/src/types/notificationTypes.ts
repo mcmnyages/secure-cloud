@@ -17,6 +17,18 @@ export interface ApiResponse<TData> {
   data: TData;
 }
 
-
 /** Concrete response type */
-export type NotificationsResponse = ApiResponse<Notification[]>;
+
+
+export interface PaginatedResponse<T> {
+  data: T;
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export type NotificationsResponse = {
+  success: boolean;
+  data: PaginatedResponse<Notification[]>;
+};

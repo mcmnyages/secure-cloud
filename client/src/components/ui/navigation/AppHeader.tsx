@@ -2,12 +2,11 @@ import { Menu, X, LogOut, User, Settings, Cloud, Bell } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useNotifications } from "@/hooks/notifications/query/useNotification";
 import getInitials from '@/utils/helpers/getInitials'
 import MenuItem from './MenuItem'
 import ThemeToggle from '../buttons/ThemeToggleButton'
 import { NotificationModal } from '../modals/NotificationModal'
-import { notificationMock } from '@/mocks/notificationMock'
-import type { NotificationItem } from "@/types/notificationType";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
@@ -21,21 +20,13 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   const navigate = useNavigate()
 
   const [showNotification, setShowNotification] = useState(false)
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const { data } = useNotifications({
+    page: 1,
+    limit: 10,
+    onlyUnread: false,
+  });
 
-
-
-  useEffect(() => {
-    const transformed: NotificationItem[] = notificationMock.messages.map(
-      (msg, index) => ({
-        ...msg,
-        id: `notif-${index}`, // unique id for UI
-        read: false, // default unread
-      })
-    );
-
-    setNotifications(transformed);
-  }, []);
+  const notifications = Array.isArray(data) ? data : data?.data ?? [];
 
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -178,7 +169,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
                 </AnimatePresence>
 
                 {/* Optional: Subtle Ping Animation for unread items */}
-                {notifications.some(n => !n.read) && (
+                {notifications.some(n => !n.isRead) && (
                   <span className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] rounded-full animate-ping opacity-40 pointer-events-none"
                     style={{ backgroundColor: 'rgb(var(--primary))' }}
                   />
@@ -247,9 +238,9 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
         </div>
       </div>
       <NotificationModal
-        messages={notifications}
-        onClose={() => setShowNotification(false)}
         isOpen={showNotification}
+        onClose={() => setShowNotification(false)}
+        notifications={notifications}
       />
     </header>
   )
