@@ -24,7 +24,7 @@ export class AuthService {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error("Invalid email or password");
 
-    const isMatch = await bcrypt.compare(passwordRaw, user.password);
+    const isMatch = await bcrypt.compare(passwordRaw, user.password!);
     if (!isMatch) throw new Error("Invalid email or password");
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1d' });
