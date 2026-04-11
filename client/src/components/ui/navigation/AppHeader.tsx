@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useNotifications } from "@/hooks/notifications/query/useNotification";
+import { useNotificationsAction } from "@/hooks/notifications/mutations/useNotificationsAction";
 import getInitials from '@/utils/helpers/getInitials'
 import MenuItem from './MenuItem'
 import ThemeToggle from '../buttons/ThemeToggleButton'
@@ -26,7 +27,39 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
     onlyUnread: false,
   });
 
-  const notifications = Array.isArray(data) ? data : data?.data ?? [];
+  const {
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    deleteAllNotifications
+  } = useNotificationsAction();
+
+  const apiNotifications = Array.isArray(data) ? data : data?.data ?? [];
+  const [localNotifications, setLocalNotifications] = useState(apiNotifications);
+
+  useEffect(() => {
+    setLocalNotifications(apiNotifications);
+  }, [apiNotifications]);
+
+
+  const handleMarkRead = (ids: string[]) => {
+    ids.forEach(id => markAsRead.mutate(id));
+  };
+
+  const handleMarkAllRead = () => {
+    markAllAsRead.mutate();
+  };
+
+  const handleDelete = (ids: string[]) => {
+    ids.forEach(id => deleteNotification.mutate(id));
+  };
+
+  const handleDeleteAll = () => {
+    deleteAllNotifications.mutate();
+  };
+
+
+
 
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -139,7 +172,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
               type="button"
               onClick={() => setShowNotification(true)}
               className="group relative p-2 rounded-xl transition-all active:scale-90 hover:bg-[rgb(var(--primary)/0.1)]"
-              aria-label={`View ${notifications.length} notifications`}
+              aria-label={`View ${localNotifications.length} notifications`}
             >
               <div className="relative">
                 {/* The Bell Icon */}
@@ -152,7 +185,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
                 {/* Notification Badge */}
                 <AnimatePresence>
-                  {notifications.length > 0 && (
+                  {localNotifications.length > 0 && (
                     <motion.span
                       initial={{ scale: 0.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
@@ -163,13 +196,13 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
                         borderColor: 'rgb(var(--bg))' // Creates a gap between badge and bell
                       }}
                     >
-                      {notifications.length > 99 ? '99+' : notifications.length}
+                      {localNotifications.length > 99 ? '99+' : localNotifications.length}
                     </motion.span>
                   )}
                 </AnimatePresence>
 
                 {/* Optional: Subtle Ping Animation for unread items */}
-                {notifications.some(n => !n.isRead) && (
+                {localNotifications.some(n => !n.isRead) && (
                   <span className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] rounded-full animate-ping opacity-40 pointer-events-none"
                     style={{ backgroundColor: 'rgb(var(--primary))' }}
                   />
@@ -240,7 +273,11 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
       <NotificationModal
         isOpen={showNotification}
         onClose={() => setShowNotification(false)}
-        notifications={notifications}
+        notifications={localNotifications}
+        onMarkRead={handleMarkRead}
+        onDelete={handleDelete}
+        onDeleteAll={handleDeleteAll}
+        onMarkAllRead={handleMarkAllRead}
       />
     </header>
   )

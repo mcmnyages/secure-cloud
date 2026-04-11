@@ -17,4 +17,22 @@ export const notificationService = {
 
     return res.data.data; // now returns paginated object
   },
+  
+  getUnreadCount: async () => {
+    const res = await api.get<{ unreadCount: number }>('/notifications/unread-count');
+    return res.data.unreadCount;
+  },
+  markAsRead: async (id: string) => {
+    await api.patch(`/notifications/${id}/read`);
+  },
+  markAllAsRead: async () => {
+    await api.patch('/notifications/read-all');
+  },
+  deleteNotification: async (id: string) => {
+    await api.delete(`/notifications/${id}`);
+  },
+  deleteAllNotifications: async () => {
+    await api.delete('/notifications/delete-all');
+  }
+
 };
