@@ -7,7 +7,9 @@ const controller = new NotificationController();
 
 router.get("/", authenticate, controller.getMyNotifications);
 router.get("/unread-count", authenticate, controller.getUnreadCount);
-router.patch("/read-all", authenticate, controller.markAllAsRead);
 router.patch("/:id/read", authenticate, controller.markAsRead);
+router.patch("/read-all", authenticate, controller.markAllAsRead);
+router.delete("/:id", authenticate, controller.deleteNotification);
+router.delete("/delete-all", authenticate, controller.deleteAllNotifications);
 
 export default router;
