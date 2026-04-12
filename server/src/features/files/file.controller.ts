@@ -1,17 +1,25 @@
 import type { Request, Response } from 'express';
 import { FileService } from './file.service.js';
+import { prisma } from '../../lib/prisma.js';
 import path from 'path';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { NotificationService } from '../notifications/notification.service.js';
 
 const fileService = new FileService();
-const notificationService = new NotificationService(); 
+const notificationService = new NotificationService();
 
 export class FileController {
 
   upload = asyncHandler(async (req: Request, res: Response) => {
     try {
+
       const userId = (req as any).userId;
+
+      // Check if user exists before proceeding
+      const userExists = await prisma.user.findUnique({ where: { id: userId } });
+      if (!userExists) {
+        return res.status(400).json({ message: 'User does not exist. Cannot upload files.' });
+      }
 
       if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
         return res.status(400).json({ message: "No files uploaded" });
@@ -21,12 +29,12 @@ export class FileController {
       const replace = req.body.replace === 'true';
 
       const result = await fileService.uploadBatch(userId, files, replace);
-        await notificationService.createNotification({
-          userId,
-          type: "FILE_UPLOADED",
-          title: "Files Uploaded",
-          message: `${files.length} file(s) were uploaded${replace ? " and replaced existing ones" : ""}.`
-        });
+      await notificationService.createNotification({
+        userId,
+        type: "FILE_UPLOADED",
+        title: "Files Uploaded",
+        message: `${files.length} file(s) were uploaded${replace ? " and replaced existing ones" : ""}.`
+      });
 
       res.status(201).json({
         message: "Files uploaded successfully",
@@ -119,12 +127,12 @@ export class FileController {
 
       const result = await fileService.restoreVersion(fileId, versionId, userId);
 
-        await notificationService.createNotification({
-          userId,
-          type: "FILE_RESTORED",
-          title: "File Version Restored",
-          message: "A previous version of a file has been restored."
-        });
+      await notificationService.createNotification({
+        userId,
+        type: "FILE_RESTORED",
+        title: "File Version Restored",
+        message: "A previous version of a file has been restored."
+      });
 
       res.status(200).json(result);
 
@@ -149,12 +157,12 @@ export class FileController {
       }
 
       await fileService.renameFile(fileId, userId, name);
-        await notificationService.createNotification({
-          userId,
-          type: "FILE_RENAMED",
-          title: "File Renamed",
-          message: "A file has been renamed."
-        });
+      await notificationService.createNotification({
+        userId,
+        type: "FILE_RENAMED",
+        title: "File Renamed",
+        message: "A file has been renamed."
+      });
 
 
       res.json({ message: "File renamed successfully" });
@@ -179,12 +187,12 @@ export class FileController {
       }
 
       await fileService.uploadNewVersion(fileId, userId, req.file);
-        await notificationService.createNotification({
-          userId,
-          type: "FILE_UPDATED",
-          title: "File Updated",
-          message: "A new version of a file has been uploaded."
-        });
+      await notificationService.createNotification({
+        userId,
+        type: "FILE_UPDATED",
+        title: "File Updated",
+        message: "A new version of a file has been uploaded."
+      });
 
       res.json({ message: "File updated successfully" });
 
