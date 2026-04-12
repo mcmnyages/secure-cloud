@@ -31,7 +31,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
       onlyUnread: false,
     },
     {
-      enabled: isAuthenticated 
+      enabled: isAuthenticated
     }
   );
 
@@ -42,11 +42,15 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
     deleteAllNotifications
   } = useNotificationsAction();
 
-  // FIX 2: Use useMemo to stabilize the array reference.
-  // This prevents the infinite rerender loop caused by creating a new array [] on every render.
+
   const notifications = useMemo(() => {
     return Array.isArray(data) ? data : data?.data ?? [];
   }, [data]);
+
+  // 2. Filter to get only the count of unread items
+  const unreadCount = useMemo(() => {
+    return notifications.filter((n: any) => !n.isRead).length;
+  }, [notifications]);
 
   const handleMarkRead = (ids: string[]) => ids.forEach(id => markAsRead.mutate(id));
   const handleMarkAllRead = () => markAllAsRead.mutate();
@@ -109,8 +113,8 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   return (
     <header
       className={`fixed top-0 right-0 h-16 z-40 transition-all duration-300 ease-in-out shadow-lg ${isAuthenticated
-          ? `bg-[rgb(var(--card))] border-b border-[rgb(var(--border))]`
-          : `${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
+        ? `bg-[rgb(var(--card))] border-b border-[rgb(var(--border))]`
+        : `${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
         }`}
       style={headerStyle}
     >
@@ -138,15 +142,30 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
         <div className="flex items-center gap-2 sm:gap-4">
           {isAuthenticated && (
-            <button onClick={() => setShowNotification(true)} className="group relative p-2 rounded-xl transition-all active:scale-90 hover:bg-[rgb(var(--primary)/0.1)]">
+            <button
+              onClick={() => setShowNotification(true)}
+              className="group relative p-2 rounded-xl transition-all active:scale-90 hover:bg-[rgb(var(--primary)/0.1)]"
+            >
               <div className="relative">
-                <Bell size={22} strokeWidth={2.5} className="transition-transform group-hover:rotate-12" style={{ color: 'rgb(var(--text))' }} />
+                <Bell
+                  size={22}
+                  strokeWidth={2.5}
+                  className="transition-transform group-hover:rotate-12"
+                  style={{ color: 'rgb(var(--text))' }}
+                />
+
                 <AnimatePresence>
-                  {notifications.length > 0 && (
-                    <motion.span initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                  {/* Change this condition to unreadCount */}
+                  {unreadCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
                       className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black leading-none text-white rounded-full border-2"
-                      style={{ backgroundColor: 'rgb(var(--primary))', borderColor: 'rgb(var(--bg))' }}>
-                      {notifications.length > 99 ? '99+' : notifications.length}
+                      style={{ backgroundColor: 'rgb(var(--primary))', borderColor: 'rgb(var(--bg))' }}
+                    >
+                      {/* Display unreadCount here */}
+                      {unreadCount > 99 ? '99+' : unreadCount}
                     </motion.span>
                   )}
                 </AnimatePresence>
