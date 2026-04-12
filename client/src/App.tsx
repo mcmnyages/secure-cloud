@@ -13,6 +13,7 @@ import { Toaster } from 'sonner';
 import Files from './pages/files/Files';
 import FileVersionPage from './pages/files/FileVersionPage';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 import { OverlayLoader, LogoSpinner } from '@/components/ui/spinners';
 
 // A simple wrapper to protect private routes
@@ -118,6 +119,14 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+                />
             </Route>
           </Routes>
         </div>
