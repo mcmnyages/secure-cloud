@@ -1,6 +1,6 @@
 import { Menu, X, LogOut, User, Settings, Cloud, Bell } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useNotifications } from "@/hooks/notifications/query/useNotification";
 import { useNotificationsAction } from "@/hooks/notifications/mutations/useNotificationsAction";
@@ -19,13 +19,21 @@ interface Props {
 const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-
   const [showNotification, setShowNotification] = useState(false)
-  const { data } = useNotifications({
-    page: 1,
-    limit: 10,
-    onlyUnread: false,
-  });
+
+  const isAuthenticated = !!user
+
+  /* ---------------- Notification Logic ---------------- */
+  const { data } = useNotifications(
+    {
+      page: 1,
+      limit: 10,
+      onlyUnread: false,
+    },
+    {
+      enabled: isAuthenticated 
+    }
+  );
 
   const {
     markAsRead,
@@ -34,44 +42,26 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
     deleteAllNotifications
   } = useNotificationsAction();
 
-  const apiNotifications = Array.isArray(data) ? data : data?.data ?? [];
-  const [localNotifications, setLocalNotifications] = useState(apiNotifications);
+  // FIX 2: Use useMemo to stabilize the array reference.
+  // This prevents the infinite rerender loop caused by creating a new array [] on every render.
+  const notifications = useMemo(() => {
+    return Array.isArray(data) ? data : data?.data ?? [];
+  }, [data]);
 
-  useEffect(() => {
-    setLocalNotifications(apiNotifications);
-  }, [apiNotifications]);
+  const handleMarkRead = (ids: string[]) => ids.forEach(id => markAsRead.mutate(id));
+  const handleMarkAllRead = () => markAllAsRead.mutate();
+  const handleDelete = (ids: string[]) => ids.forEach(id => deleteNotification.mutate(id));
+  const handleDeleteAll = () => deleteAllNotifications.mutate();
 
-
-  const handleMarkRead = (ids: string[]) => {
-    ids.forEach(id => markAsRead.mutate(id));
-  };
-
-  const handleMarkAllRead = () => {
-    markAllAsRead.mutate();
-  };
-
-  const handleDelete = (ids: string[]) => {
-    ids.forEach(id => deleteNotification.mutate(id));
-  };
-
-  const handleDeleteAll = () => {
-    deleteAllNotifications.mutate();
-  };
-
-
-
-
+  /* ---------------- UI State ---------------- */
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const menuRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
-
-  const isAuthenticated = !!user
   const initials = getInitials(user?.name, user?.email)
 
-  /* ---------------- Scroll & Click Logic ---------------- */
   useEffect(() => {
     if (isAuthenticated) return
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -99,9 +89,7 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
     navigate('/login')
   }
 
-  /* ---------------- Responsive Constants ---------------- */
-  // These should match your Sidebar widths exactly
-  // Responsive sidebar width
+  /* ---------------- Dynamic Layout Styles ---------------- */
   const sidebarWidth = collapsed ? '4.0625rem' : '16rem'
   const [headerStyle, setHeaderStyle] = useState({ left: sidebarWidth, width: `calc(100% - ${sidebarWidth})`, transition: 'left 0.3s, width 0.3s', minWidth: '0' });
 
@@ -120,113 +108,63 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
 
   return (
     <header
-      className={`
-        fixed top-0 right-0 h-16 z-40 transition-all duration-300 ease-in-out shadow-lg
-        ${isAuthenticated
+      className={`fixed top-0 right-0 h-16 z-40 transition-all duration-300 ease-in-out shadow-lg ${isAuthenticated
           ? `bg-[rgb(var(--card))] border-b border-[rgb(var(--border))]`
           : `${scrolled ? "bg-[rgb(var(--card))/0.8] backdrop-blur-md border-b border-[rgb(var(--border))/0.5]" : "bg-transparent"}`
-        }
-      `}
-
+        }`}
       style={headerStyle}
     >
       <div className={`h-full flex items-center justify-between px-4 sm:px-6 lg:px-8 ${!isAuthenticated && 'max-w-7xl mx-auto'}`}>
 
-        {/* LEFT SECTION: Contextual Toggles */}
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
-              {/* Mobile: Hamburger to open Drawer */}
-              <button
-                onClick={onOpenMobile}
-                className="md:hidden p-2 -ml-2 rounded-md text-[rgb(var(--text))] hover:bg-[rgb(var(--bg))] transition-colors"
-                aria-label="Open sidebar"
-              >
+              <button onClick={onOpenMobile} className="md:hidden p-2 -ml-2 rounded-md text-[rgb(var(--text))] hover:bg-[rgb(var(--bg))] transition-colors">
                 <Menu size={24} />
               </button>
-
-              {/* Desktop: Collapse/Expand Sidebar */}
-              <button
-                onClick={onToggleDesktop}
-                className="hidden md:flex items-center justify-center w-8 h-8 rounded-md border border-[rgb(var(--border))] hover:bg-[rgb(var(--primary)/0.1)] hover:text-[rgb(var(--primary))] transition-all"
-                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              >
+              <button onClick={onToggleDesktop} className="hidden md:flex items-center justify-center w-8 h-8 rounded-md border border-[rgb(var(--border))] hover:bg-[rgb(var(--primary)/0.1)] hover:text-[rgb(var(--primary))] transition-all">
                 {collapsed ? <Menu size={18} /> : <X size={18} />}
               </button>
             </>
           ) : (
             <Link to="/" className="flex items-center gap-2 group">
               <Cloud className="text-[rgb(var(--primary))] group-hover:scale-110 transition-transform" size={28} />
-              <span className="font-bold text-xl tracking-tight  xs:block">
+              <span className="font-bold text-xl tracking-tight">
                 Secure<span className="text-[rgb(var(--primary))]">Cloud</span>
               </span>
             </Link>
           )}
         </div>
 
-        {/* RIGHT SECTION: Actions & Profile */}
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Notification icon placeholder */}
           {isAuthenticated && (
-            <button
-              type="button"
-              onClick={() => setShowNotification(true)}
-              className="group relative p-2 rounded-xl transition-all active:scale-90 hover:bg-[rgb(var(--primary)/0.1)]"
-              aria-label={`View ${localNotifications.length} notifications`}
-            >
+            <button onClick={() => setShowNotification(true)} className="group relative p-2 rounded-xl transition-all active:scale-90 hover:bg-[rgb(var(--primary)/0.1)]">
               <div className="relative">
-                {/* The Bell Icon */}
-                <Bell
-                  size={22}
-                  strokeWidth={2.5}
-                  className="transition-transform group-hover:rotate-12"
-                  style={{ color: 'rgb(var(--text))' }}
-                />
-
-                {/* Notification Badge */}
+                <Bell size={22} strokeWidth={2.5} className="transition-transform group-hover:rotate-12" style={{ color: 'rgb(var(--text))' }} />
                 <AnimatePresence>
-                  {localNotifications.length > 0 && (
-                    <motion.span
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
+                  {notifications.length > 0 && (
+                    <motion.span initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
                       className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black leading-none text-white rounded-full border-2"
-                      style={{
-                        backgroundColor: 'rgb(var(--primary))',
-                        borderColor: 'rgb(var(--bg))' // Creates a gap between badge and bell
-                      }}
-                    >
-                      {localNotifications.length > 99 ? '99+' : localNotifications.length}
+                      style={{ backgroundColor: 'rgb(var(--primary))', borderColor: 'rgb(var(--bg))' }}>
+                      {notifications.length > 99 ? '99+' : notifications.length}
                     </motion.span>
                   )}
                 </AnimatePresence>
-
-                {/* Optional: Subtle Ping Animation for unread items */}
-                {localNotifications.some(n => !n.isRead) && (
-                  <span className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] rounded-full animate-ping opacity-40 pointer-events-none"
-                    style={{ backgroundColor: 'rgb(var(--primary))' }}
-                  />
-                )}
               </div>
             </button>
           )}
+
           <ThemeToggle />
 
           {isAuthenticated ? (
             <div ref={menuRef} className="relative">
-              <button
-                onClick={() => setOpen(!open)}
-                className="flex items-center gap-2 p-1 rounded-full hover:bg-[rgb(var(--bg))] transition-colors group"
-                aria-label="Open profile menu"
-              >
+              <button onClick={() => setOpen(!open)} className="flex items-center gap-2 p-1 rounded-full hover:bg-[rgb(var(--bg))] transition-colors group">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[rgb(var(--primary))] text-white flex items-center justify-center text-xs font-bold shadow-inner group-hover:ring-2 group-hover:ring-[rgb(var(--primary))] transition-all">
                   {initials}
                 </div>
-                {/* Desktop only: Show Name */}
                 <span className="hidden lg:block text-sm font-medium pr-2">{user?.name?.split(' ')[0]}</span>
               </button>
 
-              {/* Dropdown Menu */}
               {open && (
                 <div className="absolute right-0 mt-2 w-56 origin-top-right bg-[rgb(var(--card))] border border-[rgb(var(--border))] rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                   <div className="px-4 py-3 border-b border-[rgb(var(--border))]">
@@ -244,19 +182,13 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
             </div>
           ) : (
             <nav className="flex items-center gap-2">
-              {/* Public Desktop Nav */}
               <div className="hidden sm:flex items-center gap-2">
                 <Link to="/login" className="px-4 py-2 text-sm font-medium hover:text-[rgb(var(--primary))] transition-colors">Log In</Link>
                 <Link to="/register" className="px-4 py-2 text-sm font-bold bg-[rgb(var(--primary))] text-white rounded-lg hover:opacity-90 transition-all">Get Started</Link>
               </div>
 
-              {/* Public Mobile Nav Dropdown */}
               <div className="sm:hidden" ref={mobileMenuRef}>
-                <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2 rounded-md border border-[rgb(var(--border))]"
-                  aria-label="Open mobile menu"
-                >
+                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-md border border-[rgb(var(--border))]">
                   {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
                 {mobileMenuOpen && (
@@ -270,10 +202,11 @@ const AppHeader = ({ collapsed, onToggleDesktop, onOpenMobile }: Props) => {
           )}
         </div>
       </div>
+
       <NotificationModal
         isOpen={showNotification}
         onClose={() => setShowNotification(false)}
-        notifications={localNotifications}
+        notifications={notifications}
         onMarkRead={handleMarkRead}
         onDelete={handleDelete}
         onDeleteAll={handleDeleteAll}
