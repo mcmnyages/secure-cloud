@@ -2,26 +2,43 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
-const uploadDir = path.resolve('uploads');
-
 const ensureDirExists = (dir: string) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 };
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    ensureDirExists(uploadDir);
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+type UploadOptions = {
+  folder?: string;
+  getFolder?: (req: any, file: Express.Multer.File) => string;
+};
 
-export const upload = multer({
-  storage,
-  limits: { fileSize: 100 * 1024 * 1024 } // 100MB
-});
+export const upload = (options: UploadOptions = {}) => {
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      const folder =
+        options.getFolder?.(req, file) ||
+        options.folder ||
+        'misc';
+
+      const fullPath = path.resolve('uploads', folder);
+
+      ensureDirExists(fullPath);
+      cb(null, fullPath);
+    },
+
+    filename: (req, file, cb) => {
+      const uniqueSuffix =
+        Date.now() + '-' + Math.round(Math.random() * 1e9);
+
+      const sanitized = file.originalname.replace(/\s+/g, '_');
+
+      cb(null, `${uniqueSuffix}-${sanitized}`);
+    }
+  });
+
+  return multer({
+    storage,
+    limits: { fileSize: 100 * 1024 * 1024 }
+  });
+};

@@ -9,7 +9,7 @@ const fileController = new FileController();
 
 // Protected Route: Only logged-in users can upload, list, and manage their files
 // ####### POST ##########
-router.post('/upload', authenticate, upload.array(UPLOAD_CONFIG.BATCH_FIELD, UPLOAD_CONFIG.MAX_COUNT), fileController.upload);
+router.post('/upload', authenticate, upload({folder: 'files'}).array(UPLOAD_CONFIG.BATCH_FIELD, UPLOAD_CONFIG.MAX_COUNT), fileController.upload);
 router.post('/:fileId/:versionId/restore', authenticate, fileController.restoreVersion);
 
 
@@ -23,7 +23,7 @@ router.get('/download/:fileId/versions/:versionId', authenticate, fileController
 router.patch('/:fileId/rename', authenticate, fileController.rename);
 
 // ####### PUT ##########
-router.put('/:fileId', authenticate, upload.single(UPLOAD_CONFIG.SINGLE_FIELD), fileController.updateFile);
+router.put('/:fileId', authenticate, upload({folder: 'files'}).single(UPLOAD_CONFIG.SINGLE_FIELD), fileController.updateFile);
 
 // ####### DELETE ##########
 router.delete('/bulk-delete', authenticate, fileController.bulkDelete);
