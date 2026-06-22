@@ -13,7 +13,10 @@ interface UseLoginOptions {
 export const useLogin = ({ onSuccess, onError }: UseLoginOptions = {}) => {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
-    onSuccess,
+    onSuccess: (data) => {
+      toast.success("Logged in successfully");
+      onSuccess?.(data);
+    },
     onError: (error) => {
       toast.error(getErrorMessage(error));
       onError?.(error);

@@ -5,6 +5,7 @@ import {
   useMemo,
   type ReactNode,
 } from 'react'
+import { X } from "lucide-react";
 import { useQueryClient } from '@tanstack/react-query'
 import { authStorage } from '@/utils/auth/authStorage'
 import { useAuthInit } from '@/hooks/auth/useAuthInit'
@@ -49,9 +50,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // ✅ CRITICAL
     queryClient.clear()
 
-    toast.info('You’ve been logged out')
+   toast.info("You’ve been logged out", {
+  action: (
+    <button
+      onClick={() => toast.dismiss()}
+      aria-label="Close notification"
+      className="ml-2 rounded-md p-1 hover:bg-gray-200 transition"
+    >
+      <X size={16} />
+    </button>
+  ),
+})
   }
-
   // 🔁 INIT AUTH
   const { loading } = useAuthInit({
     token,
