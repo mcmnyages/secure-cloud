@@ -48,27 +48,6 @@ export class AuthService {
     return user;
   }
 
-  updateUser(userId: string, data: any) {
-    return prisma.user.update({
-      where: { id: userId },
-      data
-    });
-  }
-
-  updateUserProfile(userId: string, profileData: any) {
-    return prisma.user.update({
-      where: { id: userId },
-      data: { profile: profileData }
-    });
-  }
-
-
-  updateUserSettings(userId: string, settings: any) {
-    return prisma.user.update({
-      where: { id: userId },
-      data: { settings }
-    });
-  }
-
+ 
 
 }
