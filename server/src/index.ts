@@ -14,6 +14,7 @@ import { emailRoutes } from './features/email/index.js';
 import notificationRoutes from './features/notifications/notification.routes.js';
 import { multerErrorHandler } from './middleware/errors/multerError.middleware.js';
 import { globalRateLimiter } from './middleware/rateLimit.middleware.js';
+import settingsRoutes from './features/settings/settings.routes.js';
 
 
 const app = express();
@@ -64,7 +65,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/files', fileRoutes); 
 app.use('/api/email', emailRoutes);
 app.use('/api/notifications', notificationRoutes);
-
+app.use('/api/settings', settingsRoutes);
 // I am told this must be the last middleware in the chain, to catch any errors from above routes or middlewares
 app.use(multerErrorHandler); // Handle Multer errors before the general error handler
 app.use(errorHandler);
