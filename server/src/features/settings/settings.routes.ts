@@ -8,7 +8,7 @@ const settingsController = new SettingsController();
 
 router.get('/user', authenticate, settingsController.getUserSettings);
 router.put('/user', authenticate, settingsController.updateUser);
-router.patch("/password", settingsController.updatePassword);
+router.patch("/password",authenticate, settingsController.updatePassword);
 router.put('/user/settings', authenticate, settingsController.updateUserSettings);
 router.put('/user/profile', authenticate, settingsController.updateUserProfile);
 

@@ -11,7 +11,7 @@ export class SettingsService {
     });
   }
 
-   async updateUser(
+  async updateUser(
     userId: string,
     data: UpdateUserDto
   ) {
@@ -22,6 +22,17 @@ export class SettingsService {
         avatarUrl: data.avatarUrl,
       }).filter(([, value]) => value !== undefined)
     );
+
+    if (data.email) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: data.email },
+        select: { id: true },
+      });
+
+      if (existingUser && existingUser.id !== userId) {
+        throw new Error("Email is already in use");
+      }
+    }
 
     return prisma.user.update({
       where: { id: userId },
@@ -37,11 +48,11 @@ export class SettingsService {
 
 
   async updatePassword(
-    userId:string,
-    currentPassword:string,
-    newPassword:string,
-  
-  ){
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+
+  ) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -58,7 +69,7 @@ export class SettingsService {
       user.password
     );
 
-        if (!isValidPassword) {
+    if (!isValidPassword) {
       throw new Error("Current password is incorrect");
     }
 
