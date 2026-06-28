@@ -84,26 +84,43 @@ export class SettingsService {
   }
 
   async updateUserProfile(
-    userId: string,
-    profileData: Record<string, any>
-  ) {
-    return prisma.user.update({
-      where: { id: userId },
-      data: {
-        profile: profileData,
-      },
-    });
+  userId: string,
+  profileData: {
+    bio?: string;
+    location?: string;
+    website?: string;
   }
+) {
+  return prisma.userProfile.upsert ({
+    where: {
+      userId,
+    },
+    update: profileData,
+    create:{
+      userId,
+      ...profileData
+    }
+  });
+}
 
-  async updateUserSettings(
-    userId: string,
-    settingsData: Record<string, any>
-  ) {
-    return prisma.user.update({
-      where: { id: userId },
-      data: {
-        settings: settingsData,
-      },
-    });
+ async updateUserSettings(
+  userId: string,
+  settingsData: {
+    theme?: string;
+    language?: string;
+    emailNotifications?: boolean;
   }
+) {
+  return prisma.userSettings.upsert({
+    where: {
+      userId,
+    },
+    update: settingsData,
+    create:{
+      userId,
+      ...settingsData
+    }
+  });
+}
+
 }
