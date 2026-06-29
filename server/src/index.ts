@@ -15,6 +15,7 @@ import notificationRoutes from './features/notifications/notification.routes.js'
 import { multerErrorHandler } from './middleware/errors/multerError.middleware.js';
 import { globalRateLimiter } from './middleware/rateLimit.middleware.js';
 import settingsRoutes from './features/settings/settings.routes.js';
+import { responseSerializer } from './middleware/responseSerializer.middleware.js';
 
 
 const app = express();
@@ -48,6 +49,7 @@ if (!fs.existsSync(uploadDir)) {
 
 app.use(express.static(path.resolve("public")));
 app.use("/assets", express.static(path.resolve("assets")));
+app.use(responseSerializer)
 
 // Middleware
 app.use('/uploads', express.static(uploadDir));
