@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { User, HardDrive, Shield, Camera, Mail, UserPen, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFiles } from "@/hooks/files/queries/useFiles";
+import { useUser } from '@/hooks/auth/queries/useUser'
+import { ProcessingDots } from "@/components/ui/spinners";
 import { toast } from "sonner";
 
 const Settings = () => {
   const { user } = useAuth();
   const { storage } = useFiles();
+  const { me, isLoading } = useUser();
 
   // Dummy avatar state for frontend-only persistence
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -21,6 +24,10 @@ const Settings = () => {
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     };
   }, [avatarPreview]);
+
+  if (isLoading) {
+    <ProcessingDots />
+  }
 
   // On mount, load dummy avatar from localStorage (optional)
   useEffect(() => {
@@ -65,6 +72,7 @@ const Settings = () => {
     toast.success("Profile saved successfully");
   };
 
+
   return (
     <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--foreground))] px-4 py-8 md:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
@@ -86,10 +94,16 @@ const Settings = () => {
               {/* Avatar Logic */}
               <div className="relative mb-4">
                 <div className="w-24 h-24 rounded-full p-1 ring-2 ring-[rgb(var(--border))] group-hover:ring-[rgb(var(--primary))] transition-all duration-500 overflow-hidden bg-[rgb(var(--background))]">
-                  {avatarPreview || savedAvatar || user?.avatar ? (
-                    <img src={avatarPreview || savedAvatar || user?.avatar} className="w-full h-full object-cover rounded-full" alt="Avatar" />
+                  {avatarPreview || savedAvatar || me?.avatarUrl ? (
+                    <img
+                      src={avatarPreview || savedAvatar || me?.avatarUrl}
+                      className="w-full h-full object-cover rounded-full"
+                      alt={`${me?.name ?? "User"}'s avatar`}
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center opacity-20"><User size={40} /></div>
+                    <div className="w-full h-full flex items-center justify-center opacity-20">
+                      <User size={40} />
+                    </div>
                   )}
                 </div>
                 <label className="absolute bottom-0 right-0 p-2 bg-[rgb(var(--primary))] text-white rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform">
