@@ -31,7 +31,7 @@ export interface User {
   email: string;
   name: string;
   role?: string;
-  avatar?: string;
+  avatarUrl?: File;
   isVerifed?: boolean;
   createdAt?: string;
   updatedAt?: string;
