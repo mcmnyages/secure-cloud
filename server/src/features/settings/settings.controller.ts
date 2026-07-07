@@ -3,6 +3,7 @@
 import type { Response, NextFunction } from "express";
 import { SettingsService } from "./settings.service.js";
 import type { SettingsRequest } from "./settings.types.js";
+import { MediaPath } from "../../media/media.path.js";
 
 export class SettingsController {
   constructor(
@@ -39,9 +40,16 @@ export class SettingsController {
     next: NextFunction
   ) => {
     try {
+      const avatarUrl = req.file
+        ? MediaPath.fromFile(req.file)
+        : undefined;
+
       const user = await this.settingsService.updateUser(
         this.getUserId(req),
-        req.body
+        {
+          ...req.body,
+          avatarUrl,
+        }
       );
 
       return res.status(200).json(user);
