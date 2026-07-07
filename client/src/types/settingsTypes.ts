@@ -7,7 +7,7 @@ export interface UserSettings{
 export interface UpdateUserRequest {
   name: string;
   email: string;
-  avatarUrl?: File;
+  avatarUrl?: File | null;
 }
 
 export interface UpdateProfileRequest {
